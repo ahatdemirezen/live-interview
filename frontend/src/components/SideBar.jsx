@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const NavBar = () => {
+const SideBar = () => {
   return (
     <div className="h-screen w-64 bg-gray-800 text-white fixed top-0 left-0">
       <div className="p-4 text-2xl font-semibold">
@@ -25,4 +25,4 @@ const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default SideBar;

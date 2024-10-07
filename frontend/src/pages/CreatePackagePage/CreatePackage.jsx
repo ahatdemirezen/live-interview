@@ -1,49 +1,50 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom'; // useNavigate import edildi
-import NavBar from "../components/NavBar"; 
-import AddQuestionModal from "../components/add-question"; // AddQuestionModal bileşenini ekledik
+import { useNavigate } from 'react-router-dom';
+import SideBar from "../../components/SideBar";
+import AddQuestionModal from "./QuestionPopup";
+import useCreatePackage from "../../stores/CreatePackagePageStore";
+
 
 const CreatePackage = () => {
-  const [questions, setQuestions] = useState([
-    { id: 1, content: "What is caching?", time: "2 min" },
-    { id: 2, content: "What is Big-O notation?", time: "2 min" },
-    { id: 3, content: "Can you explain JWT concept?", time: "2 min" },
-    { id: 4, content: "What do you expect from this position?", time: "2 min" },
-  ]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal'ın açık/kapalı durumunu takip eder
-  const navigate = useNavigate(); // navigate fonksiyonu kullanıma hazır
+ 
 
-  const handleAddQuestion = (question, time) => {
-    const newQuestion = {
-      id: questions.length + 1,
-      content: question,
-      time: time,
-    };
-    setQuestions([...questions, newQuestion]); // Yeni soru listeye eklenir
-    setIsModalOpen(false); // Modal kapatılır
+  const packageTitle =  useCreatePackage((state) => state.packageTitle);
+  const questions = useCreatePackage((state) => state.questions);
+  const setPackageTitle = useCreatePackage((state) => state.setPackageTitle);
+  const removeQuestion = useCreatePackage((state) => state.removeQuestion);
+  const resetPackage = useCreatePackage((state) => state.resetPackage);
+
+
+  const handleSave = () => {
+    console.log("Package Title:", packageTitle);
+    console.log("Questions:", questions);
+   
+    resetPackage();
+    navigate('/packages');
   };
 
   return (
     <div className="flex h-screen">
-      <NavBar />
+      <SideBar />
 
       <div className="flex-1 ml-64 p-6 bg-gray-100">
         <div className="bg-white shadow-md rounded-md p-6">
           <h2 className="text-2xl font-semibold mb-6">Remote-tech Admin Page</h2>
 
           <div className="flex justify-between items-center mb-4">
-            {/* Package Title Input */}
             <input
               type="text"
               placeholder="Package Title..."
               className="border p-2 w-full rounded-md"
+              value={packageTitle}
+              onChange={(e) => setPackageTitle(e.target.value)}
             />
-
-            {/* + Butonu */}
             <button
               className="ml-4 bg-green-500 text-white p-2 rounded-full text-xl"
-              onClick={() => setIsModalOpen(true)} // Modal'ı açmak için state'i true yap
+              onClick={() => setIsModalOpen(true)}
             >
               ➕
             </button>
@@ -68,7 +69,10 @@ const CreatePackage = () => {
                 <div className="text-lg">{question.content}</div>
                 <div className="text-lg">{question.time}</div>
                 <div className="flex items-center justify-center">
-                  <button className="text-red-600 hover:text-red-800">
+                  <button
+                    onClick={() => removeQuestion(question.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
                     🗑️
                   </button>
                 </div>
@@ -77,13 +81,16 @@ const CreatePackage = () => {
           </div>
 
           <div className="mt-6 flex justify-between">
-            <button 
+            <button
               className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md"
-              onClick={() => navigate('/packages')} // Cancel butonuna tıklanıldığında packages sayfasına yönlendirme yapar
+              onClick={() => navigate('/packages')}
             >
               Cancel
             </button>
-            <button className="bg-green-500 text-white px-4 py-2 rounded-md">
+            <button
+              onClick={handleSave}
+              className="bg-green-500 text-white px-4 py-2 rounded-md"
+            >
               Save
             </button>
           </div>
@@ -91,12 +98,11 @@ const CreatePackage = () => {
       </div>
 
       {/* Modal'ı göster */}
-      {isModalOpen && (
-        <AddQuestionModal
-          onClose={() => setIsModalOpen(false)} // Modal'ı kapatır
-          onAdd={handleAddQuestion} // Soru ekleme işlemi
-        />
-      )}
+      <AddQuestionModal
+         isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}  
+      />
+
     </div>
   );
 };

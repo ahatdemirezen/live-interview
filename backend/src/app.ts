@@ -4,16 +4,16 @@ import dotenv from "dotenv";
 import cors from "cors";
 import liveInterview from "./routes/interview-route";
 import Package from "./routes/package-route";
+import loginRoute from "./routes/login-route"
 
 dotenv.config();
-connectDB();
 
 const app = express();
 
 app.use(
   cors({
     origin: "*", // Bu geçici olarak tüm kaynaklara izin verir. Güvenlik açısından gerçek ortamda uygun bir URL belirtin.
-    methods: ["GET", "POST", "PATCH", "DELETE"],
+    methods:  ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -29,6 +29,7 @@ app.get("/", (req: Request, res: Response) => {
 // API rotaları
 app.use("/api/interview", liveInterview);
 app.use("/api/package" , Package);
+app.use("/api/login", loginRoute);
 
 
 // Hataları yakalayan middleware
@@ -51,6 +52,7 @@ app.use((req: Request, res: Response) => {
 // Sunucuyu başlat
 const PORT = process.env.PORT || 5002;
 
-app.listen(PORT, () => {
+app.listen(PORT, async  () => {
+ await connectDB();
   console.log(`Server is running on port ${PORT}`);
 });
