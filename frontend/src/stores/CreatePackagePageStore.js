@@ -127,6 +127,31 @@ const useCreatePackage = create((set) => ({
     }
   },
   
+  updateQuestion: async (questionId, updatedQuestionData) => {
+    set({ loading: true, error: null });
+    try {
+      const state = useCreatePackage.getState();
+
+      // Patch isteği: packageId URL'den, questionId de URL üzerinden
+      const response = await axios.patch(`${apiUrl}/package/${state.packageId}/questions/${questionId}`, updatedQuestionData);
+      
+      // Güncellenmiş soruyu frontend'de de güncelliyoruz
+      const updatedQuestions = state.questions.map((q) =>
+        q._id === questionId ? { ...q, ...updatedQuestionData } : q
+      );
+
+      set({
+        questions: updatedQuestions,
+        loading: false,
+      });
+
+      console.log('Question updated successfully');
+    } catch (error) {
+      set({ error: 'Failed to update question', loading: false });
+      console.error(error);
+    }
+  },
+
   
   // Paket sıfırlama
   resetPackage: () => set(() => ({

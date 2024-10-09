@@ -1,13 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Modal from "../../components/modal";
 import useCreatePackage from "../../stores/CreatePackagePageStore";  // Zustand store import edildi
 
-const AddQuestionModal = ({ isOpen, onClose, packageId, onAddQuestion }) => {
+const AddQuestionModal = ({ isOpen, onClose, packageId, onAddQuestion, question, onUpdateQuestion }) => {
   const currentQuestion = useCreatePackage((state) => state.currentQuestion);
   const currentTime = useCreatePackage((state) => state.currentTime);
   const setCurrentQuestion = useCreatePackage((state) => state.setCurrentQuestion);
   const setCurrentTime = useCreatePackage((state) => state.setCurrentTime);
   const addQuestion = useCreatePackage((state) => state.addQuestion);
+
+  // Düzenleme modunda modal açılırken mevcut verileri input'lara set ediyoruz
+  useEffect(() => {
+    if (question) {
+      setCurrentQuestion(question.questionText);
+      setCurrentTime(question.timeLimit.toString());
+    } else {
+      setCurrentQuestion("");
+      setCurrentTime("2");
+    }
+  }, [question, setCurrentQuestion, setCurrentTime]);
 
   const handleSubmit = async () => {
     if (currentQuestion.trim() === "" || currentTime.trim() === "") {
@@ -16,28 +27,36 @@ const AddQuestionModal = ({ isOpen, onClose, packageId, onAddQuestion }) => {
     }
 
     try {
-      // Soru ekle
-      await addQuestion(packageId);  // `packageId` ile addQuestion fonksiyonunu çağırıyoruz
-
-      // Yeni soruyu parent component'e ilet
-      if (onAddQuestion) {
-        const newQuestion = {
+      if (question) {
+        // Mevcut soru güncelleme
+        await onUpdateQuestion(question._id, {
           questionText: currentQuestion,
           timeLimit: parseInt(currentTime, 10),
-        };
-        onAddQuestion(newQuestion);
+        });
+      } else {
+        // Yeni soru ekleme
+        await addQuestion(packageId);  // `packageId` ile addQuestion fonksiyonunu çağırıyoruz
+
+        // Yeni soruyu parent component'e ilet
+        if (onAddQuestion) {
+          const newQuestion = {
+            questionText: currentQuestion,
+            timeLimit: parseInt(currentTime, 10),
+          };
+          onAddQuestion(newQuestion);
+        }
       }
 
       // Modal kapatılır
       onClose();
 
     } catch (error) {
-      console.error("Failed to add question:", error);
+      console.error("Failed to add or update question:", error);
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Add Question">
+    <Modal isOpen={isOpen} onClose={onClose} title={question ? "Edit Question" : "Add Question"}>
       <div className="mb-4">
         <label className="block text-gray-700 mb-2">Question</label>
         <textarea
@@ -62,7 +81,7 @@ const AddQuestionModal = ({ isOpen, onClose, packageId, onAddQuestion }) => {
           onClick={handleSubmit}
           className="bg-blue-600 text-white px-4 py-2 rounded"
         >
-          Add
+          {question ? "Update" : "Add"}
         </button>
       </div>
     </Modal>

@@ -8,6 +8,7 @@ import {
   updatePackageTitle,
   deleteQuestionFromPackageService,
   addNewQuestions,
+  updateQuestionService,
   getPackageByIdService,
 } from "../services/package-service"; // Service'i import et
 
@@ -78,6 +79,23 @@ export const deleteQuestionController = async (req: Request, res: Response, next
   }
 };
 
+export const updateQuestionController = async (req: Request, res: Response, next: NextFunction) => {
+  const { packageId, questionId } = req.params; // URL'den packageId ve questionId'yi alıyoruz
+  const { questionText, timeLimit } = req.body; // Güncellenecek verileri body'den alıyoruz
+
+  try {
+    const updatedPackage = await updateQuestionService(packageId, questionId, {
+      questionText,
+      timeLimit,
+    });
+    res.status(200).json({
+      message: "Question updated successfully",
+      package: updatedPackage,
+    });
+  } catch (error) {
+    next(error); // Hata varsa sonraki middleware'e gönder
+  }
+};
 
 
 // Yeni sorular ekleme

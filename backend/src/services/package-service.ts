@@ -76,6 +76,40 @@ export const deleteQuestionFromPackageService = async (packageId: string, questi
   return updatedPackage;
 };
 
+export const updateQuestionService = async (
+  packageId: string,
+  questionId: string,
+  updates: { questionText?: string; timeLimit?: number }
+) => {
+  // packageId ve questionId'nin geçerli olup olmadığını kontrol et
+  if (!mongoose.isValidObjectId(packageId) || !mongoose.isValidObjectId(questionId)) {
+    throw createHttpError(400, "Invalid packageId or questionId");
+  }
+
+  // İlgili package'i bul
+  const packageData = await Package.findById(packageId);
+  if (!packageData) {
+    throw createHttpError(404, "Package not found");
+  }
+
+  // Soruyu bul ve güncelle
+  const question = packageData.questions.id(questionId);
+  if (!question) {
+    throw createHttpError(404, "Question not found");
+  }
+
+  if (updates.questionText) {
+    question.questionText = updates.questionText;
+  }
+  if (updates.timeLimit) {
+    question.timeLimit = updates.timeLimit;
+  }
+
+  // Güncellemeleri kaydet ve güncellenmiş paketi döndür
+  const updatedPackage = await packageData.save();
+  return updatedPackage;
+};
+
 // Yeni sorular ekleme fonksiyonu
 export const addNewQuestions = async (
   packageId: string,

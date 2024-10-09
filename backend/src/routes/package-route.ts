@@ -21,6 +21,8 @@ router.patch("/:packageId/title", PackageController.updatePackageTitleController
 // Soruları silme rotası (PATCH metodu)
 router.delete("/:packageId/questions", PackageController.deleteQuestionController);
 
+router.patch("/:packageId/questions/:questionId", PackageController.updateQuestionController);
+
 // Yeni sorular ekleme rotası (PATCH metodu)
 router.post("/:packageId/questions", PackageController.addNewQuestionsController);
 

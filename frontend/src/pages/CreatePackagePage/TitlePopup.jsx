@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "../../components/modal";
 import useCreatePackage from "../../stores/CreatePackagePageStore";  // Zustand store'u import ediyoruz
 
@@ -7,6 +7,13 @@ const TitleModal = ({ isOpen, onClose }) => {
 
   const createPackage = useCreatePackage((state) => state.createPackage);  // Zustand'dan createPackage fonksiyonunu çekiyoruz
   const setPackageTitle = useCreatePackage((state) => state.setPackageTitle);  // Zustand'dan setPackageTitle fonksiyonu
+
+  // Modal her açıldığında (isOpen true olduğunda) title state'ini sıfırla
+  useEffect(() => {
+    if (isOpen) {
+      setTitle(''); // Modal açıldığında title input alanını temizle
+    }
+  }, [isOpen]);
 
   const handleSubmit = async () => {
     setPackageTitle(title);  // Zustand store'daki title state'ini güncelliyoruz
