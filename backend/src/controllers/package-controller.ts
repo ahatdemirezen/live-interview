@@ -1,16 +1,21 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
+
+
 import {
   createPackageService,
   getAllPackagesService,
   deletePackageService,
-  updatePackageService,
+  updatePackageTitle,
+  deleteQuestionFromPackageService,
+  addNewQuestions,
+  getPackageByIdService,
 } from "../services/package-service"; // Service'i import et
 
 // Package oluşturma
 export const createPackage = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { Title, questions } = req.body;
-    const savedPackage = await createPackageService(Title, questions);
+    const { title, questions } = req.body;
+    const savedPackage = await createPackageService(title, questions);
     res.status(201).json(savedPackage);
   } catch (error) {
     next(error);
@@ -29,9 +34,9 @@ export const getAllPackages = async (req: Request, res: Response, next: NextFunc
 
 // Package silme
 export const deletePackage = async (req: Request, res: Response, next: NextFunction) => {
-  const { packageId } = req.params;
 
   try {
+    const { packageId } = req.params;
     const deletedPackage = await deletePackageService(packageId);
     res.status(200).json({ message: "Package deleted successfully", deletedPackage });
   } catch (error) {
@@ -40,20 +45,73 @@ export const deletePackage = async (req: Request, res: Response, next: NextFunct
 };
 
 // Package güncelleme
-export const updatePackage = async (req: Request, res: Response, next: NextFunction) => {
+export const updatePackageTitleController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { packageId } = req.params;
-  const { title, reorderedQuestions, deletedQuestionIds, newQuestions } = req.body;
+  const { title } = req.body;
 
   try {
-    const updatedPackage = await updatePackageService(
-      packageId,
-      title,
-      reorderedQuestions,
-      deletedQuestionIds,
-      newQuestions
-    );
+    const updatedPackage = await updatePackageTitle(packageId, title);
     res.status(200).json(updatedPackage);
   } catch (error) {
     next(error);
+  }
+};
+
+
+// Soruları silme
+export const deleteQuestionController = async (req: Request, res: Response, next: NextFunction) => {
+  const { packageId } = req.params;
+  const { questionId } = req.body; // questionId'yi body'den alıyoruz.
+
+  try {
+    const updatedPackage = await deleteQuestionFromPackageService(packageId, questionId);
+    res.status(200).json({
+      message: "Question deleted successfully",
+      package: updatedPackage,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
+// Yeni sorular ekleme
+export const addNewQuestionsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { packageId } = req.params;
+  const { newQuestions } = req.body;
+
+  try {
+    const updatedPackage = await addNewQuestions(packageId, newQuestions);
+    res.status(201).json({
+      message: "Questions added successfully",
+      package: updatedPackage,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const getPackageById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { packageId } = req.params;
+
+  try {
+    const packageData = await getPackageByIdService(packageId);
+    if (!packageData) {
+      res.status(404).json({ message: "Package not found" });
+    } else {
+      res.status(200).json(packageData); // Response döndürülüyor
+    }
+  } catch (error) {
+    next(error); // Hata döndürülüyor
   }
 };

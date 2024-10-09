@@ -1,23 +1,19 @@
 import mongoose from 'mongoose';
 
 const PackageSchema = new mongoose.Schema({
-  Title: {
+  title: {
     type: String,
-    required: true, 
+    required: false, 
   },
   questions: [
     {
       questionText: {
         type: String,
-        required: true,  
+        required: false,  
       },
       timeLimit: {
         type: Number,  
-        required: true,  
-      },
-      sequenceNumber: {
-        type: Number,
-        required: true,  // Sıra numarası zorunlu olarak işaretlenir
+        required: false,  
       },
     },
   ],

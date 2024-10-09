@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PackageList from './PackageList';
 import SideBar from '../../components/SideBar';
+import TitleModal from "../CreatePackagePage/TitlePopup";  // Modal bileşenini import ettiniz
 
 const ManagePackages = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);  // Modal görünürlüğünü kontrol eden state
   const navigate = useNavigate();
+
+  // Modal'ı açma ve kapatma fonksiyonları
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="flex bg-gray-100 h-screen">
@@ -18,7 +29,7 @@ const ManagePackages = () => {
             <h2 className="text-2xl font-semibold">Manage Question Package</h2>
             <button
               className="bg-green-500 text-white p-2 rounded-full text-xl"
-              onClick={() => navigate('/create-package')}
+              onClick={openModal}  // Modal'ı açıyoruz
             >
               ➕
             </button>
@@ -28,6 +39,12 @@ const ManagePackages = () => {
           <PackageList />
         </div>
       </div>
+
+      {/* TitleModal bileşeni */}
+      <TitleModal 
+        isOpen={isModalOpen} 
+        onClose={closeModal}  // Modal'ı kapatma fonksiyonu
+      />
     </div>
   );
 };

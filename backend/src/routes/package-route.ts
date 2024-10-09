@@ -6,10 +6,22 @@ const router = express.Router();
 // Package oluşturma rotası
 router.post("/", PackageController.createPackage);
 
+// Tüm paketleri listeleme rotası
 router.get("/list", PackageController.getAllPackages);
 
-router.delete("/:packageId", PackageController.deletePackage); // Package silme rotası (DELETE metodu)
+// Belirli bir paketi ID ile getirme rotası
+router.get("/:packageId", PackageController.getPackageById);
 
-router.patch("/:packageId", PackageController.updatePackage);
+// Package silme rotası
+router.delete("/:packageId", PackageController.deletePackage);
+
+// Package başlığını güncelleme rotası (PATCH metodu)
+router.patch("/:packageId/title", PackageController.updatePackageTitleController);
+
+// Soruları silme rotası (PATCH metodu)
+router.delete("/:packageId/questions", PackageController.deleteQuestionController);
+
+// Yeni sorular ekleme rotası (PATCH metodu)
+router.post("/:packageId/questions", PackageController.addNewQuestionsController);
 
 export default router;

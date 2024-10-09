@@ -2,23 +2,42 @@ import React from "react";
 import Modal from "../../components/modal";
 import useCreatePackage from "../../stores/CreatePackagePageStore";  // Zustand store import edildi
 
-const AddQuestionModal = ({ isOpen, onClose }) => {
+const AddQuestionModal = ({ isOpen, onClose, packageId, onAddQuestion }) => {
   const currentQuestion = useCreatePackage((state) => state.currentQuestion);
   const currentTime = useCreatePackage((state) => state.currentTime);
   const setCurrentQuestion = useCreatePackage((state) => state.setCurrentQuestion);
   const setCurrentTime = useCreatePackage((state) => state.setCurrentTime);
   const addQuestion = useCreatePackage((state) => state.addQuestion);
-  
-  const handleSubmit = () => {
-    if (currentQuestion) {
-      addQuestion();
-      onClose();  // Modal kapatılır
+
+  const handleSubmit = async () => {
+    if (currentQuestion.trim() === "" || currentTime.trim() === "") {
+      alert("Please enter a question and a valid time limit.");
+      return;
+    }
+
+    try {
+      // Soru ekle
+      await addQuestion(packageId);  // `packageId` ile addQuestion fonksiyonunu çağırıyoruz
+
+      // Yeni soruyu parent component'e ilet
+      if (onAddQuestion) {
+        const newQuestion = {
+          questionText: currentQuestion,
+          timeLimit: parseInt(currentTime, 10),
+        };
+        onAddQuestion(newQuestion);
+      }
+
+      // Modal kapatılır
+      onClose();
+
+    } catch (error) {
+      console.error("Failed to add question:", error);
     }
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Add Question">
-      {/* Soru Girişi */}
       <div className="mb-4">
         <label className="block text-gray-700 mb-2">Question</label>
         <textarea
@@ -29,7 +48,6 @@ const AddQuestionModal = ({ isOpen, onClose }) => {
         />
       </div>
 
-      {/* Süre Girişi */}
       <div className="flex space-x-4 mb-4">
         <div className="flex items-center">
           <input
