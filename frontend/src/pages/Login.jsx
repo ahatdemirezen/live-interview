@@ -1,8 +1,27 @@
 import React, { useState } from "react";
+import { useAuthStore } from "../stores/LoginStore"; // Zustand store'u import ediyoruz
+import { useNavigate } from "react-router-dom"; // Yönlendirme için
 import Image from "../assets/image.png"; // Resmi import edin
 
 const Login = () => {
+  const [email, setEmail] = useState(''); // E-mail input state
+  const [password, setPassword] = useState(''); // Şifre input state
   const [showPassword, setShowPassword] = useState(false); // Şifreyi gösterme durumu
+  const navigate = useNavigate(); // Yönlendirme için useNavigate fonksiyonu
+
+  const login = useAuthStore((state) => state.login); // Zustand'dan login fonksiyonunu alıyoruz
+  const error = useAuthStore((state) => state.error); // Zustand'dan error state'ini alıyoruz
+  
+  // Form submit olduğunda login fonksiyonunu çağırıyoruz
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await login(email, password); // Zustand'daki login fonksiyonunu çağırıyoruz
+      navigate('/packages'); // Login başarılı olursa /packages sayfasına yönlendir
+    } catch (error) {
+      console.error("Login failed:", error); // Hata varsa konsola yazdır
+    }
+  };
 
   return (
     <div className="flex h-screen">
@@ -21,7 +40,7 @@ const Login = () => {
             </h2>
             <p className="text-sm text-gray-600">Hesabınıza giriş yapın</p>
           </div>
-          <form>
+          <form onSubmit={handleSubmit}> {/* Form submit */}
             <div className="mb-4">
               <label className="block text-sm text-gray-700 font-bold mb-2">
                 E-mail
@@ -30,6 +49,8 @@ const Login = () => {
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 type="email"
                 placeholder="E-mail"
+                value={email} // Email input value
+                onChange={(e) => setEmail(e.target.value)} // Email state güncelleme
               />
             </div>
             <div className="mb-6 relative">
@@ -40,6 +61,8 @@ const Login = () => {
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 type={showPassword ? "text" : "password"} // Şifre gösterme durumu
                 placeholder="Password"
+                value={password} // Password input value
+                onChange={(e) => setPassword(e.target.value)} // Password state güncelleme
               />
               <button
                 type="button"
@@ -71,6 +94,8 @@ const Login = () => {
                 Giriş Yap
               </button>
             </div>
+            {/* Hata mesajı varsa göster */}
+            {error && <p className="text-red-500 text-xs mt-4">{error}</p>}
           </form>
         </div>
       </div>
