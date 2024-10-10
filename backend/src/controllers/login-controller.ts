@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 // .env dosyasındaki verileri kullanabilmek için dotenv'i başlatıyoruz
 dotenv.config();
 
-// Statik email ve şifreyi .env dosyasından alıyoruz
 const adminEmail = process.env.ADMIN_EMAIL;
 const adminPassword = process.env.ADMIN_PASSWORD;
 const jwtSecret = process.env.JWT_SECRET;
@@ -25,10 +24,17 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
         { expiresIn: jwtExpiresIn } // Token'ın geçerlilik süresi
       );
 
-      // Başarılı giriş durumunda JWT token'ı döndür
+      // Token'ı HTTP Only cookie olarak ekliyoruz
+      res.cookie('token', token, {
+        httpOnly: true,  // JavaScript ile erişimi kapatır (XSS koruması)
+        secure: process.env.NODE_ENV === 'production', // Yalnızca HTTPS üzerinden gönderilsin
+        maxAge: 24 * 60 * 60 * 1000, // Cookie süresi: 1 gün
+        sameSite: 'strict', // CSRF saldırılarına karşı koruma
+      });
+
+      // Başarılı giriş yanıtı
       res.status(200).json({
         message: "Login successful",
-        token, // Token'ı döndürüyoruz
       });
     } else {
       throw createHttpError(401, "Invalid email or password");

@@ -4,6 +4,7 @@ import CreatePackage from "./pages/CreatePackagePage/CreatePackage";
 import ManagePackages from "./pages/PackagePage/ManagePackages";// CreatePackage bileşenini ekledik
 import Login from "./pages/Login";  // Login bileşenini ekledik
 import Modal from 'react-modal';
+import InterviewList from "./pages/InterviewListPage/InterviewList";
 Modal.setAppElement('#root');
 
 const App = () => {
@@ -16,6 +17,7 @@ const App = () => {
           <Route path="/packages" element={<ManagePackages />} />
           <Route path="/create-package" element={<CreatePackage />} /> {/* CreatePackage rotası */}
           <Route path="/create-package/:packageId" element={<CreatePackage />} /> {/* Paket Düzenleme */}
+          <Route path="/interview-list" element={<InterviewList/>}/>
         </Routes>
       </div>
     </Router>
