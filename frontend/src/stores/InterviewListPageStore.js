@@ -1,35 +1,39 @@
 import { create } from 'zustand';
+import axios from 'axios';
+
+const apiUrl = import.meta.env.VITE_BE_URL; // Backend URL'ini çevresel değişkenden alıyoruz
+
 const useInterviewStore = create((set) => ({
-  interviews: [],
-  currentInterview: {
-    interviewTitle: '',  // Title için yeni isimlendirme
-    packageId: [],  // Package için yeni isimlendirme
-    expireDate: '', // Expire Date için aynı
+  interviews: [],  // Interview verilerini burada tutacağız
+  loading: false,  // Yükleme durumu
+  error: null,     // Hata durumu
+
+  // Interview'ları getiren fonksiyon
+  fetchInterviews: async () => {
+    set({ loading: true });
+    try {
+      const response = await axios.get(`${apiUrl}/interview` , {
+        withCredentials: true,
+      });  // GET isteği yapılıyor
+      set({ interviews: response.data, loading: false });
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
   },
-  // Interview Title için setter
-  setInterviewTitle: (interviewTitle) => set((state) => ({
-    currentInterview: { ...state.currentInterview, interviewTitle },
-  })),
-  // Package ID için setter
-  setPackageId: (packageId) => set((state) => ({
-    currentInterview: { ...state.currentInterview, packageId },
-  })),
-  // Expire Date için setter
-  setExpireDate: (expireDate) => set((state) => ({
-    currentInterview: { ...state.currentInterview, expireDate },
-  })),
-  // Interview ekleme fonksiyonu
-  addInterview: () => set((state) => ({
-    interviews: [...state.interviews, { ...state.currentInterview, id: state.interviews.length + 1 }],
-    currentInterview: {
-      interviewTitle: '',  // Interview Title sıfırlanıyor
-      packageId: [],  // Package ID sıfırlanıyor
-      expireDate: '', // Expire Date sıfırlanıyor
-    },
-  })),
-  // Interview silme fonksiyonu
-  removeInterview: (id) => set((state) => ({
-    interviews: state.interviews.filter((interview) => interview.id !== id),
-  })),
+
+  // Interview'ı silen fonksiyon
+  deleteInterview: async (interviewId) => {
+    try {
+      await axios.delete(`${apiUrl}/interview/${interviewId}` , {
+        withCredentials: true,
+      });  // DELETE isteği
+      set((state) => ({
+        interviews: state.interviews.filter((interview) => interview._id !== interviewId), // Interview'ı state'den çıkarıyoruz
+      }));
+    } catch (error) {
+      console.error('Error deleting interview:', error);
+    }
+  },
 }));
+
 export default useInterviewStore;

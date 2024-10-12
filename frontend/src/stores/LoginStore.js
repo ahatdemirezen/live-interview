@@ -13,6 +13,7 @@ export const useAuthStore = create((set) => ({
     try {
       const response = await axios.post(`${apiUrl}/login`, { email, password }, { withCredentials: true });
 
+      
       // Başarılı login durumunda token'ı state'e kaydediyoruz
       set({
         token: response.data.token,

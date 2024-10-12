@@ -22,11 +22,9 @@ app.use(
 );
 
 
-// Middleware: Cookie parsing
-app.use(cookieParser()); // Cookie'leri okumak için ekliyoruz
-
 // Middleware: JSON body parsing
 app.use(express.json()); // JSON verileri alabilmek için
+app.use(cookieParser()); // Cookie'leri kullanabilmek için cookie parser middleware'i kullan
 
 // Ana sayfa rotası
 app.get("/", (req: Request, res: Response) => {

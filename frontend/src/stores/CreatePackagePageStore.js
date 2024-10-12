@@ -44,7 +44,9 @@ const useCreatePackage = create((set) => ({
       };
 
       // POST isteği ile yeni paket oluşturma
-      const response = await axios.post(`${apiUrl}/package`, packageData);
+      const response = await axios.post(`${apiUrl}/package`, packageData,{
+        withCredentials:true,
+      });
 
       // Backend'den dönen packageId'yi ve title'ı alıp state'e set ediyoruz
       const newPackageId = response.data._id;
@@ -72,8 +74,9 @@ const useCreatePackage = create((set) => ({
       const state = useCreatePackage.getState();
 
       // Silme isteği: packageId URL'den, questionId body'den gönderiliyor
-      await axios.delete(`${apiUrl}/package/${state.packageId}/questions`, {
+      await axios.delete(`${apiUrl}/package/${state.packageId}/questions`,  {
         data: { questionId }, // request body'de questionId'yi gönderiyoruz
+        withCredentials:true,
       });
 
       // Silinen soruyu frontende de güncelliyoruz
@@ -103,13 +106,18 @@ const useCreatePackage = create((set) => ({
       };
   
       // Backend'e doğrudan questionText ve timeLimit ile POST isteği yapıyoruz
-      const response = await axios.post(`${apiUrl}/package/${state.packageId}/questions`, {
-        newQuestions: [{  // Burada newQuestions bir array olarak gönderiliyor
-          questionText: questionData.questionText,
-          timeLimit: questionData.timeLimit,
-        }],
-      });
-      
+      const response = await axios.post(
+        `${apiUrl}/package/${state.packageId}/questions`, 
+        {
+          newQuestions: [{  // Burada newQuestions bir array olarak gönderiliyor
+            questionText: questionData.questionText,
+            timeLimit: questionData.timeLimit,
+          }],
+        },
+        {
+          withCredentials: true,  // Çerezleri gönder
+        }
+      );
   
       const updatedPackage = response.data.package;
   
@@ -127,13 +135,16 @@ const useCreatePackage = create((set) => ({
     }
   },
   
+  
   updateQuestion: async (questionId, updatedQuestionData) => {
     set({ loading: true, error: null });
     try {
       const state = useCreatePackage.getState();
 
       // Patch isteği: packageId URL'den, questionId de URL üzerinden
-      const response = await axios.patch(`${apiUrl}/package/${state.packageId}/questions/${questionId}`, updatedQuestionData);
+      const response = await axios.patch(`${apiUrl}/package/${state.packageId}/questions/${questionId}` , updatedQuestionData ,
+        { withCredentials: true }
+      );
       
       // Güncellenmiş soruyu frontend'de de güncelliyoruz
       const updatedQuestions = state.questions.map((q) =>
@@ -167,7 +178,9 @@ const useCreatePackage = create((set) => ({
   getPackageById: async (packageId) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get(`${apiUrl}/package/${packageId}`);
+      const response = await axios.get(`${apiUrl}/package/${packageId}` ,
+        { withCredentials: true }
+      );
       const { title, questions } = response.data;
       set({
         packageId,

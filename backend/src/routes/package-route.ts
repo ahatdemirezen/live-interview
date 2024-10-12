@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/", PackageController.createPackage);
 
 // Tüm paketleri listeleme rotası
-router.get("/list", PackageController.getAllPackages);
+router.get("/", PackageController.getAllPackages);
 
 // Belirli bir paketi ID ile getirme rotası
 router.get("/:packageId", PackageController.getPackageById);

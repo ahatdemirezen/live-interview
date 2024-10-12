@@ -4,23 +4,29 @@ import createHttpError from "http-errors";
 import Package from "../models/package-model"; // Package şemasını import et
 
 // Interview oluşturma servisi
-export const createInterviewService = async (interviewTitle: string, expireDate: Date, packageId: string) => {
-  // packageId'nin geçerli bir ObjectId olup olmadığını kontrol et
-  if (!mongoose.isValidObjectId(packageId)) {
-    throw createHttpError(400, "Invalid packageId format");
+export const createInterviewService = async (interviewTitle: string, expireDate: Date, packageIds: string[]) => {
+  // Gelen packageIds'in bir array olup olmadığını kontrol et
+  if (!Array.isArray(packageIds)) {
+    throw createHttpError(400, "packageIds must be an array");
   }
 
-  // packageId'ye sahip bir Package var mı diye kontrol et
-  const packageExists = await Package.findById(packageId);
-  if (!packageExists) {
-    throw createHttpError(404, "Package not found");
+  // Her bir packageId'nin geçerli bir ObjectId olup olmadığını ve var olup olmadığını kontrol et
+  for (const packageId of packageIds) {
+    if (!mongoose.isValidObjectId(packageId)) {
+      throw createHttpError(400, `Invalid packageId format: ${packageId}`);
+    }
+
+    const packageExists = await Package.findById(packageId);
+    if (!packageExists) {
+      throw createHttpError(404, `Package not found: ${packageId}`);
+    }
   }
 
   // Interview nesnesini oluştur
   const newInterview = new Interview({
     interviewTitle,
     expireDate,
-    packageId, // Seçilen paketi ilişkilendir
+    packageId: packageIds, // Artık bir array olarak kaydediyoruz
   });
 
   // Veritabanına kaydet
@@ -28,6 +34,7 @@ export const createInterviewService = async (interviewTitle: string, expireDate:
 
   return savedInterview;
 };
+
 
 // Tüm interview'ları getirme servisi
 export const getInterviewsService = async () => {

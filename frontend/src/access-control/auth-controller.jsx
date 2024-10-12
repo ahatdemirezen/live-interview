@@ -1,17 +1,14 @@
-import React from 'react';
+import { useAuthStore } from '../stores/LoginStore'; // Store'u içe aktarıyoruz
 import { Navigate } from 'react-router-dom';
-import Cookies from 'js-cookie'; // Cookie'yi almak için 'js-cookie' kütüphanesini kullanıyoruz
 
 const ProtectedRoute = ({ children }) => {
-  const token = Cookies.get('token'); // Cookie'den token'ı alıyoruz
+  const { isAuthenticated } = useAuthStore(); // State'den isAuthenticated değerini alıyoruz
 
-  if (!token) {
-    // Token yoksa login sayfasına yönlendir
-    return <Navigate to="/login" />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />; // Eğer giriş yapılmamışsa login sayfasına yönlendir
   }
 
-  // Token varsa, child bileşeni render ediyoruz (korunan sayfa)
-  return children;
+  return children; // Eğer giriş yapılmışsa korunan bileşeni render et
 };
 
 export default ProtectedRoute;

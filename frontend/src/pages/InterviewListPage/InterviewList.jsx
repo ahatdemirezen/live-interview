@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useInterviewStore from "../../stores/InterviewListPageStore";
 import InterviewCard from "./InterviewCard";
 import AddInterviewModal from "./AddInterviewModal";
@@ -8,7 +8,14 @@ import Header from "../../components/header";
 
 const InterviewList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const interviews = useInterviewStore((state) => state.interviews);
+
+  // Zustand store'dan interviews ve fetchInterviews fonksiyonunu alıyoruz
+  const { interviews, fetchInterviews } = useInterviewStore();
+
+  // Component mount olduğunda fetchInterviews fonksiyonunu çağırıyoruz
+  useEffect(() => {
+    fetchInterviews();
+  }, [fetchInterviews]);
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
@@ -21,13 +28,16 @@ const InterviewList = () => {
             <Button icon="➕" onClick={() => setIsModalOpen(true)} variant="secondary" rounded="rounded-full"/>
           </div>
         </div>
+        
+        {/* Interview Card'ların listelenmesi */}
         <div className="flex flex-wrap justify-start mt-5 gap-4">
           {interviews.map((interview) => (
-            <InterviewCard key={interview.id} interview={interview} />
+            <InterviewCard key={interview._id} interview={interview} />
           ))}
         </div>
       </div>
 
+      {/* Modal'ın Açık olup olmadığını kontrol ediyoruz */}
       {isModalOpen && (
         <AddInterviewModal
           isOpen={isModalOpen}

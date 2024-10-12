@@ -13,7 +13,9 @@ const usePackageStore = create((set) => ({
   getPackages: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get(`${apiUrl}/package/list`);
+      const response = await axios.get(`${apiUrl}/package`,{
+          withCredentials:true
+      });
       set({ packages: response.data, loading: false });
     } catch (error) {
       set({ error: 'Failed to fetch packages', loading: false });
@@ -29,7 +31,9 @@ const usePackageStore = create((set) => ({
   deletePackage: async (packageId) => {
     set({ loading: true, error: null });
     try {
-      await axios.delete(`${apiUrl}/package/${packageId}`);
+      await axios.delete(`${apiUrl}/package/${packageId}` , {
+        withCredentials:true
+      });
       set((state) => ({
         packages: state.packages.filter((pkg) => pkg._id !== packageId), // Silinen paketi store'dan kaldır
         loading: false,

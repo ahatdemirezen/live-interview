@@ -3,10 +3,10 @@ import { createInterviewService, getInterviewsService, deleteInterviewService } 
 
 export const createInterview = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { interviewTitle, expireDate, packageId } = req.body;
+    const { interviewTitle, expireDate, packageIds } = req.body; // packageId değil packageIds array olarak aldık
 
     // Service katmanını kullanarak interview oluştur
-    const savedInterview = await createInterviewService(interviewTitle, expireDate, packageId);
+    const savedInterview = await createInterviewService(interviewTitle, expireDate, packageIds);
 
     // Başarı durumunda yanıt döndür
     res.status(201).json(savedInterview);
@@ -15,6 +15,7 @@ export const createInterview = async (req: Request, res: Response, next: NextFun
     next(error);
   }
 };
+
 
 export const getInterviews = async (req: Request, res: Response, next: NextFunction) => {
   try {

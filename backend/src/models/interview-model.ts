@@ -10,11 +10,11 @@ const InterviewSchema = new Schema({
     type: Date, // Sona erme tarihi
     required: true,
   },
-  packageId: {
-    type: Types.ObjectId, // Package şemasına referans
-    ref: 'Package',       // Referans verilen model adı
+  packageId: [{
+    type: Types.ObjectId,
+    ref: 'Package',
     required: true,
-  },
+  }],  
 });
 
 const Interview = mongoose.model('Interview', InterviewSchema);

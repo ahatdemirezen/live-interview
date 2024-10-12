@@ -1,20 +1,24 @@
 import React from "react";
 import useInterviewStore from "../../stores/InterviewListPageStore";
 import Button from "../../components/buttonComponent";
+import dayjs from "dayjs"; // Tarih karşılaştırması için dayjs kullanabilirsiniz
 
 const InterviewCard = ({ interview }) => {
-  const removeInterview = useInterviewStore((state) => state.removeInterview);
+  const deleteInterview = useInterviewStore((state) => state.deleteInterview);
+
+  // Expire date ile bugünün tarihini karşılaştırıyoruz
+  const isExpired = dayjs(interview.expireDate).isBefore(dayjs());
 
   return (
     <div className="bg-white p-4 m-4 shadow-md rounded-md relative w-64">
       {/* Soru işareti ve link kısmı */}
       <div className="absolute top-1 left-1 text-gray-600">
-      <Button icon="❓" size="sm"/>
+        <Button icon="❓" size="sm" />
       </div>
-      
+
       <div className="absolute top-2 right-1 flex space-x-2">
-       <Button icon="🔗" label="Copy Link" size="sm" />
-        <Button icon="🗑️"  onClick={() => removeInterview(interview.id)} size="sm"/>
+        <Button icon="🔗" label="Copy Link" size="sm" />
+        <Button icon="🗑️" onClick={() => deleteInterview(interview._id)} size="sm" />
       </div>
 
       {/* Başlık */}
@@ -35,7 +39,8 @@ const InterviewCard = ({ interview }) => {
 
       {/* Yayın durumu ve videolar */}
       <div className="flex justify-between items-center text-sm">
-        <span className="text-gray-500">Published</span>
+        {/* ExpireDate'e göre Published ya da Unpublished gösteriyoruz */}
+        <span className="text-gray-500">{isExpired ? "Unpublished" : "Published"}</span>
         <button className="text-blue-500">See Videos ➡</button>
       </div>
     </div>
