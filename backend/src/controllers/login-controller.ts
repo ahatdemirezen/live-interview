@@ -28,7 +28,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
       res.cookie('token', token, {
         httpOnly: true,  // JavaScript ile erişimi kapatır (XSS koruması)
         secure: false, // Yalnızca HTTPS üzerinden gönderilsin
-        maxAge:  24* 60 * 60 * 1000, // Cookie süresi: 1 dakika (60 saniye)
+        maxAge: 60 * 60 * 1000, // Cookie süresi: 1 saat (3600000 milisaniye)
         sameSite: 'strict', // CSRF saldırılarına karşı koruma
       });
       

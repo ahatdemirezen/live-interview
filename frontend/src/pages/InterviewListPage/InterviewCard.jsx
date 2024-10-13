@@ -9,6 +9,18 @@ const InterviewCard = ({ interview }) => {
   // Expire date ile bugünün tarihini karşılaştırıyoruz
   const isExpired = dayjs(interview.expireDate).isBefore(dayjs());
 
+  // Interview ID'ye göre link oluşturma ve kopyalama işlemi
+  const handleCopyLink = () => {
+    const interviewLink = `${window.location.origin}/interview/${interview._id}`; // Interview ID'ye göre link oluşturuyoruz
+    navigator.clipboard.writeText(interviewLink) // Bu linki kopyalıyoruz
+      .then(() => {
+        alert("Link copied to clipboard!"); // Kopyalandı uyarısı
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err); // Hata durumunda loglama
+      });
+  };
+
   return (
     <div className="bg-white p-4 m-4 shadow-md rounded-md relative w-64">
       {/* Soru işareti ve link kısmı */}
@@ -17,7 +29,7 @@ const InterviewCard = ({ interview }) => {
       </div>
 
       <div className="absolute top-2 right-1 flex space-x-2">
-        <Button icon="🔗" label="Copy Link" size="sm" />
+        <Button icon="🔗" label="Copy Link" size="sm" onClick={handleCopyLink} /> {/* Copy Link butonuna tıklandığında handleCopyLink çağrılıyor */}
         <Button icon="🗑️" onClick={() => deleteInterview(interview._id)} size="sm" />
       </div>
 

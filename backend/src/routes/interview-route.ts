@@ -8,4 +8,7 @@ router.post("/", InterviewController.createInterview);
 router.get("/", InterviewController.getInterviews);    // Tüm interview'ları getirme rotası
 router.delete("/:interviewId", InterviewController.deleteInterview);
 
+router.get("/:interviewId/packages/questions", InterviewController.getPackageQuestionsByInterview);
+
+
 export default router;

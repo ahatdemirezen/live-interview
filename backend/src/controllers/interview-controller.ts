@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { createInterviewService, getInterviewsService, deleteInterviewService } from "../services/interview-service"; // Service'i import et
+import Package from "../models/package-model"; // Package şemasını import et
+import Interview from "../models/interview-model";
 
 export const createInterview = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -13,6 +15,35 @@ export const createInterview = async (req: Request, res: Response, next: NextFun
   } catch (error) {
     // Hataları yakalayıp bir sonraki middleware'e ilet
     next(error);
+  }
+};
+
+export const getPackageQuestionsByInterview = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { interviewId } = req.params;
+
+    const interview = await Interview.findById(interviewId).populate("packageId");
+
+    if (!interview) {
+      res.status(404).json({ message: "Interview not found" });
+      return;
+    }
+
+    const packages = await Package.find({
+      _id: { $in: interview.packageId },
+    });
+
+    const packageQuestions = packages.map((pkg) => ({
+      packageId: pkg._id,
+      questions: pkg.questions,
+    }));
+
+    res.status(200).json({
+      interviewId: interview._id,
+      packages: packageQuestions,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching package questions", error });
   }
 };
 

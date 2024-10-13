@@ -6,7 +6,7 @@ import TextInputComponent from "../../components/textInputComponent";
 import DateInputComponent from "../../components/dateInputComponent";
 import Button from "../../components/buttonComponent";
 
-const AddInterviewModal = ({ isOpen, onClose }) => {
+const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded }) => {
   const {
     setInterviewTitle,
     setPackageId,
@@ -43,6 +43,7 @@ const AddInterviewModal = ({ isOpen, onClose }) => {
   const handleAddInterview = async () => {
     await addInterview(); // Zustand store'daki addInterview fonksiyonunu çağırıyoruz
     onClose(); // Modal'ı kapatıyoruz
+    onInterviewAdded(); // Interview eklendikten sonra listeyi yenilemek için callback fonksiyonunu çağırıyoruz
   };
 
   return (

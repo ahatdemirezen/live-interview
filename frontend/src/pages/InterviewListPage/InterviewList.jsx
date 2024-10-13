@@ -17,6 +17,11 @@ const InterviewList = () => {
     fetchInterviews();
   }, [fetchInterviews]);
 
+  // Modal kapandıktan sonra interview listesini yenileyecek fonksiyon
+  const handleInterviewAdded = () => {
+    fetchInterviews();  // Yeni interview eklendikten sonra listeyi güncelliyoruz
+  };
+
   return (
     <div className="flex flex-col md:flex-row h-screen">
       <SideBar />
@@ -25,10 +30,10 @@ const InterviewList = () => {
         <div className="bg-white shadow-md rounded-md p-4 md:p-6 mt-5">
           <div className="flex flex-col md:flex-row justify-between items-center mb-4">
             <h2 className="text-xl md:text-2xl font-semibold">Interview List</h2>
-            <Button icon="➕" onClick={() => setIsModalOpen(true)} variant="secondary" rounded="rounded-full"/>
+            <Button icon="➕" onClick={() => setIsModalOpen(true)} variant="secondary" rounded="rounded-full" />
           </div>
         </div>
-        
+
         {/* Interview Card'ların listelenmesi */}
         <div className="flex flex-wrap justify-start mt-5 gap-4">
           {interviews.map((interview) => (
@@ -42,6 +47,7 @@ const InterviewList = () => {
         <AddInterviewModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          onInterviewAdded={handleInterviewAdded}  // Modal kapandıktan sonra tetiklenecek fonksiyon
         />
       )}
     </div>

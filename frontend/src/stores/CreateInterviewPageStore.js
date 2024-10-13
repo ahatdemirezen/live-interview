@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import axios from 'axios';
-
 const apiUrl = import.meta.env.VITE_BE_URL;
 
 const useCreateInterviewStore = create((set, get) => ({
@@ -23,12 +22,12 @@ const useCreateInterviewStore = create((set, get) => ({
   addInterview: async () => {
     const { interviewTitle, expireDate, packageId } = get().currentInterview;
   
-    // Post isteğinde sadece _id'leri göndereceğiz, title'ları değil
+    // Sadece _id'leri gönderiyoruz
     const packageIds = packageId.map(pkg => pkg._id);
   
     try {
       const response = await axios.post(
-        `${apiUrl}/interview`, 
+        `${apiUrl}/interview`,
         {
           interviewTitle,
           expireDate,
@@ -38,10 +37,10 @@ const useCreateInterviewStore = create((set, get) => ({
           withCredentials: true,  // Çerezleri gönder
         }
       );
-      
+  
       console.log('Interview created:', response.data);
   
-      // İsteğin başarılı olması durumunda state'i sıfırlayabiliriz
+      // İsteğin başarılı olması durumunda state'i sıfırlıyoruz
       set({
         currentInterview: {
           interviewTitle: '',
@@ -53,6 +52,7 @@ const useCreateInterviewStore = create((set, get) => ({
       console.error('Error creating interview:', error);
     }
   },
+  
   
 }));
 

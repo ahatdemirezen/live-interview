@@ -5,6 +5,7 @@ import cors from "cors";
 import liveInterview from "./routes/interview-route";
 import Package from "./routes/package-route";
 import loginRoute from "./routes/login-route";
+import candidate from "./routes/candidate-route"
 import { authenticateToken } from "./middleware/auth";
 import cookieParser from "cookie-parser"; // Cookie-parser'ı import ediyoruz
 
@@ -14,7 +15,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Frontend URL'sini burada tanımlıyoruz geçici olarak.
+    origin: ['http://localhost:5173', 'http://localhost:5174'], // Birden fazla frontend URL'sine izin veriyoruz
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Credentials ile ilgili isteklere izin ver
@@ -35,6 +36,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/interview", authenticateToken, liveInterview);
 app.use("/api/package", authenticateToken, Package);
 app.use("/api/login", loginRoute);
+app.use("/api/candidate", candidate);
 
 // Hataları yakalayan middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
