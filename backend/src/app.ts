@@ -33,7 +33,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // API rotaları
-app.use("/api/interview", authenticateToken, liveInterview);
+app.use("/api/interview", liveInterview);
 app.use("/api/package", authenticateToken, Package);
 app.use("/api/login", loginRoute);
 app.use("/api/candidate", candidate);

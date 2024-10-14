@@ -11,7 +11,7 @@ const InterviewCard = ({ interview }) => {
 
   // Interview ID'ye göre link oluşturma ve kopyalama işlemi
   const handleCopyLink = () => {
-    const interviewLink = `${window.location.origin}/interview/${interview._id}`; // Interview ID'ye göre link oluşturuyoruz
+    const interviewLink = `http://localhost:5174/information-form/${interview._id}`; // Interview ID'ye göre link oluşturuyoruz
     navigator.clipboard.writeText(interviewLink) // Bu linki kopyalıyoruz
       .then(() => {
         alert("Link copied to clipboard!"); // Kopyalandı uyarısı

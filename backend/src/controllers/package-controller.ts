@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction} from "express";
-
+import Package from "../models/package-model"; // Package şemasını import et
+import mongoose from "mongoose";
 
 import {
   createPackageService,
@@ -10,6 +11,7 @@ import {
   addNewQuestions,
   updateQuestionService,
   getPackageByIdService,
+  updateQuestionSequenceService,
 } from "../services/package-service"; // Service'i import et
 
 // Package oluşturma
@@ -79,6 +81,22 @@ export const deleteQuestionController = async (req: Request, res: Response, next
   }
 };
 
+export const updateQuestionSequenceController = async (req: Request, res: Response, next: NextFunction) => {
+  const { packageId } = req.params;
+  const { questionId, newSequenceNumber } = req.body;
+
+  try {
+    const updatedPackage = await updateQuestionSequenceService(packageId, questionId, newSequenceNumber);
+    res.status(200).json({
+      message: "Sıra numarası başarıyla güncellendi",
+      package: updatedPackage,
+    });
+  } catch (error) {
+    next(error); // Hata durumunda error middleware'ine gönderilir
+  }
+};
+
+
 export const updateQuestionController = async (req: Request, res: Response, next: NextFunction) => {
   const { packageId, questionId } = req.params; // URL'den packageId ve questionId'yi alıyoruz
   const { questionText, timeLimit } = req.body; // Güncellenecek verileri body'den alıyoruz
@@ -117,6 +135,8 @@ export const addNewQuestionsController = async (
     next(error);
   }
 };
+
+
 
 
 export const getPackageById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

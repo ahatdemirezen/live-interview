@@ -15,6 +15,10 @@ const PackageSchema = new mongoose.Schema({
         type: Number,  
         required: false,  
       },
+      sequenceNumber: {
+        type: Number,
+        required: false, // Sıra numarası zorunlu olarak işaretlenir
+      },
     },
   ],
   totalQuestions: {

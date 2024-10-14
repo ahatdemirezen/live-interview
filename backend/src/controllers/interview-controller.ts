@@ -60,6 +60,27 @@ export const getInterviews = async (req: Request, res: Response, next: NextFunct
 };
 
 
+export const getInterviewIds = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Interview modelinden sadece interviewId'leri (sadece _id alanını) alır
+    const interviews = await Interview.find({}, { _id: 1 });
+
+    // Eğer hiçbir interview bulunamadıysa
+    if (!interviews || interviews.length === 0) {
+      res.status(404).json({ message: "No interviews found" });
+      return;
+    }
+
+     // Interview id'lerini döndür
+    const interviewIds = interviews.map((interview) => interview._id);
+    
+    res.status(200).json(interviewIds);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 export const deleteInterview = async (req: Request, res: Response, next: NextFunction) => {
   const { interviewId } = req.params;
 
