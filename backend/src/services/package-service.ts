@@ -112,66 +112,16 @@ export const updateQuestionService = async (
 
 export const updateQuestionSequenceService = async (
   packageId: string,
-  questionId: string,
-  newSequenceNumber: number
+  questions: any
 ) => {
-  // Package ID ve Question ID'nin geçerliliğini kontrol edelim
-  if (!mongoose.Types.ObjectId.isValid(packageId)) {
-    throw new Error("Geçersiz Package ID");
-  }
-
-  const questionObjectId = new mongoose.Types.ObjectId(questionId);
-
-  if (!mongoose.Types.ObjectId.isValid(questionObjectId)) {
-      throw new Error("Geçersiz Question ID");
-  }
-  
-
-  // Sıra numarasının geçerli olup olmadığını kontrol et
-  if (typeof newSequenceNumber !== "number" || newSequenceNumber < 1) {
-    throw new Error("Geçersiz yeni sıra numarası");
-  }
-
+ 
   // Package'ı ve içindeki soruyu bul
-  const packageData = await Package.findById(packageId);
-  if (!packageData) {
-    throw new Error("Package not found");
-  }
+  let packageData: any = await Package.findById(packageId);
+  packageData.questions = questions
 
-  const question = packageData.questions.id(questionId);
-  if (!question) {
-    throw new Error("Question not found");
-  }
+  return await packageData.save()
 
-  // question.sequenceNumber'ın varlığını kontrol et
-  const currentSequenceNumber = question.sequenceNumber ?? 0; // Eğer sequenceNumber 'null' veya 'undefined' ise varsayılan değer olarak 0 kullan
-  if (currentSequenceNumber === 0) {
-    throw new Error("Mevcut sıra numarası bulunamadı.");
-  }
-
-  // Eğer yeni sıra numarası mevcut sıra numarasından farklıysa güncellemeyi yap
-  if (newSequenceNumber !== currentSequenceNumber) {
-    // Aşağıdaki diğer soruların sıra numaralarını güncelle
-    packageData.questions.forEach(q => {
-      // q.sequenceNumber'ın varlığını kontrol et
-      const seqNum = q.sequenceNumber ?? 0;
-      if (newSequenceNumber > currentSequenceNumber) {
-        if (seqNum > currentSequenceNumber && seqNum <= newSequenceNumber) {
-          q.sequenceNumber = seqNum - 1;
-        }
-      } else if (newSequenceNumber < currentSequenceNumber) {
-        if (seqNum >= newSequenceNumber && seqNum < currentSequenceNumber) {
-          q.sequenceNumber = seqNum + 1;
-        }
-      }
-    });
-
-    // Seçili sorunun sıra numarasını güncelle
-    question.sequenceNumber = newSequenceNumber;
-    await packageData.save();
-  }
-
-  return packageData; // Güncellenmiş package verisini geri döndür
+ 
 };
 
 

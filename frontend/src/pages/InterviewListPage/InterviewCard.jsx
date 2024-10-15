@@ -1,10 +1,14 @@
-import React from "react";
+import React , {useState} from "react";
 import useInterviewStore from "../../stores/InterviewListPageStore";
 import Button from "../../components/buttonComponent";
 import dayjs from "dayjs"; // Tarih karşılaştırması için dayjs kullanabilirsiniz
-
+import QuestionListModal from "./InterviewQuestionListPopup"
 const InterviewCard = ({ interview }) => {
   const deleteInterview = useInterviewStore((state) => state.deleteInterview);
+
+  const [isModalOpen, setModalOpen] = useState(false);
+  // Store'dan getQuestionsByInterview fonksiyonunu çekiyoruz
+  const getQuestionsByInterview = useInterviewStore((state) => state.getQuestionsByInterview);
 
   // Expire date ile bugünün tarihini karşılaştırıyoruz
   const isExpired = dayjs(interview.expireDate).isBefore(dayjs());
@@ -21,11 +25,17 @@ const InterviewCard = ({ interview }) => {
       });
   };
 
+  const handleOpenModal = async () => {
+    console.log("Interview ID:", interview._id);  // Interview ID'yi kontrol et
+    await getQuestionsByInterview(interview._id);  // Soruları API'den çekiyoruz
+    setModalOpen(true);  // Modal'ı açıyoruz
+  };
+
   return (
     <div className="bg-white p-4 m-4 shadow-md rounded-md relative w-64">
       {/* Soru işareti ve link kısmı */}
       <div className="absolute top-1 left-1 text-gray-600">
-        <Button icon="❓" size="sm" />
+        <Button icon="❓" size="sm"  onClick={handleOpenModal} />
       </div>
 
       <div className="absolute top-2 right-1 flex space-x-2">
@@ -55,6 +65,7 @@ const InterviewCard = ({ interview }) => {
         <span className="text-gray-500">{isExpired ? "Unpublished" : "Published"}</span>
         <button className="text-blue-500">See Videos ➡</button>
       </div>
+      <QuestionListModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 };

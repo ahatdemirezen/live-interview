@@ -42,6 +42,24 @@ const usePackageStore = create((set) => ({
       set({ error: 'Failed to delete package', loading: false });
     }
   },
+  updateQuestionSequence: async (packageId, updatedQuestions) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.patch(`${apiUrl}/package/${packageId}/sequence`, updatedQuestions, {
+        withCredentials: true
+      });
+
+      set((state) => ({
+        packages: state.packages.map((pkg) => 
+          pkg._id === packageId ? { ...pkg, questions: response.data.questions } : pkg
+        ),
+        loading: false,
+      }));
+    } catch (error) {
+      set({ error: 'Failed to update question sequence', loading: false });
+    }
+  },
+
 }));
 
 export default usePackageStore;

@@ -83,10 +83,10 @@ export const deleteQuestionController = async (req: Request, res: Response, next
 
 export const updateQuestionSequenceController = async (req: Request, res: Response, next: NextFunction) => {
   const { packageId } = req.params;
-  const { questionId, newSequenceNumber } = req.body;
+  const { questions } = req.body;
 
   try {
-    const updatedPackage = await updateQuestionSequenceService(packageId, questionId, newSequenceNumber);
+    const updatedPackage = await updateQuestionSequenceService(packageId, questions);
     res.status(200).json({
       message: "Sıra numarası başarıyla güncellendi",
       package: updatedPackage,
