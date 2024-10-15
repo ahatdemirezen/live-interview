@@ -14,6 +14,11 @@ const InterviewSchema = new Schema({
     type: Types.ObjectId,
     ref: 'Package',
     required: true,
+  }],
+  personalInformationForms: [{ 
+    type: Types.ObjectId, 
+    ref: 'PersonalInformationForm', // Referans gösterilen schema
+    required: true,
   }],  
 });
 

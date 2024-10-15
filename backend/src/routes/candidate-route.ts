@@ -7,6 +7,6 @@ const router = express.Router();
 router.get("/", getAllPersonalInfo);
 
 // POST request - Yeni kişisel bilgi ekler
-router.post("/", createPersonalInfo);
+router.post("/:interviewId", createPersonalInfo);
 
 export default router;
