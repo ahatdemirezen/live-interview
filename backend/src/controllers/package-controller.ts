@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction} from "express";
-import Package from "../models/package-model"; // Package şemasını import et
-import mongoose from "mongoose";
 
 import {
   createPackageService,
@@ -11,7 +9,7 @@ import {
   addNewQuestions,
   updateQuestionService,
   getPackageByIdService,
-  updateQuestionSequenceService,
+  updateQuestionOrderService,
 } from "../services/package-service"; // Service'i import et
 
 // Package oluşturma
@@ -47,6 +45,31 @@ export const deletePackage = async (req: Request, res: Response, next: NextFunct
   }
 };
 
+export const updateQuestionOrderController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { packageId } = req.params;
+  const { questions } = req.body; // Frontend'den gelen sıralama bilgisi
+
+  try {
+    // Service katmanını çağırarak sıralamayı güncelle
+    const updatedPackage = await updateQuestionOrderService(packageId, questions);
+
+    res.status(200).json({
+      message: 'Questions order updated successfully',
+      package: updatedPackage,
+    });
+  } catch (error) {
+    next(error); // Hata varsa next fonksiyonuna gönder (middleware'ler tarafından işlenir)
+  }
+};
+
+
+
+
+
 // Package güncelleme
 export const updatePackageTitleController = async (
   req: Request,
@@ -78,21 +101,6 @@ export const deleteQuestionController = async (req: Request, res: Response, next
     });
   } catch (error) {
     next(error);
-  }
-};
-
-export const updateQuestionSequenceController = async (req: Request, res: Response, next: NextFunction) => {
-  const { packageId } = req.params;
-  const { questions } = req.body;
-
-  try {
-    const updatedPackage = await updateQuestionSequenceService(packageId, questions);
-    res.status(200).json({
-      message: "Sıra numarası başarıyla güncellendi",
-      package: updatedPackage,
-    });
-  } catch (error) {
-    next(error); // Hata durumunda error middleware'ine gönderilir
   }
 };
 

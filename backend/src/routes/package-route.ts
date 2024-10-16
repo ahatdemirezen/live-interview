@@ -25,8 +25,6 @@ router.patch("/:packageId/questions/:questionId", PackageController.updateQuesti
 // Yeni sorular ekleme rotası (PATCH metodu)
 router.post("/:packageId/questions", PackageController.addNewQuestionsController);
   
-router.patch(
-    "/:packageId/sequence",
-    PackageController.updateQuestionSequenceController // questionId artık body'den alınacak
-  );
+router.post('/:packageId/update-order', PackageController.updateQuestionOrderController);
+
 export default router;

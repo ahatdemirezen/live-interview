@@ -42,24 +42,21 @@ const usePackageStore = create((set) => ({
       set({ error: 'Failed to delete package', loading: false });
     }
   },
-  updateQuestionSequence: async (packageId, updatedQuestions) => {
+  updatePackageOrder: async (packageId, reorderedQuestions) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.patch(`${apiUrl}/package/${packageId}/sequence`, updatedQuestions, {
-        withCredentials: true
+      await axios.post(`${apiUrl}/package/${packageId}/update-order`, {
+        questions: reorderedQuestions,
+      }, {
+        withCredentials: true,  // Çerezleri gönder
       });
-
-      set((state) => ({
-        packages: state.packages.map((pkg) => 
-          pkg._id === packageId ? { ...pkg, questions: response.data.questions } : pkg
-        ),
-        loading: false,
-      }));
+      set({ loading: false });
+      console.log('Sıralama başarıyla kaydedildi.');
     } catch (error) {
-      set({ error: 'Failed to update question sequence', loading: false });
+      set({ error: 'Failed to update package order', loading: false });
+      console.error('Sıralama kaydedilirken hata oluştu:', error);
     }
-  },
-
+  },  
 }));
 
 export default usePackageStore;

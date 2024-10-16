@@ -21,23 +21,36 @@ const useInterviewStore = create((set) => ({
       set({ error: error.message, loading: false });
     }
   },
+  
   getQuestionsByInterview: async (interviewId) => {
     console.log("getQuestionsByInterview fonksiyonu çalışıyor:", interviewId);
     try {
       const response = await axios.get(`${apiUrl}/interview/${interviewId}/packages/questions`, {
         withCredentials: true,
       });
+  
       const packages = response.data?.packages || [];
-      const allQuestions = packages.flatMap((pkg) => pkg.questions);
-      console.log("Bütün Sorular:", allQuestions);
+  
+      // Paketlerin sıralı bir şekilde sorularını kaydediyoruz
+      let allQuestions = [];
+  
+      // Paketler sırasına göre her paketin sorularını sıralı olarak ekliyoruz
+      packages.forEach((pkg) => {
+        const sortedQuestions = pkg.questions.sort((a, b) => a.sequenceNumber - b.sequenceNumber); // Soruları sequenceNumber'a göre sıralıyoruz
+        allQuestions.unshift(...sortedQuestions); // Soruları başa ekliyoruz
+      });
+  
+      console.log("Bütün Sorular (Sıralı, önceki paketler üstte):", allQuestions);
+  
       // Soruları store'a kaydediyoruz
       set({ questions: allQuestions });
     } catch (error) {
       console.error("Error fetching questions:", error);
-      console.log("Hata Detayları:", error.response?.data);
       set({ questions: [] });
     }
   },
+  
+  
   // Interview'ı silen fonksiyon
   deleteInterview: async (interviewId) => {
     try {

@@ -47,6 +47,24 @@ export const getPackageQuestionsByInterview = async (req: Request, res: Response
   }
 };
 
+export const getInterviewExpireDate = async (req: Request, res: Response, next: NextFunction) => {
+  const { interviewId } = req.params;
+
+  try {
+    // Interview id'ye göre veritabanından interview'u buluyoruz
+    const interview = await Interview.findById(interviewId);
+
+    if (!interview) {
+      res.status(404).json({ message: "Interview not found" });
+      return;
+    }
+
+    // Interview bulundu, expireDate'i yanıt olarak döndürüyoruz
+    res.status(200).json({ expireDate: interview.expireDate });
+  } catch (error) {
+    next(error); // Eğer bir hata olursa, hata middleware'ine iletilir
+  }
+};
 
 export const getInterviews = async (req: Request, res: Response, next: NextFunction) => {
   try {

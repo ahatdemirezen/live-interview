@@ -110,22 +110,28 @@ export const updateQuestionService = async (
   return updatedPackage;
 };
 
-export const updateQuestionSequenceService = async (
+
+export const updateQuestionOrderService = async (
   packageId: string,
-  questions: any
+  questions: { questionId: string; sequenceNumber: number }[]
 ) => {
- 
-  // Package'ı ve içindeki soruyu bul
-  let packageData: any = await Package.findById(packageId);
-  packageData.questions = questions
+  const packageData = await Package.findById(packageId); // Paketi veritabanından bul
 
-  return await packageData.save()
+  if (!packageData) {
+    throw new Error('Package not found'); // Eğer paket bulunmazsa hata fırlat
+  }
 
- 
+  // Soruların sıralamasını güncelle
+  questions.forEach((q) => {
+    const question = packageData.questions.id(q.questionId); // Soruyu bul
+    if (question) {
+      question.sequenceNumber = q.sequenceNumber; // Yeni sıralamayı atayın
+    }
+  });
+
+  await packageData.save(); // Paketi kaydet (MongoDB'ye güncellemeleri kaydet)
+  return packageData; // Güncellenmiş paketi geri döndür
 };
-
-
-
 // Yeni sorular ekleme fonksiyonu
 export const addNewQuestions = async (
   packageId: string,

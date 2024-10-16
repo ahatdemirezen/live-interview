@@ -178,21 +178,27 @@ const useCreatePackage = create((set) => ({
   getPackageById: async (packageId) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get(`${apiUrl}/package/${packageId}` ,
-        { withCredentials: true }
-      );
+      const response = await axios.get(`${apiUrl}/package/${packageId}`, {
+        withCredentials: true,
+      });
+  
       const { title, questions } = response.data;
+  
+      // Soruları `sequenceNumber` alanına göre sıralıyoruz
+      const sortedQuestions = questions.sort((a, b) => a.sequenceNumber - b.sequenceNumber);
+  
       set({
         packageId,
         packageTitle: title,
-        questions,
-        totalQuestions: questions.length,
+        questions: sortedQuestions, // Sıralanmış soruları set ediyoruz
+        totalQuestions: sortedQuestions.length,
         loading: false,
       });
     } catch (error) {
       set({ error: 'Failed to fetch package', loading: false });
     }
   },
+  
 }));
 
 export default useCreatePackage;
