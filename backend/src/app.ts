@@ -8,6 +8,7 @@ import loginRoute from "./routes/login-route";
 import candidate from "./routes/candidate-route"
 import { authenticateToken } from "./middleware/auth";
 import cookieParser from "cookie-parser"; // Cookie-parser'ı import ediyoruz
+import media from "./routes/media-route"
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use("/api/interview", liveInterview);
 app.use("/api/package",  authenticateToken, Package);
 app.use("/api/login", loginRoute);
 app.use("/api/candidate", candidate);
+app.use("/api/upload", media); // Yeni eklenen route
 
 // Hataları yakalayan middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

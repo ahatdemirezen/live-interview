@@ -9,7 +9,7 @@ router.post("/", authenticateToken, InterviewController.createInterview);
 router.get("/",  authenticateToken, InterviewController.getInterviews);    // Tüm interview'ları getirme rotası
 router.delete("/:interviewId",  authenticateToken, InterviewController.deleteInterview);
 
-router.get("/:interviewId/packages/questions",  authenticateToken, InterviewController.getPackageQuestionsByInterview);
+router.get("/:interviewId/packages/questions",  InterviewController.getPackageQuestionsByInterview);
 
 router.get("/:interviewId/expire-date", InterviewController.getInterviewExpireDate);
 
