@@ -3,11 +3,17 @@ import axios from "axios";
 
 const apiUrl = import.meta.env.VITE_BE_URL; // Backend URL
 
-const useInterviewStore = create((set) => ({
+const useInterviewStore = create((set, get) => ({
   interviewExists: null,   // Başlangıç durumu (true/false/null)
   questions: [],
   loading: false,          // Yükleme durumu
   error: null,             // Hata durumu
+
+  isRecording: false,      // Video kayıt durumu
+  timerActive: false,      // Soruların süresi aktif mi
+  videoURL: null,
+  mediaRecorderRef: null,
+  recordedChunks: [],
 
   // Interview ID'yi kontrol etme fonksiyonu
   checkInterviewId: async (interviewId) => {
@@ -24,6 +30,42 @@ const useInterviewStore = create((set) => ({
       set({ error: error.message, loading: false });
     }
   },
+
+
+// Video kaydını başlatma fonksiyonu
+startRecording: async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        set((state) => ({
+          recordedChunks: [...state.recordedChunks, event.data],
+        }));
+      }
+    };
+
+    mediaRecorder.start();
+    set({ mediaRecorderRef: mediaRecorder, isRecording: true });
+  } catch (error) {
+    console.error("Recording error:", error);
+  }
+},
+
+ // Video kaydını durdurma fonksiyonu
+ stopRecording: () => {
+  const { mediaRecorderRef } = get();
+  if (mediaRecorderRef) {
+    mediaRecorderRef.stop();
+    set({ isRecording: false });
+  }
+},
+
+
+startTimer: () => set({ timerActive: true }),
+stopTimer: () => set({ timerActive: false }),
+
 
   fetchExpireDate: async (interviewId) => {
     set({ loading: true, error: null });
@@ -42,19 +84,25 @@ const useInterviewStore = create((set) => ({
     try {
       const response = await axios.get(`${apiUrl}/interview/${interviewId}/packages/questions`, {
         withCredentials: true,
-
       });
+  
       const packages = response.data?.packages || [];
-      const allQuestions = packages.flatMap((pkg) => pkg.questions);
-      console.log("Bütün Sorular:", allQuestions);
-
+  
+      // Paketlerin sıralı bir şekilde sorularını kaydediyoruz
+      let allQuestions = [];
+  
+      // Paketler sırasına göre her paketin sorularını sıralı olarak ekliyoruz
+      packages.forEach((pkg) => {
+        const sortedQuestions = pkg.questions.sort((a, b) => a.sequenceNumber - b.sequenceNumber); // Soruları sequenceNumber'a göre sıralıyoruz
+        allQuestions.unshift(...sortedQuestions); // Soruları başa ekliyoruz
+      });
+  
+      console.log("Bütün Sorular (Sıralı, önceki paketler üstte):", allQuestions);
+  
       // Soruları store'a kaydediyoruz
       set({ questions: allQuestions });
-    
-     
     } catch (error) {
       console.error("Error fetching questions:", error);
-      console.log("Hata Detayları:", error.response?.data);
       set({ questions: [] });
     }
   },

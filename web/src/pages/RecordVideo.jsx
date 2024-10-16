@@ -1,56 +1,33 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import useInterviewStore from '../stores/InterviewFetchStore'; // Zustand store'dan state'leri çekiyoruz
 
 const VideoRecorder = () => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [videoURL, setVideoURL] = useState(null);
+  const { isRecording, videoURL } = useInterviewStore(); // Zustand store'dan gerekli state'leri alıyoruz
+
   const videoRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-  const recordedChunks = useRef([]);
 
-  const handleStartRecording = async () => {
-    // Kullanıcıdan video ve ses izni isteme
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    videoRef.current.srcObject = stream;
-    mediaRecorderRef.current = new MediaRecorder(stream, {
-      mimeType: 'video/webm',
-    });
-
-    // Data elde edildikçe kaydetme
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        recordedChunks.current.push(event.data);
+  useEffect(() => {
+    if (isRecording) {
+      // Kayıt başlıyorsa video akışını başlat
+      const handleStartRecording = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      };
+      handleStartRecording();
+    } else {
+      // Kayıt durduğunda video akışını durdur
+      if (videoRef.current && videoRef.current.srcObject) {
+        videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
       }
-    };
-
-    // Kaydedilen veriyi alıp URL oluşturma
-    mediaRecorderRef.current.onstop = () => {
-      const blob = new Blob(recordedChunks.current, {
-        type: 'video/webm',
-      });
-      setVideoURL(URL.createObjectURL(blob));
-      recordedChunks.current = [];
-    };
-
-    // Kayıt işlemini başlatma
-    mediaRecorderRef.current.start();
-    setIsRecording(true);
-  };
-
-  const handleStopRecording = () => {
-    mediaRecorderRef.current.stop();
-    setIsRecording(false);
-  };
+    }
+  }, [isRecording]);
 
   return (
     <div>
       <video ref={videoRef} autoPlay playsInline style={{ width: '400px' }} />
-      <div>
-        {!isRecording ? (
-          <button onClick={handleStartRecording}>Kayda Başla</button>
-        ) : (
-          <button onClick={handleStopRecording}>Kaydı Durdur</button>
-        )}
-      </div>
       {videoURL && (
         <div>
           <h4>Kayıt:</h4>

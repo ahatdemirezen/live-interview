@@ -2,7 +2,17 @@ import React, { useState, useEffect } from 'react';
 import useInterviewStore from '../stores/InterviewFetchStore'; // Store'u kullanıyoruz
 
 const QuestionPanel = ({ interviewId }) => {
-  const { questions, getQuestionsByInterview } = useInterviewStore(); // API'den soruları çekmek için fonksiyon ve state
+  const {
+    questions,
+    getQuestionsByInterview,
+    isRecording,
+    startRecording,
+    stopRecording,
+    timerActive,        // timerActive'yi Zustand store'dan alıyoruz
+    startTimer,         // Timer'ı başlatma fonksiyonu
+    stopTimer,          // Timer'ı durdurma fonksiyonu
+  } = useInterviewStore(); // API'den soruları çekmek ve video kayıt kontrolü için state'leri çekiyoruz
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
 
@@ -24,19 +34,21 @@ const QuestionPanel = ({ interviewId }) => {
 
   // Zamanlayıcı
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (timeRemaining > 0) {
-        setTimeRemaining(timeRemaining - 1);
-      } else {
-        if (currentQuestionIndex < questions.length - 1) {
-          setCurrentQuestionIndex(currentQuestionIndex + 1);
-          setTimeRemaining(questions[currentQuestionIndex + 1]?.timeLimit * 60 || 0); // Yeni sorunun süresi, dakikayı saniyeye çeviriyoruz
+    if (timerActive) { // Zustand store'dan gelen timerActive state'ini kullanıyoruz
+      const timer = setInterval(() => {
+        if (timeRemaining > 0) {
+          setTimeRemaining(timeRemaining - 1);
+        } else {
+          if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex(currentQuestionIndex + 1);
+            setTimeRemaining(questions[currentQuestionIndex + 1]?.timeLimit * 60 || 0); // Yeni sorunun süresi
+          }
         }
-      }
-    }, 1000);
+      }, 1000);
 
-    return () => clearInterval(timer);
-  }, [timeRemaining, currentQuestionIndex, questions]);
+      return () => clearInterval(timer);
+    }
+  }, [timeRemaining, currentQuestionIndex, timerActive, questions]);
 
   // Skip tuşu ile bir sonraki soruya geçiş
   const handleSkip = () => {
@@ -44,6 +56,18 @@ const QuestionPanel = ({ interviewId }) => {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setTimeRemaining(questions[currentQuestionIndex + 1]?.timeLimit * 60 || 0); // Yeni sorunun süresi
     }
+  };
+
+  // "Kayda Başla" butonuna basıldığında video ve süreyi başlatma
+  const handleStart = async () => {
+    await startRecording(); // Video kaydını başlat
+    startTimer();           // Timer'ı store'dan başlatıyoruz
+  };
+
+  // "Done" butonuna basıldığında video kaydını durdurma
+  const handleDone = () => {
+    stopRecording(); // Video kaydını durdur
+    stopTimer();     // Timer'ı store'dan durduruyoruz
   };
 
   // Dakika ve saniye formatına çevirme fonksiyonu
@@ -62,13 +86,29 @@ const QuestionPanel = ({ interviewId }) => {
             <div>Time Left: {formatTime(timeRemaining)}</div> {/* Saniyeyi dakika:saniye formatında gösteriyoruz */}
           </div>
           <div className="text-center">
-            <button 
-              className="bg-gray-500 text-white px-4 py-2 rounded"
-              onClick={handleSkip} // Skip tuşuna basıldığında handleSkip çalışacak
-            >
-              Skip
-            </button>
-            <button className="bg-green-500 text-white px-4 py-2 rounded ml-2">Start/Done</button>
+            {!isRecording ? (
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+                onClick={handleStart} // Kayda Başla butonu
+              >
+                Kayda Başla
+              </button>
+            ) : (
+              <>
+                <button
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  onClick={handleSkip} // Skip tuşuna basıldığında handleSkip çalışacak
+                >
+                  Skip
+                </button>
+                <button
+                  className="bg-green-500 text-white px-4 py-2 rounded ml-2"
+                  onClick={handleDone} // Done butonu ile kaydı durdur
+                >
+                  Done
+                </button>
+              </>
+            )}
           </div>
         </>
       ) : (
