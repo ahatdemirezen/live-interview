@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import useInterviewStore from '../stores/InterviewFetchStore'; // Store'dan soruları çekiyoruz
-import useMediaStore from '../stores/RecordVideoStore'; // Medya upload store'u
+import useInterviewStore from '../stores/InterviewFetchStore'; // Soruları almak için state
+import useMediaStore from '../stores/RecordVideoStore'; // Medya upload fonksiyonu ve fileId
 
 const QuestionPanel = ({ interviewId, formId }) => {
   const { questions, getQuestionsByInterview } = useInterviewStore(); // Soruları almak için state
-  const { uploadMedia, isLoading, error } = useMediaStore(); // Medya upload fonksiyonu
+  const { uploadMedia, isLoading, error, fileId } = useMediaStore(); // Medya upload fonksiyonu ve fileId
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
@@ -96,7 +96,6 @@ const QuestionPanel = ({ interviewId, formId }) => {
     }
   };
 
-
   // Video upload işlemi
   const handleSubmit = async () => {
     if (!videoBlob) {
@@ -104,10 +103,15 @@ const QuestionPanel = ({ interviewId, formId }) => {
       return;
     }
 
-    const fileName = `video_${Date.now()}.webm`; // Örnek dosya adı
-
     try {
-      await uploadMedia(videoBlob, fileName); // Videoyu yüklemek için store fonksiyonunu çağırıyoruz
+      await uploadMedia(videoBlob, formId); // Videoyu yüklüyoruz
+
+      if (fileId) {
+        // Video başarıyla yüklendi ve fileId alındı
+        console.log(`File ID ${fileId} başarıyla alındı ve form ile ilişkilendirildi.`);
+      } else {
+        console.error('Video yüklendi fakat fileId alınamadı.');
+      }
     } catch (err) {
       console.error('Video yüklenirken hata oluştu:', err);
       alert('Video yüklenemedi.');
