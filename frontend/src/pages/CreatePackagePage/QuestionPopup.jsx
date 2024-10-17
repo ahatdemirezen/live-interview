@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import Modal from "../../components/modal";
 import useCreatePackage from "../../stores/CreatePackagePageStore";  // Zustand store import edildi
+import TextareaComponent from "../../components/textAreaComponent";
+import Button from "../../components/buttonComponent";
 
 const AddQuestionModal = ({ isOpen, onClose, packageId, onAddQuestion, question, onUpdateQuestion }) => {
   const currentQuestion = useCreatePackage((state) => state.currentQuestion);
@@ -57,15 +59,7 @@ const AddQuestionModal = ({ isOpen, onClose, packageId, onAddQuestion, question,
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={question ? "Edit Question" : "Add Question"}>
-      <div className="mb-4">
-        <label className="block text-gray-700 mb-2">Question</label>
-        <textarea
-          className="border p-2 w-full rounded"
-          placeholder="Input..."
-          value={currentQuestion}
-          onChange={(e) => setCurrentQuestion(e.target.value)}  // Zustand ile state yönetimi
-        />
-      </div>
+     <TextareaComponent placeholder="Input..." value={currentQuestion} onChange={(e) => setCurrentQuestion(e.target.value)} textAreaInputHeader="Question" rows={10}/>
 
       <div className="flex space-x-4 mb-4">
         <div className="flex items-center">
@@ -77,12 +71,7 @@ const AddQuestionModal = ({ isOpen, onClose, packageId, onAddQuestion, question,
           />
           <span className="ml-2">min</span>
         </div>
-        <button
-          onClick={handleSubmit}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          {question ? "Update" : "Add"}
-        </button>
+        <Button onClick={handleSubmit} label={question ? "Update" : "Add"} variant="primary"/>
       </div>
     </Modal>
   );

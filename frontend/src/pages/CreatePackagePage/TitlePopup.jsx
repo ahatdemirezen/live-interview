@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Modal from "../../components/modal";
 import useCreatePackage from "../../stores/CreatePackagePageStore";  // Zustand store'u import ediyoruz
+import TextInputComponent from "../../components/textInputComponent";
+import Button from "../../components/buttonComponent";
 
 const TitleModal = ({ isOpen, onClose }) => {
   const [title, setTitle] = useState('');  // Package Title state'i
@@ -27,26 +29,15 @@ const TitleModal = ({ isOpen, onClose }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Add Package Title">
+       
       {/* Package Title Girişi */}
       <div className="mb-4">
-        <label className="block text-gray-700 mb-2">Package Title</label>
-        <input
-          type="text"
-          className="border p-2 w-full rounded"
-          placeholder="Package Title..."
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}  // State'e title'ı set et
-        />
+        <TextInputComponent onChange={(e) => setTitle(e.target.value)} value={title} textInputHeader='Package Title'/>
       </div>
 
       {/* Save Butonu */}
       <div className="flex justify-end">
-        <button
-          onClick={handleSubmit}
-          className="bg-green-500 text-white px-4 py-2 rounded"
-        >
-          Save
-        </button>
+       <Button onClick={handleSubmit} label='Save' variant="primary"/>
       </div>
     </Modal>
   );

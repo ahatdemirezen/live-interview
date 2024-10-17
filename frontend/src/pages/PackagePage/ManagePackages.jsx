@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PackageList from './PackageList';
 import SideBar from '../../components/SideBar';
-import TitleModal from "../CreatePackagePage/TitlePopup";  // Modal bileşenini import ettiniz
-import Header from "../../components/header";
+import TitleModal from "../CreatePackagePage/TitlePopup";
+import Header from '../../components/Header';
+import Button from '../../components/buttonComponent';
+import { HiViewGridAdd } from "react-icons/hi";
 
 const ManagePackages = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);  // Modal görünürlüğünü kontrol eden state
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Modal'ı açma ve kapatma fonksiyonları
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -19,23 +20,20 @@ const ManagePackages = () => {
   };
 
   return (
-    <div className="flex bg-gray-100 h-screen">
-      {/* Sol tarafa sabitlenen NavBar */}
-      <SideBar />
+    <div className="flex flex-col lg:flex-row bg-gray-100 h-screen">
+      {/* SideBar - Mobilde gizlenir, büyük ekranlarda görünür */}
+      <div className="hidden lg:block">
+        <SideBar />
+      </div>
 
       {/* Sağdaki içerik alanı */}
-      <div className="flex-1 ml-64 p-6 bg-gray-100">
-      <Header />
+      <div className="flex-1 lg:ml-64 p-4 md:p-6 bg-gray-100">
+        <Header />
 
-        <div className="bg-white shadow-md rounded-md p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold">Manage Question Package</h2>
-            <button
-              className="bg-green-500 text-white p-2 rounded-full text-xl"
-              onClick={openModal}  // Modal'ı açıyoruz
-            >
-              ➕
-            </button>
+        <div className="bg-white shadow-md rounded-md p-4 md:p-6 mt-4">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+            <h2 className="text-xl md:text-2xl font-semibold text-stone-500">Manage Question Package</h2>
+            <Button onClick={openModal} size='lg' icon={<HiViewGridAdd className='text-2xl md:text-3xl text-[#92C7CF]' />} />
           </div>
 
           {/* Paket Listesi */}
@@ -46,7 +44,7 @@ const ManagePackages = () => {
       {/* TitleModal bileşeni */}
       <TitleModal 
         isOpen={isModalOpen} 
-        onClose={closeModal}  // Modal'ı kapatma fonksiyonu
+        onClose={closeModal}
       />
     </div>
   );

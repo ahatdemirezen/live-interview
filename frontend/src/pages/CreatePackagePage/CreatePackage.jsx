@@ -6,6 +6,8 @@ import AddQuestionModal from "./QuestionPopup";
 import useCreatePackage from "../../stores/CreatePackagePageStore";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import usePackageStore from '../../stores/PackagePageStore'; // Zustand store'u import ediyoruz
+import Header from "../../components/Header";
+import Button from "../../components/buttonComponent";
 
 const CreatePackage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -79,32 +81,19 @@ const CreatePackage = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex flex-col lg:flex-row bg-gray-100 h-screen">
       <SideBar />
 
-      <div className="flex-1 ml-64 p-6 bg-gray-100">
-        <div className="bg-white shadow-md rounded-md p-6">
-          <h2 className="text-2xl font-semibold mb-6">Remote-tech Admin Page</h2>
-
-          {/* Paket başlığını gösteren kısım */}
-          <div className="flex justify-between items-center mb-4">
-            <div className="p-2 w-full rounded-md text-gray-800 font-semibold mt-[-4px]">
-              {packageTitle || "Loading Package Title..."}
+      <div className="flex-1 lg:ml-64 p-4 md:p-6 bg-gray-100">
+        <Header/>
+      {/* Paket başlığını gösteren kısım */}
+          <div className="bg-white shadow-md rounded-md p-4 md:p-6 mt-4">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+            <h2 className="text-xl md:text-2xl font-semibold text-stone-500">{packageTitle || "Loading Package Title..."}</h2>
+           <Button onClick={() => {setSelectedQuestion(null);setIsModalOpen(true);}} label="Add Question" variant="primary"/>
+              
             </div>
-
-            <button
-              className="bg-white text-[#091E42] border border-[#D6D6D6] shadow-md flex items-center justify-center w-[92px] h-[40px] rounded-md px-4 py-2 text-[14px] font-medium leading-[20px] hover:shadow-lg transition-shadow duration-200"
-              onClick={() => {
-                setSelectedQuestion(null);
-                setIsModalOpen(true);
-              }}
-            >
-              <span>Add</span>&nbsp;<span>Question</span>
-            </button>
-          </div>
-
-          {/* Soruları görüntüleme ve Drag-and-Drop işlemi */}
-          <DragDropContext onDragEnd={onDragEnd}>
+            <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="questions">
               {(provided) => (
                 <table
@@ -113,11 +102,12 @@ const CreatePackage = () => {
                   className="table-auto w-full text-left"
                 >
                   <thead>
-                    <tr className="font-semibold text-gray-700">
-                      <th className="w-1/12">Order</th>
-                      <th className="w-4/12">Question</th>
-                      <th className="w-2/12">Time</th>
-                      <th className="w-5/12 text-center">Delete <FaTrash className="inline-block" /> / Edit <FaEdit className="inline-block" /></th>
+                    <tr className="font-semibold text-stone-500 ">
+                      <th className="w-2/12 py-2">Order</th>
+                      <th className="w-2/12 py-2">Question</th>
+                      <th className="w-2/12 py-2">Time</th>
+                      <th className="w-2/12 py-2 ">Delete</th>
+                      <th className="w-2/12 py-2 ">Edit</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -128,24 +118,16 @@ const CreatePackage = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className="bg-gray-50 hover:bg-gray-100 p-4 rounded-md shadow"
+                            className="bg-gray-50 hover:bg-gray-100 p-4 rounded-md"
                           >
-                            <td className="py-4">{index + 1}</td>
-                            <td className="py-4">{question.questionText}</td>
-                            <td className="py-4">{question.timeLimit} min</td>
-                            <td className="py-4 text-center">
-                              <button
-                                className="text-red-600 hover:text-red-800 mr-4"
-                                onClick={() => handleDeleteQuestion(question._id)}
-                              >
-                                <FaTrash />
-                              </button>
-                              <button
-                                className="text-blue-600 hover:text-blue-800"
-                                onClick={() => handleEditQuestion(question)}
-                              >
-                                <FaEdit />
-                              </button>
+                            <td className="py-4 px-2">{index + 1}</td>
+                            <td className="py-4 px-2">{question.questionText}</td>
+                            <td className="py-4 px-2">{question.timeLimit} min</td>
+                            <td className="py-4 px-2  text-center align-middle">
+                           <Button onClick={() => handleDeleteQuestion(question._id)} icon={<FaTrash className="text-rose-800 " />} />
+                            </td>
+                            <td className="py-4 px-2 text-center align-middle">
+                              <Button onClick={() => handleEditQuestion(question)} icon={<FaEdit className="text-rose-600" />}/>
                             </td>
                           </tr>
                         )}
@@ -158,12 +140,13 @@ const CreatePackage = () => {
             </Droppable>
           </DragDropContext>
 
-          {/* Toplam Soru Sayısı */}
           <div className="mt-4">
             <p className="font-semibold">Total Questions: {totalQuestions}</p>
           </div>
-        </div>
-      </div>
+
+           
+          </div>
+          </div>
 
       <AddQuestionModal
         isOpen={isModalOpen}

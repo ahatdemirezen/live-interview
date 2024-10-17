@@ -3,6 +3,10 @@ import useInterviewStore from "../../stores/InterviewListPageStore";
 import Button from "../../components/buttonComponent";
 import dayjs from "dayjs";
 import QuestionListModal from "./InterviewQuestionListPopup";
+import { MdOutlineQuestionMark } from "react-icons/md";
+import { AiOutlineLink } from "react-icons/ai";
+import { FaTrash} from 'react-icons/fa';
+import { GoChevronRight } from "react-icons/go";
 
 const InterviewCard = ({ interview }) => {
   const deleteInterview = useInterviewStore((state) => state.deleteInterview);
@@ -37,37 +41,37 @@ const InterviewCard = ({ interview }) => {
   };
 
   return (
-    <div className="bg-white p-4 m-4 shadow-md rounded-md relative w-64">
+    <div className="bg-white p-4 m-4 shadow-md rounded-md relative w-60 h-60">
       {/* Soru işareti ve link kısmı */}
       <div className="absolute top-1 left-1 text-gray-600">
-        <Button icon="❓" size="sm" onClick={handleOpenModal} />
+        <Button icon={<MdOutlineQuestionMark className="text-red-500 text-2xl" />} size="sm" onClick={handleOpenModal} />
       </div>
 
-      <div className="absolute top-2 right-1 flex space-x-2">
-        <Button icon="🔗" label="Copy Link" size="sm" onClick={handleCopyLink} />
-        <Button icon="🗑️" onClick={() => deleteInterview(interview._id)} size="sm" />
-      </div>
+      <div className="absolute top-1 right-1 flex items-center space-x-3">
+  <Button icon={<AiOutlineLink className="text-stone-400 text-2xl" />} onClick={handleCopyLink} />
+  <Button icon={<FaTrash className="text-rose-800 text-xl" />} onClick={() => deleteInterview(interview._id)}  />
+</div>
+
 
       {/* Başlık */}
-      <h3 className="text-lg font-bold mb-1 mt-3">{interview.interviewTitle}</h3>
+      <h3 className="text-lg font-bold mb-1 mt-8 text-center">{interview.interviewTitle}</h3>
 
       {/* Aday sayıları */}
-      <p className="text-sm text-gray-500 mb-2">Candidates:</p>
-      <div className="bg-gray-100 rounded-lg p-2 flex justify-between items-center mb-4">
-        <div className="text-center">
-          <p className="text-xs text-gray-500">TOTAL</p>
-          <p className="text-2xl font-bold">{interview.packageId.length}</p>
-        </div>
-        <div className="text-center">
-          <p className="text-xs text-gray-500">ON HOLD</p>
-          <p className="text-2xl font-bold">{Math.floor(Math.random() * 10)}</p>
-        </div>
-      </div>
+      <div className="bg-gray-100 rounded-lg p-2 flex justify-between items-center mt-6 shadow-md">
+  <div className="text-center">
+    <p className="text-xs text-gray-500">TOTAL</p>
+    <p className="text-xl font-bold">{interview.packageId.length}</p>
+  </div>
+  <div className="text-center">
+    <p className="text-xs text-gray-500">ON HOLD</p>
+    <p className="text-xl font-bold">{Math.floor(Math.random() * 10)}</p>
+  </div>
+</div>
 
       {/* Yayın durumu ve videolar */}
-      <div className="flex justify-between items-center text-sm">
+      <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center text-sm p-4">
         <span className="text-gray-500">{isExpired ? "Unpublished" : "Published"}</span>
-        <button className="text-blue-500">See Videos ➡</button>
+       <Button  label="See Videos" size="sm" icon={<GoChevronRight />} variant="secondary"/>
       </div>
 
       <QuestionListModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />

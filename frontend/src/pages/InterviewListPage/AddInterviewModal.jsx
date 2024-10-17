@@ -107,9 +107,8 @@ const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded }) => {
         <Button
           onClick={handleAddInterview} // Butona tıklandığında veriler gönderilir
           size="md"
-          variant="secondary"
+          variant="primary"
           rounded="rounded-md"
-          type="button"
           label="Add"
         />
       </div>
