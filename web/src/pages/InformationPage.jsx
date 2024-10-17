@@ -37,18 +37,22 @@ function PersonalInformationForm() {
   const handleSubmit = async (e) => {
     e.preventDefault(); // Sayfanın yeniden yüklenmesini önlüyoruz
     setCandidateForm(form); // Zustand state'ini form verileriyle güncelliyoruz
-    await submitCandidateForm(interviewId);
-    // Form başarıyla gönderildikten sonra inputları temizleyebilirsin
-    setForm({
-      name: '',
-      surname: '',
-      email: '',
-      phone: '',
-    });
-    // Form gönderildikten sonra /video-recorder sayfasına yönlendir
     
-   navigate(`/interview/${interviewId}`); 
+    try {
+      const savedPersonalInfo = await submitCandidateForm(interviewId); // Formu gönderip, savedPersonalInfo'yu alıyoruz
+      
+      // Backend'den gelen `personalInfoId`'yi alıyoruz
+      const { _id: formId } = savedPersonalInfo; // savedPersonalInfo nesnesinden id'yi çıkarıyoruz
+      
+      // Video sayfasına yönlendirme yapıyoruz (interviewId ve formId ile)
+      navigate(`/interview/${interviewId}/${formId}`);
+      
+    } catch (error) {
+      console.error("Form gönderim hatası:", error);
+    }
   };
+  
+  
   if (loading) {
     return <p>Loading...</p>; // Yükleniyor ekranı
   }

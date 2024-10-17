@@ -20,6 +20,10 @@ const PersonalInformationFormSchema = new Schema(
       required: true,
       match: /^\d{10,15}$/,  // Telefon numarasının uzunluğunu kontrol etmek için
     },
+    videoPath: {
+      type: String,  // Video dosyasının yolunu tutacak alan
+      default: '',   // Varsayılan olarak boş, video yüklendiğinde güncellenecek
+    },
   },
   {
     timestamps: true, // createdAt ve updatedAt alanlarını otomatik olarak ekler

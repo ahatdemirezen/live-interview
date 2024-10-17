@@ -1,119 +1,198 @@
-import React, { useState, useEffect } from 'react';
-import useInterviewStore from '../stores/InterviewFetchStore'; // Store'u kullanıyoruz
+import React, { useState, useEffect, useRef } from 'react';
+import useInterviewStore from '../stores/InterviewFetchStore'; // Store'dan soruları çekiyoruz
+import useMediaStore from '../stores/RecordVideoStore'; // Medya upload store'u
 
-const QuestionPanel = ({ interviewId }) => {
-  const {
-    questions,
-    getQuestionsByInterview,
-    isRecording,
-    startRecording,
-    stopRecording,
-    timerActive,        // timerActive'yi Zustand store'dan alıyoruz
-    startTimer,         // Timer'ı başlatma fonksiyonu
-    stopTimer,          // Timer'ı durdurma fonksiyonu
-  } = useInterviewStore(); // API'den soruları çekmek ve video kayıt kontrolü için state'leri çekiyoruz
+const QuestionPanel = ({ interviewId, formId }) => {
+  const { questions, getQuestionsByInterview } = useInterviewStore(); // Soruları almak için state
+  const { uploadMedia, isLoading, error } = useMediaStore(); // Medya upload fonksiyonu
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [videoBlob, setVideoBlob] = useState(null); // Blob verisini tutmak için state
+  const [videoURL, setVideoURL] = useState(null); // Kaydedilen video URL'si
+  const [stream, setStream] = useState(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [timerInterval, setTimerInterval] = useState(null);
+  const videoRef = useRef(null);
 
   // Soruları çek ve ilk sorunun süresini ayarla
   useEffect(() => {
     const fetchQuestions = async () => {
-      await getQuestionsByInterview(interviewId); // API'den soruları çekiyoruz
+      await getQuestionsByInterview(interviewId);
     };
-
     fetchQuestions();
   }, [interviewId, getQuestionsByInterview]);
 
-  // Sorular güncellendiğinde, ilk sorunun süresini ayarla (dakikayı saniyeye çeviriyoruz)
+  // Mevcut sorunun timeLimit süresini ayarla
   useEffect(() => {
     if (questions.length > 0) {
-      setTimeRemaining(questions[0].timeLimit * 60); // Dakikayı saniyeye çeviriyoruz
+      const currentQuestion = questions[currentQuestionIndex];
+      if (currentQuestion.timeLimit) {
+        setTimeRemaining(currentQuestion.timeLimit * 60); // Dakika cinsinden gelen timeLimit'i saniyeye çevir
+      }
     }
-  }, [questions]);
+  }, [questions, currentQuestionIndex]);
 
-  // Zamanlayıcı
-  useEffect(() => {
-    if (timerActive) { // Zustand store'dan gelen timerActive state'ini kullanıyoruz
-      const timer = setInterval(() => {
-        if (timeRemaining > 0) {
-          setTimeRemaining(timeRemaining - 1);
-        } else {
-          if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
-            setTimeRemaining(questions[currentQuestionIndex + 1]?.timeLimit * 60 || 0); // Yeni sorunun süresi
+  // Geri sayım başlatma fonksiyonu
+  const startTimer = () => {
+    if (timeRemaining > 0) {
+      const interval = setInterval(() => {
+        setTimeRemaining((prevTime) => {
+          if (prevTime === 1) {
+            clearInterval(interval);
+            handleSkip(); // Süre bittiğinde bir sonraki soruya geç
           }
-        }
+          return prevTime - 1;
+        });
       }, 1000);
-
-      return () => clearInterval(timer);
+      setTimerInterval(interval);
+      return () => clearInterval(interval); // Bileşen kapandığında temizle
     }
-  }, [timeRemaining, currentQuestionIndex, timerActive, questions]);
+  };
 
-  // Skip tuşu ile bir sonraki soruya geçiş
+  // Sorular arasında geçiş
   const handleSkip = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setTimeRemaining(questions[currentQuestionIndex + 1]?.timeLimit * 60 || 0); // Yeni sorunun süresi
+      clearInterval(timerInterval);
+      setTimeRemaining(questions[currentQuestionIndex + 1].timeLimit * 60 || 0); // Yeni sorunun timeLimit'ini başlat
+      startTimer();
     }
   };
 
-  // "Kayda Başla" butonuna basıldığında video ve süreyi başlatma
-  const handleStart = async () => {
-    await startRecording(); // Video kaydını başlat
-    startTimer();           // Timer'ı store'dan başlatıyoruz
+  // Video kaydını başlatma fonksiyonu
+  const handleStartRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const recorder = new MediaRecorder(stream);
+      setMediaRecorder(recorder);
+      videoRef.current.srcObject = stream;
+      recorder.start();
+      setStream(stream);
+      setIsRecording(true);
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          const blob = new Blob([event.data], { type: 'video/webm' });
+          setVideoBlob(blob); // Blob'u state'e kaydet
+          const videoUrl = URL.createObjectURL(blob);
+          setVideoURL(videoUrl); // Video URL'sini oluştur
+        }
+      };
+    } catch (error) {
+      console.error('Medya cihazlarına erişim hatası:', error);
+    }
   };
 
-  // "Done" butonuna basıldığında video kaydını durdurma
-  const handleDone = () => {
-    stopRecording(); // Video kaydını durdur
-    stopTimer();     // Timer'ı store'dan durduruyoruz
+  // Video kaydını durdurma fonksiyonu
+  const handleStopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+      stream.getTracks().forEach((track) => track.stop()); // Kamera ve mikrofonu kapat
+      videoRef.current.srcObject = null;
+      clearInterval(timerInterval);
+    }
   };
 
-  // Dakika ve saniye formatına çevirme fonksiyonu
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`; // Dakika:saniye formatı
+
+  // Video upload işlemi
+  const handleSubmit = async () => {
+    if (!videoBlob) {
+      alert('Lütfen önce bir video kaydedin.');
+      return;
+    }
+
+    const fileName = `video_${Date.now()}.webm`; // Örnek dosya adı
+
+    try {
+      await uploadMedia(videoBlob, fileName); // Videoyu yüklemek için store fonksiyonunu çağırıyoruz
+    } catch (err) {
+      console.error('Video yüklenirken hata oluştu:', err);
+      alert('Video yüklenemedi.');
+    }
+  };
+
+  // Geri kalan zamanı dakika ve saniye olarak göstermek için formatlama fonksiyonu
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
   };
 
   return (
-    <div className="p-4 bg-gray-100 rounded shadow-md">
-      {questions.length > 0 ? (
-        <>
-          <div className="flex justify-between mb-4">
-            <div>Question: {questions[currentQuestionIndex].questionText}</div>
-            <div>Time Left: {formatTime(timeRemaining)}</div> {/* Saniyeyi dakika:saniye formatında gösteriyoruz */}
-          </div>
-          <div className="text-center">
-            {!isRecording ? (
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-                onClick={handleStart} // Kayda Başla butonu
-              >
-                Kayda Başla
-              </button>
-            ) : (
-              <>
+    <div className="flex flex-col h-full bg-white">
+      {/* İlerleme Çubuğu */}
+      <div className="relative h-4 bg-gray-200 flex items-center">
+        <div
+          className="h-full bg-green-500"
+          style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+        />
+        {questions.map((_, index) => (
+          index !== 0 && (
+            <div
+              key={index}
+              className="absolute h-full border-l border-gray-400"
+              style={{ left: `${(index / questions.length) * 100}%` }}
+            />
+          )
+        ))}
+      </div>
+
+      <div className="flex h-full p-4 bg-gray-100 rounded shadow-md">
+        {/* Sol taraf: Video */}
+        <div className="w-1/2 flex items-center justify-center">
+          <video ref={videoRef} className="w-full h-auto bg-black" autoPlay muted />
+        </div>
+
+        {/* Sağ taraf: Sorular ve butonlar */}
+        <div className="w-1/2 p-4 flex flex-col justify-between">
+          {questions.length > 0 ? (
+            <>
+              <div className="mb-4">
+                <div className="flex justify-between mb-4">
+                  <div>Question: {questions[currentQuestionIndex].questionText}</div>
+                  <div>Time Remaining: {formatTime(timeRemaining)}</div>
+                </div>
+              </div>
+              <div className="text-center mt-auto">
                 <button
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
-                  onClick={handleSkip} // Skip tuşuna basıldığında handleSkip çalışacak
+                  className="bg-gray-500 text-white px-4 py-2 rounded mr-2"
+                  onClick={handleSkip}
                 >
                   Skip
                 </button>
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded ml-2"
-                  onClick={handleDone} // Done butonu ile kaydı durdur
-                >
-                  Done
-                </button>
-              </>
-            )}
-          </div>
-        </>
-      ) : (
-        <div>Loading questions...</div>
-      )}
+                {!isRecording ? (
+                  <button
+                    className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+                    onClick={handleStartRecording}
+                  >
+                    Start Recording
+                  </button>
+                ) : (
+                  <button
+                    className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                    onClick={handleStopRecording}
+                  >
+                    Stop Recording
+                  </button>
+                )}
+                {videoBlob && (
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+                    onClick={handleSubmit}
+                  >
+                    Submit Video
+                  </button>
+                )}
+              </div>
+            </>
+          ) : (
+            <div>Loading questions...</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

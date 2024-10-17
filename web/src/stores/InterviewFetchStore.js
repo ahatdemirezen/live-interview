@@ -9,12 +9,6 @@ const useInterviewStore = create((set, get) => ({
   loading: false,          // Yükleme durumu
   error: null,             // Hata durumu
 
-  isRecording: false,      // Video kayıt durumu
-  timerActive: false,      // Soruların süresi aktif mi
-  videoURL: null,
-  mediaRecorderRef: null,
-  recordedChunks: [],
-
   // Interview ID'yi kontrol etme fonksiyonu
   checkInterviewId: async (interviewId) => {
     set({ loading: true, error: null });
@@ -30,41 +24,6 @@ const useInterviewStore = create((set, get) => ({
       set({ error: error.message, loading: false });
     }
   },
-
-
-// Video kaydını başlatma fonksiyonu
-startRecording: async () => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-
-    mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        set((state) => ({
-          recordedChunks: [...state.recordedChunks, event.data],
-        }));
-      }
-    };
-
-    mediaRecorder.start();
-    set({ mediaRecorderRef: mediaRecorder, isRecording: true });
-  } catch (error) {
-    console.error("Recording error:", error);
-  }
-},
-
- // Video kaydını durdurma fonksiyonu
- stopRecording: () => {
-  const { mediaRecorderRef } = get();
-  if (mediaRecorderRef) {
-    mediaRecorderRef.stop();
-    set({ isRecording: false });
-  }
-},
-
-
-startTimer: () => set({ timerActive: true }),
-stopTimer: () => set({ timerActive: false }),
 
 
   fetchExpireDate: async (interviewId) => {

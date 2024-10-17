@@ -30,12 +30,17 @@ const useCandidateStore = create((set) => ({
           'Content-Type': 'application/json',
         },
       });
-  
-      console.log('Form başarıyla gönderildi:', response.data);
+      
+      const savedPersonalInfo = response.data; // Backend'den gelen yanıtı kaydediyoruz
+      
+      console.log('Form başarıyla gönderildi:', savedPersonalInfo);
+      return savedPersonalInfo; // Backend'den dönen `savedPersonalInfo` nesnesini return ediyoruz
     } catch (error) {
       console.error('Form gönderilirken bir hata oluştu:', error.response ? error.response.data : error.message);
+      throw error; // Hata oluşursa yakalayıp fırlatıyoruz
     }
   },
+  
 }));
 
 export default useCandidateStore;

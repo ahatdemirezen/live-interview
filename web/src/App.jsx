@@ -13,7 +13,7 @@ const App = () => {
         {/* Rotalar */}
         <Routes>
           <Route path="/information-form/:interviewId" element={<PersonalInformationForm />} />
-          <Route path="/interview/:interviewId" element={<InterviewPage/>} /> {/* Video kaydedici rotası */}
+          <Route path="/interview/:interviewId/:formId" element={<InterviewPage />} /> {/* formId ve interviewId URL'den geliyor */}
         </Routes>
       </div>
     </Router>
