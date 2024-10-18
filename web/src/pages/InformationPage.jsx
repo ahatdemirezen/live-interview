@@ -1,32 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import useInterviewStore from '../stores/InterviewFetchStore'; // Interview kontrol fonksiyonu
-import useCandidateStore from '../stores/InformationFormStore'; // Zustand store dosyasını buraya import et
-import dayjs from 'dayjs'; // Tarih kontrolü için
+import useInterviewStore from '../stores/InterviewFetchStore';
+import useCandidateStore from '../stores/InformationFormStore';
+import dayjs from 'dayjs';
+
 function PersonalInformationForm() {
-  const { interviewId } = useParams(); // URL'den interviewId'yi alıyoruz
-  const navigate = useNavigate(); // Yönlendirme yapmak için
-  const { checkInterviewId, fetchExpireDate, interviewExists, expireDate, loading, error } = useInterviewStore(); // Interview ID kontrolü için zustand'dan fonksiyonları alıyoruz
-  const { setCandidateForm, submitCandidateForm } = useCandidateStore(); // Zustand'daki fonksiyonları alıyoruz
+  const { interviewId } = useParams();
+  const navigate = useNavigate();
+  const { checkInterviewId, fetchExpireDate, interviewExists, expireDate, loading, error } = useInterviewStore();
+  const { setCandidateForm, submitCandidateForm } = useCandidateStore();
   const [form, setForm] = useState({
     name: '',
     surname: '',
     email: '',
     phone: '',
   });
-  const [accessError, setAccessError] = useState(false); // Erişim hatası için state
+  const [accessError, setAccessError] = useState(false);
+
   useEffect(() => {
-    // URL'den gelen interviewId'nin geçerli olup olmadığını kontrol ediyoruz
     checkInterviewId(interviewId);
-    // Interview'a ait expireDate verisini de çekiyoruz
     fetchExpireDate(interviewId);
   }, [interviewId, checkInterviewId, fetchExpireDate]);
+
   useEffect(() => {
-    // Eğer expireDate varsa ve şimdiki tarihten büyükse (geçmişse), erişim hatası set ediyoruz
     if (expireDate && dayjs(expireDate).isBefore(dayjs())) {
-      setAccessError(true); // Tarih geçmişse, erişim hatası set ediliyor
+      setAccessError(true);
     }
   }, [expireDate]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prevForm) => ({
@@ -34,99 +35,101 @@ function PersonalInformationForm() {
       [name]: value,
     }));
   };
+
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Sayfanın yeniden yüklenmesini önlüyoruz
-    setCandidateForm(form); // Zustand state'ini form verileriyle güncelliyoruz
+    e.preventDefault();
+    setCandidateForm(form);
     
     try {
-      const savedPersonalInfo = await submitCandidateForm(interviewId); // Formu gönderip, savedPersonalInfo'yu alıyoruz
-      
-      // Backend'den gelen `personalInfoId`'yi alıyoruz
-      const { _id: formId } = savedPersonalInfo; // savedPersonalInfo nesnesinden id'yi çıkarıyoruz
-      
-      // Video sayfasına yönlendirme yapıyoruz (interviewId ve formId ile)
+      const savedPersonalInfo = await submitCandidateForm(interviewId);
+      const { _id: formId } = savedPersonalInfo;
       navigate(`/interview/${interviewId}/${formId}`);
-      
     } catch (error) {
       console.error("Form gönderim hatası:", error);
     }
   };
-  
-  
+
   if (loading) {
-    return <p>Loading...</p>; // Yükleniyor ekranı
+    return <p className="text-center text-gray-500">Loading...</p>;
   }
+
   if (error) {
-    return <p>Error: {error}</p>; // Hata varsa göster
+    return <p className="text-center text-red-500">Error: {error}</p>;
   }
+
   if (interviewExists === false) {
-    return <p>Interview not found! Please check the URL.</p>; // Interview ID bulunamazsa mesaj göster
+    return <p className="text-center text-red-500">Interview not found! Please check the URL.</p>;
   }
-  // Eğer erişim hatası varsa, formu göstermeden sadece uyarı mesajı gösteriyoruz
+
   if (accessError) {
-    return <p>Access denied: Interview link is expired.</p>;
+    return <p className="text-center text-red-500">Access denied: Interview link is expired.</p>;
   }
+
   return (
-    <div style={{ width: '300px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <h2 style={{ backgroundColor: '#ccc', padding: '10px', textAlign: 'center' }}>Personal Information Form</h2>
-        <label>
-          Name*:
-          <input
-            type="text"
-            name="name"
-            value={form.name} // input value state ile bağlanıyor
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-          />
-        </label>
-        <label>
-          Surname*:
-          <input
-            type="text"
-            name="surname"
-            value={form.surname}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-          />
-        </label>
-        <label>
-          Email*:
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-          />
-        </label>
-        <label>
-          Phone*:
-          <input
-            type="tel"
-            name="phone"
-            value={form.phone}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-          />
-        </label>
-        <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
-          <input type="checkbox" name="kvkk" required style={{ marginRight: '10px' }} />
-          <label>
-            I have read and approved the <a href="#" style={{ textDecoration: 'underline' }}>KVKK text</a>.
-          </label>
-        </div>
-        <button
-          type="submit"
-          style={{ padding: '10px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer', marginTop: '15px' }}>
-          Submit
-        </button>
-      </form>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-700">Personal Information Form</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Name*</label>
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              required
+              className="mt-1 p-3 block w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Surname*</label>
+            <input
+              type="text"
+              name="surname"
+              value={form.surname}
+              onChange={handleChange}
+              required
+              className="mt-1 p-3 block w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email*</label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              className="mt-1 p-3 block w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Phone*</label>
+            <input
+              type="tel"
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              required
+              className="mt-1 p-3 block w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="flex items-start">
+            <input type="checkbox" name="kvkk" required className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+            <label className="ml-2 block text-sm text-gray-700">
+              I have read and approved the <a href="#" className="text-blue-600 hover:underline">KVKK text</a>.
+            </label>
+          </div>
+          <button
+            type="submit"
+            className="w-full py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
+
 export default PersonalInformationForm;

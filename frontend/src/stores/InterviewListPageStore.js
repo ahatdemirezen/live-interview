@@ -5,7 +5,8 @@ const apiUrl = import.meta.env.VITE_BE_URL; // Backend URL'ini çevresel değiş
 
 const useInterviewStore = create((set) => ({
   interviews: [],  // Interview verilerini burada tutacağız
-  questions : [],
+  questions: [],
+  personalForms: [], // Interview içindeki adayların kişisel bilgilerini tutmak için state
   loading: false,  // Yükleme durumu
   error: null,     // Hata durumu
 
@@ -13,7 +14,7 @@ const useInterviewStore = create((set) => ({
   fetchInterviews: async () => {
     set({ loading: true });
     try {
-      const response = await axios.get(`${apiUrl}/interview` , {
+      const response = await axios.get(`${apiUrl}/interview`, {
         withCredentials: true,
       });  // GET isteği yapılıyor
       set({ interviews: response.data, loading: false });
@@ -21,27 +22,27 @@ const useInterviewStore = create((set) => ({
       set({ error: error.message, loading: false });
     }
   },
-  
+
   getQuestionsByInterview: async (interviewId) => {
     console.log("getQuestionsByInterview fonksiyonu çalışıyor:", interviewId);
     try {
       const response = await axios.get(`${apiUrl}/interview/${interviewId}/packages/questions`, {
         withCredentials: true,
       });
-  
+
       const packages = response.data?.packages || [];
-  
+
       // Paketlerin sıralı bir şekilde sorularını kaydediyoruz
       let allQuestions = [];
-  
+
       // Paketler sırasına göre her paketin sorularını sıralı olarak ekliyoruz
       packages.forEach((pkg) => {
         const sortedQuestions = pkg.questions.sort((a, b) => a.sequenceNumber - b.sequenceNumber); // Soruları sequenceNumber'a göre sıralıyoruz
         allQuestions.unshift(...sortedQuestions); // Soruları başa ekliyoruz
       });
-  
+
       console.log("Bütün Sorular (Sıralı, önceki paketler üstte):", allQuestions);
-  
+
       // Soruları store'a kaydediyoruz
       set({ questions: allQuestions });
     } catch (error) {
@@ -49,12 +50,26 @@ const useInterviewStore = create((set) => ({
       set({ questions: [] });
     }
   },
-  
-  
+
+  // Interview'daki adayların kişisel bilgilerini getiren fonksiyon
+  getPersonalFormsByInterview: async (interviewId) => {
+    try {
+      const response = await axios.get(`${apiUrl}/interview/${interviewId}/personal-forms`, {
+        withCredentials: true,
+      });
+      
+      // Backend'den gelen personalInformationForms'u alıp store'a kaydediyoruz
+      set({ personalForms: response.data.personalInformationForms });
+    } catch (error) {
+      console.error('Error fetching personal forms:', error);
+      set({ personalForms: [] }); // Hata olursa personalForms'u boş yapıyoruz
+    }
+  },
+
   // Interview'ı silen fonksiyon
   deleteInterview: async (interviewId) => {
     try {
-      await axios.delete(`${apiUrl}/interview/${interviewId}` , {
+      await axios.delete(`${apiUrl}/interview/${interviewId}`, {
         withCredentials: true,
       });  // DELETE isteği
       set((state) => ({

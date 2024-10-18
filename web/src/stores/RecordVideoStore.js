@@ -13,7 +13,7 @@ const useMediaStore = create((set) => ({
     try {
       // FormData oluşturuyoruz
       const formData = new FormData();
-      formData.append('file', mediaFile, 'video32.webm');
+      formData.append('file', mediaFile, 'video36.webm');
 
       // Backend API URL (formId'yi URL'ye ekliyoruz)
       const apiUrl = `http://localhost:5002/api/upload/media/${formId}`;

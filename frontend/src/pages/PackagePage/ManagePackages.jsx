@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PackageList from './PackageList';
 import SideBar from '../../components/SideBar';
 import TitleModal from "../CreatePackagePage/TitlePopup";
-import Header from '../../components/Header';
+import Header from '../../components/header';
 import Button from '../../components/buttonComponent';
 import { HiViewGridAdd } from "react-icons/hi";
 

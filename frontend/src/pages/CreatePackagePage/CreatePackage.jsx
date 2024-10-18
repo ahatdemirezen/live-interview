@@ -6,7 +6,7 @@ import AddQuestionModal from "./QuestionPopup";
 import useCreatePackage from "../../stores/CreatePackagePageStore";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import usePackageStore from '../../stores/PackagePageStore'; // Zustand store'u import ediyoruz
-import Header from "../../components/Header";
+import Header from "../../components/header";
 import Button from "../../components/buttonComponent";
 
 const CreatePackage = () => {

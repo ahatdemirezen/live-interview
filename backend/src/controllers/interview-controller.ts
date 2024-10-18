@@ -47,6 +47,28 @@ export const getPackageQuestionsByInterview = async (req: Request, res: Response
   }
 };
 
+export const getPersonalFormsByInterview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { interviewId } = req.params;
+
+  try {
+    // Interview verisini populate kullanarak personalInformationForms ile çekiyoruz
+    const interview = await Interview.findById(interviewId).populate('personalInformationForms');
+
+    if (!interview) {
+      // Bu satırın dönüş tipi Response olsa bile, Promise<void> olarak döneceğiz.
+      res.status(404).json({ message: 'Interview not found' });
+      return; // return ile fonksiyonun işlemini bitiriyoruz.
+    }
+
+    // Eğer interview bulunduysa, personalInformationForms verisini döndürüyoruz
+    res.status(200).json({ personalInformationForms: interview.personalInformationForms });
+  } catch (error) {
+    next(error);  // Hata oluşursa, error handling middleware'ine yönlendirme
+  }
+};
+
+
+
 export const getInterviewExpireDate = async (req: Request, res: Response, next: NextFunction) => {
   const { interviewId } = req.params;
 

@@ -6,7 +6,7 @@ import Login from "./pages/Login";
 import Modal from 'react-modal';
 import InterviewList from "./pages/InterviewListPage/InterviewList";
 import ProtectedRoute from './access-control/auth-controller'; // Koruma bileşenini import ediyoruz
-
+import InterviewVideosPage from "./pages/InterviewListPage/interviewVideos"
 Modal.setAppElement('#root');
 
 const App = () => {
@@ -45,13 +45,22 @@ const App = () => {
               </ProtectedRoute>
             } 
           />
-          <Route 
+          <Route
+           
             path="/interview-list" 
             element={
               <ProtectedRoute>
                 <InterviewList />
               </ProtectedRoute>
             } 
+          />
+          <Route 
+            path="/interview/:interviewId/videos" 
+            element={
+              <ProtectedRoute>
+                <InterviewVideosPage />
+              </ProtectedRoute>
+            }
           />
         </Routes>
       </div>
