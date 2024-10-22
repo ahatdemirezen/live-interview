@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { getAllPersonalInfoService, createPersonalInfoService } from '../services/candidate-service';
+import { getAllPersonalInfoService, createPersonalInfoService ,updatePersonalInfoStatusService } from '../services/candidate-service';
+import PersonalInformationForm from "../models/candidate-model";
 
 // GET - Tüm kişisel bilgileri getirme
 export const getAllPersonalInfo = async (req: Request, res: Response): Promise<void> => {
@@ -31,5 +32,26 @@ export const createPersonalInfo = async (req: Request, res: Response, next: Next
     } else {
       next(error); // error, Error tipi değilse, yine de bir sonraki middleware'e geç
     }
+  }
+};
+
+// Adayın status durumunu güncelleyen endpoint (formId'yi body'den alıyoruz)
+export const updateCandidateStatus = async (req: Request,res: Response,next: NextFunction): Promise<any> => {
+  const { formId, status } = req.body;
+
+  try {
+    const updatedForm = await PersonalInformationForm.findByIdAndUpdate(
+      formId,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedForm) {
+      return res.status(404).json({ message: 'Candidate form not found' });
+    }
+
+    return res.status(200).json({ message: 'Candidate status updated', updatedForm });
+  } catch (error) {
+    next(error);
   }
 };

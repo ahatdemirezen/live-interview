@@ -2,16 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useInterviewStore from "../../stores/InterviewListPageStore"; // Store'dan verileri çekmek için
 import axios from "axios";
-import Modal from "../../components/modal";// Sizin modal componentinizi buraya import ediyoruz
+import Modal from "../../components/modal"; // Sizin modal componentinizi buraya import ediyoruz
 
 const InterviewVideosPage = () => {
   const { interviewId } = useParams(); // URL'deki interviewId'yi alıyoruz
-  const { getPersonalFormsByInterview, personalForms } = useInterviewStore();
+  const { getPersonalFormsByInterview, personalForms, updateCandidateStatus, deleteCandidateAndMedia } = useInterviewStore(); // updateCandidateStatus ve deleteCandidateAndMedia fonksiyonlarını ekledik
 
   const [loading, setLoading] = useState(true);
   const [videoURLs, setVideoURLs] = useState({}); // Her videoId için URL'leri tutacak state
   const [selectedVideo, setSelectedVideo] = useState(null); // Açılacak video için state
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal açılıp kapanma kontrolü
+  const [status, setStatus] = useState(false); // Status durumu için state
+  const [selectedFormId, setSelectedFormId] = useState(null); // Seçilen formId'yi tutmak için state
+  const [selectedVideoId, setSelectedVideoId] = useState(null); // Seçilen videoId'yi tutmak için state
 
   // Belirli bir videoId için video URL'sini getir
   const fetchVideoURL = async (videoId) => {
@@ -24,7 +27,7 @@ const InterviewVideosPage = () => {
       const response = await axios.post(`http://localhost:5002/api/upload/video-url`, {
         videoId: videoId, // Body'ye videoId ekleniyor
       });
-      
+
       const videoUrl = response.data.videoUrl; // Gelen video URL'sini döndür
       return videoUrl;
     } catch (error) {
@@ -61,16 +64,42 @@ const InterviewVideosPage = () => {
     fetchVideos();
   }, [personalForms]);
 
-  // Modal açma ve video seçme işlemi
-  const openModal = (videoUrl) => {
+  // Modal açma ve video seçme işlemi (formId ve status'ü de ayarlıyoruz)
+  const openModal = (videoUrl, formId, formStatus, videoId) => {
     setSelectedVideo(videoUrl);
+    setSelectedFormId(formId); // FormId'yi ayarla
+    setSelectedVideoId(videoId); // VideoId'yi ayarla
+    setStatus(formStatus); // Formun mevcut status durumunu ayarla
     setIsModalOpen(true);
   };
 
   // Modal kapatma işlemi
   const closeModal = () => {
     setSelectedVideo(null);
+    setSelectedFormId(null);
+    setSelectedVideoId(null);
     setIsModalOpen(false);
+  };
+
+  // Status durumunu toggle eden fonksiyon
+  const toggleStatus = async () => {
+    const newStatus = !status; // Yeni status durumunu alıyoruz
+    setStatus(newStatus); // Durumu frontend'de değiştiriyoruz
+    if (selectedFormId) {
+      await updateCandidateStatus(selectedFormId, newStatus); // Zustand fonksiyonunu kullanarak backend'e PATCH isteği atıyoruz
+    }
+  };
+
+  // Silme işlemi
+  const handleDelete = async () => {
+    if (selectedFormId && selectedVideoId) {
+      try {
+        await deleteCandidateAndMedia(selectedFormId, selectedVideoId); // formId ve videoId'yi gönderiyoruz
+        closeModal(); // Silme işleminden sonra modal'ı kapatıyoruz
+      } catch (error) {
+        console.error("Error deleting candidate and media:", error);
+      }
+    }
   };
 
   if (loading) {
@@ -84,12 +113,18 @@ const InterviewVideosPage = () => {
         {personalForms.map((form) => (
           <div
             key={form._id}
-            className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transform hover:scale-105 transition-transform duration-300"
-             
-            onClick={() => openModal(videoURLs[form.videoId])}
+            className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transform hover:scale-105 transition-transform duration-300 relative" // relative sınıfını ekliyoruz
+            onClick={() => openModal(videoURLs[form.videoId], form._id, form.status, form.videoId)} // FormId, videoId ve status'ü gönderiyoruz
           >
+            {/* Status Gösterge Düğmesi */}
+            <div
+              className={`absolute top-2 left-2 w-4 h-4 rounded-full ${form.status ? "bg-green-400" : "bg-red-400"}`}
+              title={form.status ? "Active" : "Inactive"} // Tooltip ekliyoruz
+            ></div>
             <div className="bg-[#92C7CF] px-6 py-4">
-              <h2 className="font-semibold text-lg text-slate-100">{form.name} {form.surname}</h2>
+              <h2 className="font-semibold text-lg text-slate-100">
+                {form.name} {form.surname}
+              </h2>
             </div>
             <div className="bg-stone-200 h-48 flex items-center justify-center">
               <svg
@@ -118,18 +153,35 @@ const InterviewVideosPage = () => {
       </div>
 
       {/* Modal yapısı */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        title="Interview Video"
-      >
+      <Modal isOpen={isModalOpen} onClose={closeModal} title="Interview Video">
         {selectedVideo ? (
           <div className="flex flex-col items-center">
             <video controls width="600" className="mb-4">
               <source src={selectedVideo} type="video/webm" />
               Your browser does not support the video tag.
             </video>
-           
+
+            {/* Status Switch */}
+            <div className="flex items-center space-x-3 mt-4">
+              <span className="font-semibold text-gray-600">Status</span>
+              <div
+                onClick={toggleStatus}
+                className={`w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer ${status ? "bg-green-400" : "bg-gray-300"}`}
+              >
+                {/* Switch Düğmesi */}
+                <div
+                  className={`bg-white w-5 h-5 rounded-full shadow-md transform duration-300 ${status ? "translate-x-6" : "translate-x-1"}`}
+                />
+              </div>
+            </div>
+
+            {/* Silme Butonu */}
+            <button
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
+              onClick={handleDelete}
+            >
+              Delete Candidate and Video
+            </button>
           </div>
         ) : (
           <p>No video available</p>

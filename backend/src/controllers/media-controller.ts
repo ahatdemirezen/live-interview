@@ -136,3 +136,53 @@ export const getMediaInfo = async (req: Request, res: Response): Promise<void> =
     }
   }
 };
+
+export const deleteCandidateAndMedia = async (req: Request, res: Response): Promise<void> => {
+  const { AWS_SECRET_ACCESS_KEY, BUCKET_NAME, Project, Link } = process.env;
+  const { formId, videoId } = req.body;  // Body'den formId ve videoId'yi alıyoruz
+
+  if (!formId || !videoId) {
+    res.status(400).json({ message: 'Both formId and videoId are required' });
+    return;
+  }
+
+  try {
+    // 1. Adayı Silme İşlemi
+    const deletedForm = await PersonalInformationForm.findByIdAndDelete(formId);
+
+    if (!deletedForm) {
+      res.status(404).json({ message: 'Candidate form not found' });
+      return;
+    }
+
+    // 2. Video Silme İşlemi
+    const videoDeleteUrl = `${Link}/${Project}/${BUCKET_NAME}/${AWS_SECRET_ACCESS_KEY}/${videoId}`;
+
+    // Harici medya servisinde videoyu silme
+    const videoDeleteResponse = await axios.delete(videoDeleteUrl);
+
+    if (videoDeleteResponse.status === 200 || videoDeleteResponse.status === 204) {
+      res.status(200).json({
+        message: 'Candidate form and associated media deleted successfully',
+        deletedForm,
+      });
+    } else {
+      res.status(500).json({ 
+        message: 'Failed to delete media from external service',
+        error: videoDeleteResponse.data 
+      });
+    }
+  } catch (error) {
+    console.error('Error deleting candidate or media:', error);
+    if (axios.isAxiosError(error)) {
+      res.status(500).json({
+        message: 'Error during delete request to external service',
+        error: error.response?.data || error.message,
+      });
+    } else {
+      res.status(500).json({
+        message: 'An unknown error occurred during deletion',
+      });
+    }
+  }
+};

@@ -37,3 +37,16 @@ export const createPersonalInfoService = async (name: string, surname: string, e
 
   return savedPersonalInfo;
 };
+// Service - Adayın mülakat statüsünü güncelleme
+export const updatePersonalInfoStatusService = async (id: string, status: boolean) => {
+  const personalInfo = await PersonalInformationForm.findById(id);
+
+  if (!personalInfo) {
+    throw new Error('Aday bulunamadı');
+  }
+
+  personalInfo.status = status; // Status alanını güncelliyoruz
+  await personalInfo.save();
+
+  return personalInfo;
+};

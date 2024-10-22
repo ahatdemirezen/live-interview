@@ -24,6 +24,11 @@ const PersonalInformationFormSchema = new Schema(
       type: String,  // Video ID'sini tutan alan, herhangi bir şemaya referans vermiyor
       default: null, // Varsayılan olarak null
     },
+    status: {
+      type: Boolean,  // Adayın mülakattan geçip geçmediğini belirten boolean değer
+      default: false, // Varsayılan olarak 'false' (geçmedi)
+      required: true,
+    }
   },
   {
     timestamps: true, // createdAt ve updatedAt alanlarını otomatik olarak ekler

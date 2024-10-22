@@ -79,6 +79,52 @@ const useInterviewStore = create((set) => ({
       console.error('Error deleting interview:', error);
     }
   },
+
+  deleteCandidateAndMedia: async (formId, videoId) => {
+    try {
+      // Silme isteği, formId ve videoId'yi body'den gönderiyoruz
+      const response = await axios.delete(`${apiUrl}/upload/delete-candidate-media`, {
+        data: {
+          formId,
+          videoId,
+        },
+        withCredentials: true,  // Eğer authentication varsa
+      });
+
+      // Store'daki personalForms listesinden silinen adayı çıkarıyoruz
+      set((state) => ({
+        personalForms: state.personalForms.filter((form) => form._id !== formId),
+      }));
+
+      console.log('Aday ve medya başarıyla silindi:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting candidate and media:', error);
+    }
+  },
+
+  updateCandidateStatus: async (formId, newStatus) => {
+    try {
+      // PATCH isteği ile adayın status durumunu güncelleme
+      const response = await axios.patch(`${apiUrl}/candidate/status`, {
+        formId: formId,
+        status: newStatus,
+      }, {
+        withCredentials: true,  // Eğer authentication varsa
+      });
+
+      // Backend'den dönen güncellenmiş formu alıp store'daki personalForms listesini güncelliyoruz
+      set((state) => ({
+        personalForms: state.personalForms.map((form) =>
+          form._id === formId ? { ...form, status: newStatus } : form
+        ),
+      }));
+
+      return response.data;  // İsteğin sonucunu döndürüyoruz
+    } catch (error) {
+      console.error('Error updating candidate status:', error);
+    }
+  },
 }));
 
 export default useInterviewStore;

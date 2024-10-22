@@ -26,7 +26,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 
       // Token'ı HTTP Only cookie olarak ekliyoruz
       res.cookie('token', token, {
-        httpOnly: true,  // JavaScript ile erişimi kapatır (XSS koruması)
+        httpOnly: process.env.NODE_ENV == "production" ? true : false,
         secure: false, // Yalnızca HTTPS üzerinden gönderilsin
         maxAge: 60 * 60 * 1000, // Cookie süresi: 1 saat (3600000 milisaniye)
         sameSite: 'strict', // CSRF saldırılarına karşı koruma
