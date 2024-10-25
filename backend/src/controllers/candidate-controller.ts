@@ -36,8 +36,14 @@ export const createPersonalInfo = async (req: Request, res: Response, next: Next
 };
 
 // Adayın status durumunu güncelleyen endpoint (formId'yi body'den alıyoruz)
-export const updateCandidateStatus = async (req: Request,res: Response,next: NextFunction): Promise<any> => {
+export const updateCandidateStatus = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   const { formId, status } = req.body;
+
+  // Geçerli statü değerlerini kontrol edelim
+  const validStatuses = ['pending', 'passed', 'failed'];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ message: 'Geçersiz statü değeri' });
+  }
 
   try {
     const updatedForm = await PersonalInformationForm.findByIdAndUpdate(

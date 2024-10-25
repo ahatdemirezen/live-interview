@@ -45,7 +45,10 @@ export const updatePersonalInfoStatusService = async (id: string, status: boolea
     throw new Error('Aday bulunamadı');
   }
 
-  personalInfo.status = status; // Status alanını güncelliyoruz
+  // Boolean değeri "passed" veya "failed" string'ine dönüştür
+  const updatedStatus = status ? 'passed' : 'failed';
+
+  personalInfo.status = updatedStatus; // Status alanını güncelliyoruz
   await personalInfo.save();
 
   return personalInfo;

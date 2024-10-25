@@ -25,9 +25,9 @@ const PersonalInformationFormSchema = new Schema(
       default: null, // Varsayılan olarak null
     },
     status: {
-      type: Boolean,  // Adayın mülakattan geçip geçmediğini belirten boolean değer
-      default: false, // Varsayılan olarak 'false' (geçmedi)
-      required: true,
+     type: String,
+     enum: ['pending', 'passed', 'failed'],
+     default: 'pending',
     }
   },
   {

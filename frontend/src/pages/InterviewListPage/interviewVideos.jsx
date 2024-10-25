@@ -82,9 +82,8 @@ const InterviewVideosPage = () => {
   };
 
   // Status durumunu toggle eden fonksiyon
-  const toggleStatus = async () => {
-    const newStatus = !status; // Yeni status durumunu alıyoruz
-    setStatus(newStatus); // Durumu frontend'de değiştiriyoruz
+  const toggleStatus = async (newStatus) => {
+    setStatus(newStatus); // Yeni durumu frontend'de güncelliyoruz
     if (selectedFormId) {
       await updateCandidateStatus(selectedFormId, newStatus); // Zustand fonksiyonunu kullanarak backend'e PATCH isteği atıyoruz
     }
@@ -108,86 +107,109 @@ const InterviewVideosPage = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4 text-center text-stone-500">Interview Video Collection</h1>
-      <div className="grid grid-cols-3 gap-4">
-        {personalForms.map((form) => (
-          <div
-            key={form._id}
-            className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transform hover:scale-105 transition-transform duration-300 relative" // relative sınıfını ekliyoruz
-            onClick={() => openModal(videoURLs[form.videoId], form._id, form.status, form.videoId)} // FormId, videoId ve status'ü gönderiyoruz
+  <h1 className="text-2xl font-bold mb-4 text-center text-stone-500">Interview Video Collection</h1>
+  <div className="grid grid-cols-3 gap-4">
+    {personalForms.map((form) => (
+      <div
+        key={form._id}
+        className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transform hover:scale-105 transition-transform duration-300 relative"
+        onClick={() => openModal(videoURLs[form.videoId], form._id, form.status, form.videoId)}
+      >
+        {/* Statü Gösterge Düğmesi */}
+        <div
+          className={`absolute top-2 left-2 w-4 h-4 rounded-full ${
+            form.status === "passed"
+              ? "bg-green-400"
+              : form.status === "failed"
+              ? "bg-red-400"
+              : "bg-gray-400"
+          }`}
+          title={
+            form.status === "passed"
+              ? "Passed"
+              : form.status === "failed"
+              ? "Failed"
+              : "Pending"
+          }
+        ></div>
+        <div className="bg-[#92C7CF] px-6 py-4">
+          <h2 className="font-semibold text-lg text-slate-100">
+            {form.name} {form.surname}
+          </h2>
+        </div>
+        <div className="bg-stone-200 h-48 flex items-center justify-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-12 w-12 text-gray-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            {/* Status Gösterge Düğmesi */}
-            <div
-              className={`absolute top-2 left-2 w-4 h-4 rounded-full ${form.status ? "bg-green-400" : "bg-red-400"}`}
-              title={form.status ? "Active" : "Inactive"} // Tooltip ekliyoruz
-            ></div>
-            <div className="bg-[#92C7CF] px-6 py-4">
-              <h2 className="font-semibold text-lg text-slate-100">
-                {form.name} {form.surname}
-              </h2>
-            </div>
-            <div className="bg-stone-200 h-48 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-12 w-12 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14.752 11.168l-3.197 2.132A1 1 0 0110 12.441V7.558a1 1 0 011.555-.832l3.197 2.132a1 1 0 010 1.664z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 11A7.5 7.5 0 114.95 7.905"
-                />
-              </svg>
-            </div>
-          </div>
-        ))}
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M14.752 11.168l-3.197 2.132A1 1 0 0110 12.441V7.558a1 1 0 011.555-.832l3.197 2.132a1 1 0 010 1.664z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 11A7.5 7.5 0 114.95 7.905"
+            />
+          </svg>
+        </div>
       </div>
+    ))}
+  </div>
 
-      {/* Modal yapısı */}
-      <Modal isOpen={isModalOpen} onClose={closeModal} title="Interview Video">
-        {selectedVideo ? (
-          <div className="flex flex-col items-center">
-            <video controls width="600" className="mb-4">
-              <source src={selectedVideo} type="video/webm" />
-              Your browser does not support the video tag.
-            </video>
+  {/* Modal */}
+  <Modal isOpen={isModalOpen} onClose={closeModal} title="Interview Video">
+    {selectedVideo ? (
+      <div className="flex flex-col items-center">
+        <video controls width="600" className="mb-4">
+          <source src={selectedVideo} type="video/webm" />
+          Your browser does not support the video tag.
+        </video>
 
-            {/* Status Switch */}
-            <div className="flex items-center space-x-3 mt-4">
-              <span className="font-semibold text-gray-600">Status</span>
-              <div
-                onClick={toggleStatus}
-                className={`w-12 h-6 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer ${status ? "bg-green-400" : "bg-gray-300"}`}
-              >
-                {/* Switch Düğmesi */}
-                <div
-                  className={`bg-white w-5 h-5 rounded-full shadow-md transform duration-300 ${status ? "translate-x-6" : "translate-x-1"}`}
-                />
-              </div>
-            </div>
+        {/* Checkbox Statü Seçim Alanı */}
+        <div className="mt-4">
+          <label htmlFor="passedStatus" className="inline-flex items-center">
+            <input
+              type="checkbox"
+              id="passedStatus"
+              checked={status === "passed"}
+              onChange={() => toggleStatus("passed")}
+              className="form-checkbox h-5 w-5 text-green-500"
+            />
+            <span className="ml-2 text-gray-600">Passed</span>
+          </label>
 
-            {/* Silme Butonu */}
-            <button
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-              onClick={handleDelete}
-            >
-              Delete Candidate and Video
-            </button>
-          </div>
-        ) : (
-          <p>No video available</p>
-        )}
-      </Modal>
-    </div>
+          <label htmlFor="failedStatus" className="inline-flex items-center ml-4">
+            <input
+              type="checkbox"
+              id="failedStatus"
+              checked={status === "failed"}
+              onChange={() => toggleStatus("failed")}
+              className="form-checkbox h-5 w-5 text-red-500"
+            />
+            <span className="ml-2 text-gray-600">Failed</span>
+          </label>
+        </div>
+
+        {/* Silme Butonu */}
+        <button
+          className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
+          onClick={handleDelete}
+        >
+          Delete Candidate and Video
+        </button>
+      </div>
+    ) : (
+      <p>No video available</p>
+    )}
+  </Modal>
+</div>
   );
 };
 
