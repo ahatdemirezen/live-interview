@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { getAllPersonalInfoService, createPersonalInfoService ,updatePersonalInfoStatusService } from '../services/candidate-service';
-import PersonalInformationForm from "../models/candidate-model";
+import { getAllPersonalInfoService, createPersonalInfoService , updateCandidateStatusService ,updateCandidateNoteService } from '../services/candidate-service';
 
 // GET - Tüm kişisel bilgileri getirme
 export const getAllPersonalInfo = async (req: Request, res: Response): Promise<void> => {
@@ -39,25 +38,28 @@ export const createPersonalInfo = async (req: Request, res: Response, next: Next
 export const updateCandidateStatus = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   const { formId, status } = req.body;
 
-  // Geçerli statü değerlerini kontrol edelim
-  const validStatuses = ['pending', 'passed', 'failed'];
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({ message: 'Geçersiz statü değeri' });
-  }
-
   try {
-    const updatedForm = await PersonalInformationForm.findByIdAndUpdate(
-      formId,
-      { status },
-      { new: true }
-    );
-
-    if (!updatedForm) {
-      return res.status(404).json({ message: 'Candidate form not found' });
-    }
-
+    // Service fonksiyonunu çağırıyoruz
+    const updatedForm = await updateCandidateStatusService(formId, status);
+    
+    // Başarı yanıtı döndürme
     return res.status(200).json({ message: 'Candidate status updated', updatedForm });
   } catch (error) {
-    next(error);
+    next(error); // Hataları middleware'e gönderiyoruz
+  }
+};
+
+export const updateCandidateNote = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  const { formId } = req.params; // Güncellenecek adayın formId'si
+  const { note } = req.body; // Gönderilen not değeri
+
+  try {
+    // Service fonksiyonunu çağırıyoruz
+    const updatedCandidate = await updateCandidateNoteService(formId, note);
+
+    // Başarı yanıtı döndürme
+    res.status(200).json(updatedCandidate);
+  } catch (error) {
+    next(error); // Hataları middleware'e yönlendiriyoruz
   }
 };

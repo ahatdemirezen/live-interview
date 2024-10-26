@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createInterviewService, getInterviewsService, deleteInterviewService } from "../services/interview-service"; // Service'i import et
-import Package from "../models/package-model"; // Package şemasını import et
-import Interview from "../models/interview-model";
+import { createInterviewService, getInterviewsService, deleteInterviewService , fetchInterviewIds , getInterviewExpireDateService , getPersonalFormsByInterviewService, getPackageQuestionsByInterviewService } from "../services/interview-service"; // Service'i import et
 
 export const createInterview = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -18,73 +16,46 @@ export const createInterview = async (req: Request, res: Response, next: NextFun
   }
 };
 
-export const getPackageQuestionsByInterview = async (req: Request, res: Response): Promise<void> => {
+export const getPackageQuestionsByInterview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { interviewId } = req.params;
 
-    const interview = await Interview.findById(interviewId).populate("packageId");
+    // Service fonksiyonunu çağırıyoruz
+    const result = await getPackageQuestionsByInterviewService(interviewId);
 
-    if (!interview) {
-      res.status(404).json({ message: "Interview not found" });
-      return;
-    }
-
-    const packages = await Package.find({
-      _id: { $in: interview.packageId },
-    });
-
-    const packageQuestions = packages.map((pkg) => ({
-      packageId: pkg._id,
-      questions: pkg.questions,
-    }));
-
-    res.status(200).json({
-      interviewId: interview._id,
-      packages: packageQuestions,
-    });
+    // Başarı yanıtı döndürme
+    res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching package questions", error });
+    next(error); // Hataları middleware'e yönlendiriyoruz
   }
 };
-
 export const getPersonalFormsByInterview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { interviewId } = req.params;
-
   try {
-    // Interview verisini populate kullanarak personalInformationForms ile çekiyoruz
-    const interview = await Interview.findById(interviewId).populate('personalInformationForms');
+    const { interviewId } = req.params;
 
-    if (!interview) {
-      // Bu satırın dönüş tipi Response olsa bile, Promise<void> olarak döneceğiz.
-      res.status(404).json({ message: 'Interview not found' });
-      return; // return ile fonksiyonun işlemini bitiriyoruz.
-    }
+    // Service fonksiyonunu çağırıyoruz ve personal forms verisini alıyoruz
+    const personalInformationForms = await getPersonalFormsByInterviewService(interviewId);
 
-    // Eğer interview bulunduysa, personalInformationForms verisini döndürüyoruz
-    res.status(200).json({ personalInformationForms: interview.personalInformationForms });
+    // Başarı yanıtı döndürme
+    res.status(200).json({ personalInformationForms });
   } catch (error) {
-    next(error);  // Hata oluşursa, error handling middleware'ine yönlendirme
+    next(error); // Hataları middleware'e yönlendiriyoruz
   }
 };
 
 
 
 export const getInterviewExpireDate = async (req: Request, res: Response, next: NextFunction) => {
-  const { interviewId } = req.params;
-
   try {
-    // Interview id'ye göre veritabanından interview'u buluyoruz
-    const interview = await Interview.findById(interviewId);
+    const { interviewId } = req.params;
 
-    if (!interview) {
-      res.status(404).json({ message: "Interview not found" });
-      return;
-    }
+    // Service fonksiyonunu çağırarak expire date'i alıyoruz
+    const expireDate = await getInterviewExpireDateService(interviewId);
 
-    // Interview bulundu, expireDate'i yanıt olarak döndürüyoruz
-    res.status(200).json({ expireDate: interview.expireDate });
+    // Başarı yanıtı döndürme
+    res.status(200).json({ expireDate });
   } catch (error) {
-    next(error); // Eğer bir hata olursa, hata middleware'ine iletilir
+    next(error); // Hataları middleware'e yönlendiriyoruz
   }
 };
 
@@ -102,21 +73,13 @@ export const getInterviews = async (req: Request, res: Response, next: NextFunct
 
 export const getInterviewIds = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Interview modelinden sadece interviewId'leri (sadece _id alanını) alır
-    const interviews = await Interview.find({}, { _id: 1 });
-
-    // Eğer hiçbir interview bulunamadıysa
-    if (!interviews || interviews.length === 0) {
-      res.status(404).json({ message: "No interviews found" });
-      return;
-    }
-
-     // Interview id'lerini döndür
-    const interviewIds = interviews.map((interview) => interview._id);
+    // Servis katmanından interview ID'lerini al
+    const interviewIds = await fetchInterviewIds();
     
+    // Yanıt olarak interview ID'lerini gönder
     res.status(200).json(interviewIds);
   } catch (error) {
-    next(error);
+    next(error); // Hata işleme
   }
 };
 
@@ -131,3 +94,4 @@ export const deleteInterview = async (req: Request, res: Response, next: NextFun
     next(error);
   }
 };
+

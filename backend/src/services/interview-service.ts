@@ -42,6 +42,16 @@ export const getInterviewsService = async () => {
   return interviews;
 };
 
+export const fetchInterviewIds = async (): Promise<string[]> => {
+  const interviews = await Interview.find({}, { _id: 1 });
+
+  if (!interviews || interviews.length === 0) {
+    throw new Error("No interviews found");
+  }
+
+  // Interview ID'lerini döndür
+  return interviews.map((interview) => interview._id.toString());
+};
 
 export const deleteInterviewService = async (interviewId: string) => {
     // interviewId'nin geçerli olup olmadığını kontrol et
@@ -58,4 +68,53 @@ export const deleteInterviewService = async (interviewId: string) => {
     }
   
     return deletedInterview;
+  };
+
+  export const getPackageQuestionsByInterviewService = async (interviewId: string) => {
+    // Interview'i bulma ve packageId'leri getirme
+    const interview = await Interview.findById(interviewId).populate("packageId");
+  
+    if (!interview) {
+      throw createHttpError(404, "Interview not found");
+    }
+  
+    // Interview'deki paketlerin sorularını getirme
+    const packages = await Package.find({
+      _id: { $in: interview.packageId },
+    });
+  
+    // Paketlerin sorularını düzenleme
+    const packageQuestions = packages.map((pkg) => ({
+      packageId: pkg._id,
+      questions: pkg.questions,
+    }));
+  
+    return {
+      interviewId: interview._id,
+      packages: packageQuestions,
+    };
+  };
+
+  export const getPersonalFormsByInterviewService = async (interviewId: string) => {
+    // Interview'i bulma ve personalInformationForms alanını getirme
+    const interview = await Interview.findById(interviewId).populate("personalInformationForms");
+  
+    if (!interview) {
+      throw createHttpError(404, "Interview not found");
+    }
+  
+    // Interview bulunduysa, personalInformationForms verisini döndür
+    return interview.personalInformationForms;
+  };
+
+  export const getInterviewExpireDateService = async (interviewId: string) => {
+    // Interview'i bulma
+    const interview = await Interview.findById(interviewId);
+  
+    if (!interview) {
+      throw createHttpError(404, "Interview not found");
+    }
+  
+    // Interview bulunduysa, expireDate'i döndür
+    return interview.expireDate;
   };

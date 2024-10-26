@@ -28,7 +28,11 @@ const PersonalInformationFormSchema = new Schema(
      type: String,
      enum: ['pending', 'passed', 'failed'],
      default: 'pending',
-    }
+    },
+    note: {
+      type: String,
+      default: '', // Varsayılan olarak boş bir string atanır
+    },
   },
   {
     timestamps: true, // createdAt ve updatedAt alanlarını otomatik olarak ekler

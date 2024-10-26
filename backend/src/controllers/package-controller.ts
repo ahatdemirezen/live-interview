@@ -67,9 +67,6 @@ export const updateQuestionOrderController = async (
 };
 
 
-
-
-
 // Package güncelleme
 export const updatePackageTitleController = async (
   req: Request,

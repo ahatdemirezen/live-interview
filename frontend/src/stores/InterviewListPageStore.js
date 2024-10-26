@@ -29,20 +29,20 @@ const useInterviewStore = create((set) => ({
       const response = await axios.get(`${apiUrl}/interview/${interviewId}/packages/questions`, {
         withCredentials: true,
       });
-
+  
       const packages = response.data?.packages || [];
-
+  
       // Paketlerin sıralı bir şekilde sorularını kaydediyoruz
       let allQuestions = [];
-
+  
       // Paketler sırasına göre her paketin sorularını sıralı olarak ekliyoruz
       packages.forEach((pkg) => {
         const sortedQuestions = pkg.questions.sort((a, b) => a.sequenceNumber - b.sequenceNumber); // Soruları sequenceNumber'a göre sıralıyoruz
-        allQuestions.unshift(...sortedQuestions); // Soruları başa ekliyoruz
+        allQuestions.push(...sortedQuestions); // Soruları sona ekliyoruz, ilk paket en üstte olacak şekilde sıralanıyor
       });
-
-      console.log("Bütün Sorular (Sıralı, önceki paketler üstte):", allQuestions);
-
+  
+      console.log("Bütün Sorular (Sıralı, ilk paket en üstte):", allQuestions);
+  
       // Soruları store'a kaydediyoruz
       set({ questions: allQuestions });
     } catch (error) {
@@ -50,6 +50,7 @@ const useInterviewStore = create((set) => ({
       set({ questions: [] });
     }
   },
+  
 
   // Interview'daki adayların kişisel bilgilerini getiren fonksiyon
   getPersonalFormsByInterview: async (interviewId) => {
@@ -123,6 +124,27 @@ const useInterviewStore = create((set) => ({
       return response.data;  // İsteğin sonucunu döndürüyoruz
     } catch (error) {
       console.error('Error updating candidate status:', error);
+    }
+  },
+  updateCandidateNote: async (formId, note) => {
+    try {
+      // PATCH isteği ile adayın not alanını güncelleme
+      const response = await axios.patch(`${apiUrl}/candidate/${formId}/note`, {
+        note: note,
+      }, {
+        withCredentials: true,  // Eğer authentication varsa
+      });
+
+      // Store'daki personalForms listesini güncelliyoruz
+      set((state) => ({
+        personalForms: state.personalForms.map((form) =>
+          form._id === formId ? { ...form, note } : form
+        ),
+      }));
+
+      return response.data;  // İsteğin sonucunu döndürüyoruz
+    } catch (error) {
+      console.error('Error updating candidate note:', error);
     }
   },
 }));

@@ -1,6 +1,7 @@
 import PersonalInformationForm from '../models/candidate-model';
 import Interview from "../models/interview-model";
 import mongoose from "mongoose";
+import createHttpError from "http-errors";
 
 // Tüm kişisel bilgileri getirme
 export const getAllPersonalInfoService = async () => {
@@ -37,19 +38,38 @@ export const createPersonalInfoService = async (name: string, surname: string, e
 
   return savedPersonalInfo;
 };
-// Service - Adayın mülakat statüsünü güncelleme
-export const updatePersonalInfoStatusService = async (id: string, status: boolean) => {
-  const personalInfo = await PersonalInformationForm.findById(id);
 
-  if (!personalInfo) {
-    throw new Error('Aday bulunamadı');
+export const updateCandidateStatusService = async (formId: string, status: string) => {
+  // Geçerli statü değerlerini kontrol ediyoruz
+  const validStatuses = ['pending', 'passed', 'failed'];
+  if (!validStatuses.includes(status)) {
+    throw createHttpError(400, 'Geçersiz statü değeri');
   }
 
-  // Boolean değeri "passed" veya "failed" string'ine dönüştür
-  const updatedStatus = status ? 'passed' : 'failed';
+  // Formu güncelleme işlemi
+  const updatedForm = await PersonalInformationForm.findByIdAndUpdate(
+    formId,
+    { status },
+    { new: true }
+  );
 
-  personalInfo.status = updatedStatus; // Status alanını güncelliyoruz
-  await personalInfo.save();
+  if (!updatedForm) {
+    throw createHttpError(404, 'Candidate form not found');
+  }
 
-  return personalInfo;
+  return updatedForm;
+};
+export const updateCandidateNoteService = async (formId: string, note: string) => {
+  // Formu güncelleme işlemi
+  const updatedCandidate = await PersonalInformationForm.findByIdAndUpdate(
+    formId,
+    { note },
+    { new: true } // Güncellenmiş belgeyi döndür
+  );
+
+  if (!updatedCandidate) {
+    throw createHttpError(404, "Aday bulunamadı");
+  }
+
+  return updatedCandidate;
 };
