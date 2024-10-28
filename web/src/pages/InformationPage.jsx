@@ -121,11 +121,12 @@ function PersonalInformationForm() {
             </label>
           </div>
           <button
-            type="submit"
-            className="w-full py-3 bg-teal-500 text-white font-semibold rounded-lg shadow-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-          >
-            Submit
-          </button>
+  type="submit"
+  className="w-full py-3 bg-[#224064] text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+>
+  Submit
+</button>
+
         </form>
       </div>
     </div>

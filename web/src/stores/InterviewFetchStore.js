@@ -53,10 +53,10 @@ const useInterviewStore = create((set, get) => ({
       // Paketler sırasına göre her paketin sorularını sıralı olarak ekliyoruz
       packages.forEach((pkg) => {
         const sortedQuestions = pkg.questions.sort((a, b) => a.sequenceNumber - b.sequenceNumber); // Soruları sequenceNumber'a göre sıralıyoruz
-        allQuestions.unshift(...sortedQuestions); // Soruları başa ekliyoruz
+        allQuestions.push(...sortedQuestions); // Soruları sona ekliyoruz, ilk paket en üstte olacak şekilde sıralanıyor
       });
   
-      console.log("Bütün Sorular (Sıralı, önceki paketler üstte):", allQuestions);
+      console.log("Bütün Sorular (Sıralı, ilk paket en üstte):", allQuestions);
   
       // Soruları store'a kaydediyoruz
       set({ questions: allQuestions });
@@ -65,6 +65,7 @@ const useInterviewStore = create((set, get) => ({
       set({ questions: [] });
     }
   },
+  
 
 
 }));
