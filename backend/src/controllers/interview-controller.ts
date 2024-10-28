@@ -29,15 +29,26 @@ export const getPackageQuestionsByInterview = async (req: Request, res: Response
     next(error); // Hataları middleware'e yönlendiriyoruz
   }
 };
-export const getPersonalFormsByInterview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getPersonalFormsByInterview = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { interviewId } = req.params;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 12;
 
-    // Service fonksiyonunu çağırıyoruz ve personal forms verisini alıyoruz
-    const personalInformationForms = await getPersonalFormsByInterviewService(interviewId);
+    // Service fonksiyonunu çağırıyoruz
+    const { personalForms, totalCount } = await getPersonalFormsByInterviewService(interviewId, page, limit);
 
     // Başarı yanıtı döndürme
-    res.status(200).json({ personalInformationForms });
+    res.status(200).json({
+      personalInformationForms: personalForms,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+    });
   } catch (error) {
     next(error); // Hataları middleware'e yönlendiriyoruz
   }
@@ -94,4 +105,5 @@ export const deleteInterview = async (req: Request, res: Response, next: NextFun
     next(error);
   }
 };
+
 

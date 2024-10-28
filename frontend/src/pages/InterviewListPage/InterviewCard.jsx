@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useInterviewStore from "../../stores/InterviewListPageStore";
 import Button from "../../components/buttonComponent";
 import dayjs from "dayjs";
@@ -16,6 +16,10 @@ const InterviewCard = ({ interview }) => {
   const navigate = useNavigate(); // Yönlendirme için useNavigate
   const getQuestionsByInterview = useInterviewStore((state) => state.getQuestionsByInterview);
 
+  const videoCounts = useInterviewStore((state) => state.videoCounts);
+
+  const totalVideos = videoCounts[interview._id]?.totalVideos || 0;
+  const pendingVideos = videoCounts[interview._id]?.pendingVideos || 0;
   // Expire date ile bugünün tarihini karşılaştırıyoruz
   const isExpired = dayjs(interview.expireDate).isBefore(dayjs());
 
@@ -65,11 +69,11 @@ const InterviewCard = ({ interview }) => {
       <div className="bg-gray-100 rounded-lg p-2 flex justify-between items-center mt-6 shadow-md">
         <div className="text-center">
           <p className="text-xs text-gray-500">TOTAL</p>
-          <p className="text-xl font-bold">{interview.packageId.length}</p>
+          <p className="text-xl font-bold">{totalVideos}</p>
         </div>
         <div className="text-center">
           <p className="text-xs text-gray-500">ON HOLD</p>
-          <p className="text-xl font-bold">{Math.floor(Math.random() * 10)}</p>
+          <p className="text-xl font-bold">{pendingVideos}</p>
         </div>
       </div>
 

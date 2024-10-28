@@ -13,8 +13,10 @@ router.get("/:interviewId/packages/questions",  InterviewController.getPackageQu
 
 router.get("/:interviewId/expire-date", InterviewController.getInterviewExpireDate);
 
-router.get('/:interviewId/personal-forms',authenticateToken, InterviewController.getPersonalFormsByInterview);
+router.get('/:interviewId/personal-forms', authenticateToken, InterviewController.getPersonalFormsByInterview);
 
 router.get("/ids", InterviewController.getInterviewIds);
+
+
 
 export default router;

@@ -7,8 +7,19 @@ const useInterviewStore = create((set) => ({
   interviews: [],  // Interview verilerini burada tutacağız
   questions: [],
   personalForms: [], // Interview içindeki adayların kişisel bilgilerini tutmak için state
+  videoCounts: {},
   loading: false,  // Yükleme durumu
   error: null,     // Hata durumu
+  totalForms: 0,   // Toplam form sayısını tutacağız
+
+  setVideoCounts: (interviewId, totalVideos, pendingVideos) => {
+    set((state) => ({
+      videoCounts: {
+        ...state.videoCounts,
+        [interviewId]: { totalVideos, pendingVideos },
+      },
+    }));
+  },
 
   // Interview'ları getiren fonksiyon
   fetchInterviews: async () => {
@@ -16,7 +27,7 @@ const useInterviewStore = create((set) => ({
     try {
       const response = await axios.get(`${apiUrl}/interview`, {
         withCredentials: true,
-      });  // GET isteği yapılıyor
+      });
       set({ interviews: response.data, loading: false });
     } catch (error) {
       set({ error: error.message, loading: false });
@@ -24,57 +35,50 @@ const useInterviewStore = create((set) => ({
   },
 
   getQuestionsByInterview: async (interviewId) => {
-    console.log("getQuestionsByInterview fonksiyonu çalışıyor:", interviewId);
     try {
       const response = await axios.get(`${apiUrl}/interview/${interviewId}/packages/questions`, {
         withCredentials: true,
       });
-  
+
       const packages = response.data?.packages || [];
-  
-      // Paketlerin sıralı bir şekilde sorularını kaydediyoruz
       let allQuestions = [];
-  
-      // Paketler sırasına göre her paketin sorularını sıralı olarak ekliyoruz
       packages.forEach((pkg) => {
-        const sortedQuestions = pkg.questions.sort((a, b) => a.sequenceNumber - b.sequenceNumber); // Soruları sequenceNumber'a göre sıralıyoruz
-        allQuestions.push(...sortedQuestions); // Soruları sona ekliyoruz, ilk paket en üstte olacak şekilde sıralanıyor
+        const sortedQuestions = pkg.questions.sort((a, b) => a.sequenceNumber - b.sequenceNumber);
+        allQuestions.push(...sortedQuestions);
       });
-  
-      console.log("Bütün Sorular (Sıralı, ilk paket en üstte):", allQuestions);
-  
-      // Soruları store'a kaydediyoruz
       set({ questions: allQuestions });
     } catch (error) {
       console.error("Error fetching questions:", error);
       set({ questions: [] });
     }
   },
-  
 
   // Interview'daki adayların kişisel bilgilerini getiren fonksiyon
-  getPersonalFormsByInterview: async (interviewId) => {
+  getPersonalFormsByInterview: async (interviewId, page = 1, limit = 12) => {
     try {
       const response = await axios.get(`${apiUrl}/interview/${interviewId}/personal-forms`, {
+        params: { page, limit },
         withCredentials: true,
       });
       
-      // Backend'den gelen personalInformationForms'u alıp store'a kaydediyoruz
-      set({ personalForms: response.data.personalInformationForms });
+      // `personalForms` ve `totalForms` değerlerini güncelleme
+      set({
+        personalForms: response.data.personalInformationForms,
+        totalForms: response.data.totalCount,  // Backend’den dönen toplam sayıyı kaydediyoruz
+      });
     } catch (error) {
       console.error('Error fetching personal forms:', error);
-      set({ personalForms: [] }); // Hata olursa personalForms'u boş yapıyoruz
+      set({ personalForms: [] });
     }
   },
 
-  // Interview'ı silen fonksiyon
   deleteInterview: async (interviewId) => {
     try {
       await axios.delete(`${apiUrl}/interview/${interviewId}`, {
         withCredentials: true,
-      });  // DELETE isteği
+      });
       set((state) => ({
-        interviews: state.interviews.filter((interview) => interview._id !== interviewId), // Interview'ı state'den çıkarıyoruz
+        interviews: state.interviews.filter((interview) => interview._id !== interviewId),
       }));
     } catch (error) {
       console.error('Error deleting interview:', error);
@@ -83,20 +87,13 @@ const useInterviewStore = create((set) => ({
 
   deleteCandidateAndMedia: async (formId, videoId) => {
     try {
-      // Silme isteği, formId ve videoId'yi body'den gönderiyoruz
       const response = await axios.delete(`${apiUrl}/upload/delete-candidate-media`, {
-        data: {
-          formId,
-          videoId,
-        },
-        withCredentials: true,  // Eğer authentication varsa
+        data: { formId, videoId },
+        withCredentials: true,
       });
-
-      // Store'daki personalForms listesinden silinen adayı çıkarıyoruz
       set((state) => ({
         personalForms: state.personalForms.filter((form) => form._id !== formId),
       }));
-
       console.log('Aday ve medya başarıyla silindi:', response.data);
       return response.data;
     } catch (error) {
@@ -106,47 +103,45 @@ const useInterviewStore = create((set) => ({
 
   updateCandidateStatus: async (formId, newStatus) => {
     try {
-      // PATCH isteği ile adayın status durumunu güncelleme
       const response = await axios.patch(`${apiUrl}/candidate/status`, {
         formId: formId,
         status: newStatus,
       }, {
-        withCredentials: true,  // Eğer authentication varsa
+        withCredentials: true,
       });
-
-      // Backend'den dönen güncellenmiş formu alıp store'daki personalForms listesini güncelliyoruz
       set((state) => ({
         personalForms: state.personalForms.map((form) =>
           form._id === formId ? { ...form, status: newStatus } : form
         ),
       }));
-
-      return response.data;  // İsteğin sonucunu döndürüyoruz
+      return response.data;
     } catch (error) {
       console.error('Error updating candidate status:', error);
     }
   },
+
   updateCandidateNote: async (formId, note) => {
     try {
-      // PATCH isteği ile adayın not alanını güncelleme
       const response = await axios.patch(`${apiUrl}/candidate/${formId}/note`, {
         note: note,
       }, {
-        withCredentials: true,  // Eğer authentication varsa
+        withCredentials: true,
       });
-
-      // Store'daki personalForms listesini güncelliyoruz
       set((state) => ({
         personalForms: state.personalForms.map((form) =>
           form._id === formId ? { ...form, note } : form
         ),
       }));
-
-      return response.data;  // İsteğin sonucunu döndürüyoruz
+      return response.data;
     } catch (error) {
       console.error('Error updating candidate note:', error);
     }
   },
+
+ 
+
+
+
 }));
 
 export default useInterviewStore;

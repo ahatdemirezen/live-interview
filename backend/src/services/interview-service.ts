@@ -2,6 +2,8 @@ import Interview from "../models/interview-model";
 import mongoose from "mongoose";
 import createHttpError from "http-errors";
 import Package from "../models/package-model"; // Package şemasını import et
+import PersonalInformationForm from "../models/candidate-model";
+import { Document } from "mongoose";
 
 // Interview oluşturma servisi
 export const createInterviewService = async (interviewTitle: string, expireDate: Date, packageIds: string[]) => {
@@ -78,15 +80,17 @@ export const deleteInterviewService = async (interviewId: string) => {
       throw createHttpError(404, "Interview not found");
     }
   
-    // Interview'deki paketlerin sorularını getirme
-    const packages = await Package.find({
-      _id: { $in: interview.packageId },
-    });
-  
+    const pckgs = await Promise.all(
+      interview?.packageId.map(async (pckgId) => {
+        const pckg = await Package.findById(pckgId);
+        return pckg;
+      })
+    );
+    
     // Paketlerin sorularını düzenleme
-    const packageQuestions = packages.map((pkg) => ({
-      packageId: pkg._id,
-      questions: pkg.questions,
+    const packageQuestions = pckgs.map((pkg) => ({
+      packageId: pkg?._id,
+      questions: pkg?.questions,
     }));
   
     return {
@@ -94,17 +98,44 @@ export const deleteInterviewService = async (interviewId: string) => {
       packages: packageQuestions,
     };
   };
+  
 
-  export const getPersonalFormsByInterviewService = async (interviewId: string) => {
-    // Interview'i bulma ve personalInformationForms alanını getirme
-    const interview = await Interview.findById(interviewId).populate("personalInformationForms");
+  interface PaginatedPersonalForms {
+    personalForms: Document[]; // PersonalInformationFormType olmadan Document tipini doğrudan kullanıyoruz
+    totalCount: number;
+  }
   
-    if (!interview) {
-      throw createHttpError(404, "Interview not found");
+  export const getPersonalFormsByInterviewService = async (
+    interviewId: string,
+    page: number = 1,
+    limit: number = 12
+  ): Promise<PaginatedPersonalForms> => {
+    try {
+      // Interview'i bulma ve personalForms IDs listesini alma
+      const interview = await Interview.findById(interviewId).select("personalInformationForms");
+  
+      if (!interview) {
+        throw createHttpError(404, "Interview not found");
+      }
+  
+      // Sayfalama için skip ve limit değerlerini hesaplama
+      const skip = (page - 1) * limit;
+      
+      // personalForms listesindeki ID'lere göre PersonalInformationForm verisini çekiyoruz
+      const personalForms = await PersonalInformationForm.find({
+        _id: { $in: interview.personalInformationForms },
+      })
+        .skip(skip)
+        .limit(limit);
+  
+      // Toplam aday sayısını Interview'deki personalForms IDs uzunluğundan alıyoruz
+      const totalCount = interview.personalInformationForms.length;
+  
+      return { personalForms, totalCount };
+    } catch (error) {
+      console.error("Error fetching personal forms by interview:", error);
+      throw error;
     }
-  
-    // Interview bulunduysa, personalInformationForms verisini döndür
-    return interview.personalInformationForms;
   };
 
   export const getInterviewExpireDateService = async (interviewId: string) => {
@@ -118,3 +149,5 @@ export const deleteInterviewService = async (interviewId: string) => {
     // Interview bulunduysa, expireDate'i döndür
     return interview.expireDate;
   };
+
+  

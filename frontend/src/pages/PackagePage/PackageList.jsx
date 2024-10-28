@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import usePackageStore from '../../stores/PackagePageStore';
 import { FaTrash, FaEdit } from 'react-icons/fa';
 
-const PackageList = () => {
-  const { packages, getPackages, deletePackage, loading, error } = usePackageStore();
+const PackageList = ({ packages }) => {  // packages propunu buradan alıyoruz
+  const { getPackages, deletePackage, loading, error } = usePackageStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +28,6 @@ const PackageList = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <div className="overflow-x-auto">
-        {/* Tablo başlıkları */}
         <table className="table-auto w-full text-left">
           <thead>
             <tr className="font-semibold text-stone-500">
