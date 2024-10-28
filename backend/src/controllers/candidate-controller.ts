@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { getAllPersonalInfoService, createPersonalInfoService , updateCandidateStatusService ,updateCandidateNoteService } from '../services/candidate-service';
+import { getAllPersonalInfoService, createPersonalInfoService , updateCandidateStatusService ,updateCandidateNoteService  } from '../services/candidate-service';
 
 // GET - Tüm kişisel bilgileri getirme
 export const getAllPersonalInfo = async (req: Request, res: Response): Promise<void> => {

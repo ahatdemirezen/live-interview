@@ -40,8 +40,26 @@ export const createInterviewService = async (interviewTitle: string, expireDate:
 
 // Tüm interview'ları getirme servisi
 export const getInterviewsService = async () => {
-  const interviews = await Interview.find(); // Tüm interview'ları veritabanından çek
-  return interviews;
+  const interviews = await Interview.find().populate('personalInformationForms').lean();
+
+  // Her interview için totalForms ve pendingForms sayısını hesapla
+  const interviewsWithStats = interviews.map((interview) => {
+    // `personalInformationForms` alanını any[] olarak dönüştürerek `status` alanına erişim sağlıyoruz
+    const personalForms = interview.personalInformationForms as any[];
+
+    const totalForms = personalForms.length;
+    const pendingForms = personalForms.filter(
+      (form) => form.status === 'pending'
+    ).length;
+
+    return {
+      ...interview,
+      totalForms,
+      pendingForms,
+    };
+  });
+
+  return interviewsWithStats;
 };
 
 export const fetchInterviewIds = async (): Promise<string[]> => {

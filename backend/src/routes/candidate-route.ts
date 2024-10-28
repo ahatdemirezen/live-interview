@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllPersonalInfo, createPersonalInfo, updateCandidateStatus , updateCandidateNote} from '../controllers/candidate-controller';
+import { getAllPersonalInfo, createPersonalInfo, updateCandidateStatus , updateCandidateNote } from '../controllers/candidate-controller';
 import { authenticateToken } from "../middleware/auth";
 
 const router = express.Router();
