@@ -158,11 +158,11 @@ const InterviewVideosPage = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-center mt-8 space-x-2 text-[#47a7a2]">
+      <div className="flex items-center justify-center mt-8 space-x-2 text-[#4B657B]">
         <button
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
           disabled={page === 1}
-          className="px-4 py-2 rounded-full hover:bg-[#47a7a2] hover:text-white disabled:opacity-50"
+          className="px-4 py-2 rounded-full hover:bg-[#4B657B] hover:text-white disabled:opacity-50"
         >
           &laquo; Prev
         </button>
@@ -170,7 +170,7 @@ const InterviewVideosPage = () => {
           <button
             key={index}
             onClick={() => setPage(index + 1)}
-            className={`px-3 py-1 rounded-full ${page === index + 1 ? 'bg-[#47a7a2] text-white' : 'text-[#47a7a2]'} hover:bg-[#47a7a2] hover:text-white`}
+            className={`px-3 py-1 rounded-full ${page === index + 1 ? 'bg-[#4B657B] text-white' : 'text-[#4B657B]'} hover:bg-[#4B657B] hover:text-white`}
           >
             {index + 1}
           </button>
@@ -178,7 +178,7 @@ const InterviewVideosPage = () => {
         <button
           onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
           disabled={page === totalPages}
-          className="px-4 py-2 rounded-full hover:bg-[#47a7a2] hover:text-white disabled:opacity-50"
+          className="px-4 py-2 rounded-full hover:bg-[#4B657B] hover:text-white disabled:opacity-50"
         >
           Next &raquo;
         </button>
