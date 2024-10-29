@@ -134,10 +134,21 @@ const InterviewVideosPage = () => {
               </h2>
             </div>
             <div className="bg-stone-200 h-48 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197 2.132A1 1 0 0110 12.441V7.558a1 1 0 011.555-.832l3.197 2.132a1 1 0 010 1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11A7.5 7.5 0 114.95 7.905" />
-              </svg>
+              {/* Eğer video URL mevcutsa video önizlemesini göster */}
+              {videoURLs[form.videoId] ? (
+                <video
+                  className="h-full w-full object-cover"
+                  src={videoURLs[form.videoId]}
+                  muted
+                  controls={false}
+                  preload="metadata" // Videonun ilk karesini yüklemek için
+                />
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197 2.132A1 1 0 0110 12.441V7.558a1 1 0 011.555-.832l3.197 2.132a1 1 0 010 1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11A7.5 7.5 0 114.95 7.905" />
+                </svg>
+              )}
             </div>
           </div>
         ))}
