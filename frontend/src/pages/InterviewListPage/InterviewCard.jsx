@@ -59,14 +59,14 @@ const InterviewCard = ({ interview }) => {
   return (
     <div className="bg-white p-4 m-4 shadow-xl rounded-3xl relative w-full sm:w-60 h-auto sm:h-60 flex flex-col items-center">
       {/* Sol üst köşedeki yuvarlak bağlantı simgesi */}
-      <div className="text-white flex items-center absolute rounded-full py-3 px-3 shadow-xl bg-[#47a7a2] left-4 top-4 sm:-top-6">
+      <div className="text-white flex items-center absolute rounded-full py-3 px-3 shadow-xl bg-[#F5A862] left-4 top-4 sm:-top-6">
         <AiOutlineLink className="text-white text-2xl" onClick={handleCopyLink} />
       </div>
 
       {/* Soru işareti ve silme ikonu */}
       <div className="absolute top-4 right-4 sm:top-1 sm:right-1 flex items-center space-x-1">
-        <Button icon={<MdOutlineQuestionMark className="text-[#FFB84D] text-2xl" />} size="sm" onClick={handleOpenModal} />
-        <Button icon={<FaTrash className="text-[#FF6F61] hover:text-[#cc0000]" />} size="sm" onClick={() => deleteInterview(interview._id)} />
+        <Button icon={<MdOutlineQuestionMark className="text-[#E2BB70] text-2xl" />} size="sm" onClick={handleOpenModal} />
+        <Button icon={<FaTrash className="text-[#D9534F] hover:text-[#cc0000]" />} size="sm" onClick={() => deleteInterview(interview._id)} />
       </div>
 
       {/* Başlık */}

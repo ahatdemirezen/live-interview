@@ -3,12 +3,16 @@ import { useParams } from "react-router-dom";
 import useInterviewStore from "../../stores/InterviewListPageStore";
 import axios from "axios";
 import VideoPopupContent from "./VideoPopupContent";
-
+import UserInfoPopup from "./UserInfoPopup";
+import Button from "../../components/buttonComponent";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { AiOutlineClose } from "react-icons/ai";
 const InterviewVideosPage = () => {
   const { interviewId } = useParams();
   const {
     getPersonalFormsByInterview,
     personalForms,
+    openUserInfoModal,
     updateCandidateStatus,
     deleteCandidateAndMedia,
     updateCandidateNote,
@@ -109,7 +113,7 @@ const InterviewVideosPage = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4 text-center text-stone-500">
+      <h1 className="text-2xl font-bold mb-4 text-center text-neutral-600">
         Interview Video Collection
       </h1>
       <div className="grid grid-cols-3 gap-4">
@@ -119,29 +123,28 @@ const InterviewVideosPage = () => {
             className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transform hover:scale-105 transition-transform duration-300 relative"
             onClick={() => openModal(videoURLs[form.videoId], form._id, form.status, form.videoId, form.note)}
           >
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(form._id, form.videoId);
-              }}
-            >✖
-           </button>
+            
             <div className={`absolute top-2 left-2 w-4 h-4 rounded-full ${form.status === "passed" ? "bg-green-400" : form.status === "failed" ? "bg-red-400" : "bg-gray-400"}`} title={form.status === "passed" ? "Passed" : form.status === "failed" ? "Failed" : "Pending"}></div>
-            <div className="bg-[#47a7a2] px-6 py-4">
-              <h2 className="font-semibold text-lg text-slate-100">
+            
+            {/* Bu alana stopPropagation ekliyoruz */}
+            <div className="bg-[#80ACD2] px-6 py-4 flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
+          
+              <h2 className="ml-4 font-semibold text-lg text-slate-100 flex-grow">
                 {form.name} {form.surname}
               </h2>
+
+              <Button onClick={(e) => {e.stopPropagation(); openUserInfoModal(form);}} icon={<AiOutlineInfoCircle className="text-2xl md:text-2xl text-[#F2D096] absolute right-20 top-5"/>}  />
+              <Button onClick={(e) => {e.stopPropagation();handleDelete(form._id, form.videoId);}} icon={<AiOutlineClose className="text-2xl md:text-2xl text-[#D9534F] absolute right-5 top-5"/>} />
             </div>
+            
             <div className="bg-stone-200 h-48 flex items-center justify-center">
-              {/* Eğer video URL mevcutsa video önizlemesini göster */}
               {videoURLs[form.videoId] ? (
                 <video
                   className="h-full w-full object-cover"
                   src={videoURLs[form.videoId]}
                   muted
                   controls={false}
-                  preload="metadata" // Videonun ilk karesini yüklemek için
+                  preload="metadata"
                 />
               ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -192,6 +195,8 @@ const InterviewVideosPage = () => {
         toggleStatus={toggleStatus}
         handleSaveNote={handleSaveNote}
       />
+
+      <UserInfoPopup />
     </div>
   );
 };

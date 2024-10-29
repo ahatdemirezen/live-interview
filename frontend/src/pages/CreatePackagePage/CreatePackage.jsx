@@ -6,7 +6,7 @@ import AddQuestionModal from "./QuestionPopup";
 import useCreatePackage from "../../stores/CreatePackagePageStore";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import usePackageStore from '../../stores/PackagePageStore'; // Zustand store'u import ediyoruz
-import Header from "../../components/header";
+import Header from "../../components/Header";
 import Button from "../../components/buttonComponent";
 
 const CreatePackage = () => {
@@ -89,8 +89,8 @@ const CreatePackage = () => {
       {/* Paket başlığını gösteren kısım */}
           <div className="bg-white shadow-md rounded-md p-4 md:p-6 mt-4">
             <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-semibold text-stone-500">{packageTitle || "Loading Package Title..."}</h2>
-           <Button onClick={() => {setSelectedQuestion(null);setIsModalOpen(true);}} label="Add Question" variant="primary"/>
+            <h2 className="text-xl md:text-2xl font-semibold text-neutral-600">{packageTitle || "Loading Package Title..."}</h2>
+           <Button onClick={() => {setSelectedQuestion(null);setIsModalOpen(true);}} label="Add Question" variant="outline"/>
               
             </div>
             <DragDropContext onDragEnd={onDragEnd}>
@@ -124,7 +124,7 @@ const CreatePackage = () => {
                             <td className="py-4 px-2">{question.questionText}</td>
                             <td className="py-4 px-2">{question.timeLimit} min</td>
                             <td className="py-4 px-2  text-center align-middle">
-                           <Button onClick={() => handleDeleteQuestion(question._id)} icon={<FaTrash className="text-[#ff2323] hover:text-[#cc0000] " />} />
+                           <Button onClick={() => handleDeleteQuestion(question._id)} icon={<FaTrash className="text-[#D9534F] hover:text-[#cc0000] " />} />
                             </td>
                             <td className="py-4 px-2 text-center align-middle">
                               <Button onClick={() => handleEditQuestion(question)} icon={<FaEdit className="text-[#ff7f0a] hover:text-[#cc6600] " />}/>

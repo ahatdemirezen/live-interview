@@ -47,7 +47,7 @@ const PackageList = ({ packages }) => {
                     className="text-red-600 hover:text-red-800"
                     onClick={() => handleDelete(pkg._id)}
                   >
-                    <FaTrash className='text-[#ff2323] hover:text-[#cc0000]'/>
+                    <FaTrash className='text-[#D9534F] hover:text-[#cc0000]'/>
                   </button>
                 </td>
                 <td className="py-4 px-2 text-center align-middle">
@@ -74,7 +74,7 @@ const PackageList = ({ packages }) => {
                   className="text-red-600 hover:text-red-800 flex items-center"
                   onClick={() => handleDelete(pkg._id)}
                 >
-                  <FaTrash className='text-[#ff2323] hover:text-[#cc0000] mr-1'/>
+                  <FaTrash className='text-[#FF6F61] hover:text-[#cc0000] mr-1'/>
                   Delete
                 </button>
                 <button

@@ -12,6 +12,12 @@ const useInterviewStore = create((set) => ({
   error: null,     // Hata durumu
   totalForms: 0,   // Toplam form sayısını tutacağız
 
+  isUserInfoModalOpen: false,
+  selectedUserInfo: null,
+
+  openUserInfoModal: (userInfo) => set({ isUserInfoModalOpen: true, selectedUserInfo: userInfo }),
+  closeUserInfoModal: () => set({ isUserInfoModalOpen: false, selectedUserInfo: null }),
+
   setVideoCounts: (interviewId, totalVideos, pendingVideos) => {
     set((state) => ({
       videoCounts: {

@@ -4,7 +4,7 @@ import InterviewCard from "./InterviewCard";
 import AddInterviewModal from "./AddInterviewModal";
 import SideBar from "../../components/SideBar";
 import Button from "../../components/buttonComponent";
-import Header from "../../components/header";
+import Header from "../../components/Header";
 import { MdPostAdd } from "react-icons/md";
 import SearchBar from "../../components/searchBar";
 
@@ -38,10 +38,10 @@ const InterviewList = () => {
         {/* Başlık ve arama butonu */}
         <div className="bg-white shadow-md rounded-md p-4 md:p-6 mt-5">
           <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-semibold text-stone-500">Interview List</h2>
+            <h2 className="text-xl md:text-2xl font-semibold text-neutral-600">Interview List</h2>
             <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 md:mt-0">
               <SearchBar value={searchQuery} onChange={setSearchQuery} />
-              <Button icon={<MdPostAdd className="text-2xl md:text-3xl text-[#47a7a2]" />} onClick={() => setIsModalOpen(true)} />
+              <Button icon={<MdPostAdd className="text-2xl md:text-3xl text-[#5C7C98]" />} onClick={() => setIsModalOpen(true)} />
             </div>
           </div>
         </div>

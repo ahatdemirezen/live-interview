@@ -50,7 +50,7 @@ const VideoPopupContent = ({
                   id="passedStatus"
                   checked={status === "passed"}
                   onChange={() => toggleStatus("passed")}
-                  className="form-checkbox h-5 w-5 accent-[#6fcfcb]"
+                  className="form-checkbox h-5 w-5 accent-[#4B8D75]"
                 />
                 <span className="ml-2 text-gray-600">Passed</span>
               </label>
@@ -61,7 +61,7 @@ const VideoPopupContent = ({
                   id="failedStatus"
                   checked={status === "failed"}
                   onChange={() => toggleStatus("failed")}
-                  className="form-checkbox h-5 w-5 accent-[#FF6F61] "
+                  className="form-checkbox h-5 w-5 accent-[#D9534F] "
                 />
                 <span className="ml-2 text-gray-600">Failed</span>
               </label>
@@ -71,7 +71,7 @@ const VideoPopupContent = ({
 
         {/* Kaydet butonu */}
         <div className="flex gap-4 justify-end mt-4">
-          <Button label="Save" onClick={handleSaveNote} variant="primary" size="md" />
+          <Button label="Save" onClick={handleSaveNote} variant="outline" size="md" />
         </div>
       </div>
     </ModalForVideos>

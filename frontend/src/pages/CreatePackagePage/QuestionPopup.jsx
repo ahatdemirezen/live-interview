@@ -71,7 +71,7 @@ const AddQuestionModal = ({ isOpen, onClose, packageId, onAddQuestion, question,
           />
           <span className="ml-2">min</span>
         </div>
-        <Button onClick={handleSubmit} label={question ? "Update" : "Add"} variant="primary"/>
+        <Button onClick={handleSubmit} label={question ? "Update" : "Add"} variant="outline"/>
       </div>
     </Modal>
   );

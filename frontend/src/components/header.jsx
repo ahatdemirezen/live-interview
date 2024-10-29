@@ -4,7 +4,7 @@ const Header = () => {
   return (
     <nav>
       <div className="responsive-nav">
-        <div className="w-full max-w-full h-auto px-4 sm:px-6 py-2 sm:py-4 bg-[#47a7a2] rounded-md flex justify-between items-center gap-2">
+        <div className="w-full max-w-full h-auto px-4 sm:px-6 py-2 sm:py-4 bg-[#4B657B] rounded-md flex justify-between items-center gap-2">
           <h2 className="responsive-nav-heading text-white text-base sm:text-lg md:text-xl lg:text-2xl">
             Remote-tech Admin Page
           </h2>
