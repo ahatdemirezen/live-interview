@@ -102,7 +102,7 @@ const CreatePackage = () => {
                   className="table-auto w-full text-left"
                 >
                   <thead>
-                    <tr className="font-semibold text-stone-500 ">
+                    <tr className="font-semibold text-stone-500">
                       <th className="w-2/12 py-2">Order</th>
                       <th className="w-2/12 py-2">Question</th>
                       <th className="w-2/12 py-2">Time</th>
@@ -124,10 +124,10 @@ const CreatePackage = () => {
                             <td className="py-4 px-2">{question.questionText}</td>
                             <td className="py-4 px-2">{question.timeLimit} min</td>
                             <td className="py-4 px-2  text-center align-middle">
-                           <Button onClick={() => handleDeleteQuestion(question._id)} icon={<FaTrash className="text-rose-800 " />} />
+                           <Button onClick={() => handleDeleteQuestion(question._id)} icon={<FaTrash className="text-[#ff2323] hover:text-[#cc0000] " />} />
                             </td>
                             <td className="py-4 px-2 text-center align-middle">
-                              <Button onClick={() => handleEditQuestion(question)} icon={<FaEdit className="text-rose-600" />}/>
+                              <Button onClick={() => handleEditQuestion(question)} icon={<FaEdit className="text-[#ff7f0a] hover:text-[#cc6600] " />}/>
                             </td>
                           </tr>
                         )}

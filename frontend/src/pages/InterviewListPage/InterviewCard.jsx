@@ -5,28 +5,36 @@ import dayjs from "dayjs";
 import QuestionListModal from "./InterviewQuestionListPopup";
 import { MdOutlineQuestionMark } from "react-icons/md";
 import { AiOutlineLink } from "react-icons/ai";
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash } from "react-icons/fa";
 import { GoChevronRight } from "react-icons/go";
-import { useNavigate } from "react-router-dom"; // Yönlendirme için useNavigate hook'u
+import { useNavigate } from "react-router-dom";
 
 const InterviewCard = ({ interview }) => {
   const deleteInterview = useInterviewStore((state) => state.deleteInterview);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [accessError, setAccessError] = useState(false); // Erişim hatası için state ekledik
-  const navigate = useNavigate(); // Yönlendirme için useNavigate
+  const [accessError, setAccessError] = useState(false);
+  
+  const navigate = useNavigate();
   const getQuestionsByInterview = useInterviewStore((state) => state.getQuestionsByInterview);
 
   const videoCounts = useInterviewStore((state) => state.videoCounts);
-
-  const totalVideos = videoCounts[interview._id]?.totalVideos || 0;
-  const pendingVideos = videoCounts[interview._id]?.pendingVideos || 0;
-  // Expire date ile bugünün tarihini karşılaştırıyoruz
+  const totalVideos = interview.totalForms || 0;
+  const pendingVideos = interview.pendingForms || 0;   
   const isExpired = dayjs(interview.expireDate).isBefore(dayjs());
 
-  // Interview ID'ye göre link oluşturma ve kopyalama işlemi
+  useEffect(() => {
+    if (accessError) {
+      const timer = setTimeout(() => {
+        setAccessError(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [accessError]);
+
   const handleCopyLink = () => {
     if (isExpired) {
-      setAccessError(true); // Eğer tarih geçmişse, erişim hatası set ediliyor
+      setAccessError(true);
     } else {
       const interviewLink = `http://localhost:5174/information-form/${interview._id}`;
       navigator.clipboard.writeText(interviewLink)
@@ -40,40 +48,39 @@ const InterviewCard = ({ interview }) => {
   };
 
   const handleOpenModal = async () => {
-    console.log("Interview ID:", interview._id);
     await getQuestionsByInterview(interview._id);
     setModalOpen(true);
   };
 
-  // See Videos butonuna basıldığında videolar sayfasına yönlendirme işlemi
   const handleSeeVideos = () => {
-    navigate(`/interview/${interview._id}/videos`); // Yönlendirme işlemi
+    navigate(`/interview/${interview._id}/videos`);
   };
 
   return (
-    <div className="bg-white p-4 m-4 shadow-md rounded-md relative w-60 h-60">
-      {/* Soru işareti ve link kısmı */}
-      <div className="absolute top-1 left-1 text-gray-600">
-        <Button icon={<MdOutlineQuestionMark className="text-red-500 text-2xl" />} size="sm" onClick={handleOpenModal} />
+    <div className="bg-white p-4 m-4 shadow-xl rounded-3xl relative w-full sm:w-60 h-auto sm:h-60 flex flex-col items-center">
+      {/* Sol üst köşedeki yuvarlak bağlantı simgesi */}
+      <div className="text-white flex items-center absolute rounded-full py-3 px-3 shadow-xl bg-[#47a7a2] left-4 top-4 sm:-top-6">
+        <AiOutlineLink className="text-white text-2xl" onClick={handleCopyLink} />
       </div>
 
-      <div className="absolute top-1 right-1 flex items-center space-x-3">
-        <Button icon={<AiOutlineLink className="text-stone-400 text-2xl" />} onClick={handleCopyLink} />
-        <Button icon={<FaTrash className="text-rose-800 text-xl" />} onClick={() => deleteInterview(interview._id)} />
+      {/* Soru işareti ve silme ikonu */}
+      <div className="absolute top-4 right-4 sm:top-1 sm:right-1 flex items-center space-x-1">
+        <Button icon={<MdOutlineQuestionMark className="text-[#FFB84D] text-2xl" />} size="sm" onClick={handleOpenModal} />
+        <Button icon={<FaTrash className="text-[#FF6F61] hover:text-[#cc0000]" />} size="sm" onClick={() => deleteInterview(interview._id)} />
       </div>
 
       {/* Başlık */}
-      <h3 className="text-lg font-bold mb-1 mt-8 text-center">{interview.interviewTitle}</h3>
+      <h3 className="text-lg sm:text-xl font-bold mb-1 mt-8 text-center text-gray-500">{interview.interviewTitle}</h3>
 
       {/* Aday sayıları */}
-      <div className="bg-gray-100 rounded-lg p-2 flex justify-between items-center mt-6 shadow-md">
-        <div className="text-center">
+      <div className="bg-gray-100 rounded-lg p-2 flex justify-between items-center mt-4 sm:mt-6 shadow-md w-full max-w-xs">
+        <div className="text-center ">
           <p className="text-xs text-gray-500">TOTAL</p>
-          <p className="text-xl font-bold">{totalVideos}</p>
+          <p className="text-lg sm:text-xl font-bold">{totalVideos}</p>
         </div>
         <div className="text-center">
           <p className="text-xs text-gray-500">ON HOLD</p>
-          <p className="text-xl font-bold">{pendingVideos}</p>
+          <p className="text-lg sm:text-xl font-bold">{pendingVideos}</p>
         </div>
       </div>
 
@@ -81,19 +88,20 @@ const InterviewCard = ({ interview }) => {
       <div className="absolute bottom-0 left-0 right-0 flex justify-between items-center text-sm p-4">
         <span className="text-gray-500">{isExpired ? "Unpublished" : "Published"}</span>
         <Button
-          label="See Videos"
           size="sm"
+          variant="special"
           icon={<GoChevronRight />}
-          variant="secondary"
-          onClick={handleSeeVideos} // See Videos butonuna tıklanınca handleSeeVideos çalıştırılıyor
+          label="See Videos"
+          onClick={handleSeeVideos}
         />
       </div>
 
+      {/* Modal bileşeni */}
       <QuestionListModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
 
-      {/* Eğer erişim hatası varsa bu mesajı gösteriyoruz */}
+      {/* Erişim hatası mesajı */}
       {accessError && (
-        <div className="bg-red-100 text-red-700 p-2 mt-4 rounded-md">
+        <div className="absolute bottom-12 left-4 right-4 bg-red-100 text-red-700 p-2 rounded-md z-20 shadow-lg">
           <p>Access denied: Interview link is expired.</p>
         </div>
       )}

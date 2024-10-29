@@ -15,7 +15,7 @@ const InterviewVideosPage = () => {
     getQuestionsByInterview,
     setVideoCounts,
     questions,
-    totalForms, // totalForms'u store'dan çekiyoruz
+    totalForms,
   } = useInterviewStore();
 
   const [loading, setLoading] = useState(true);
@@ -29,10 +29,10 @@ const InterviewVideosPage = () => {
 
   const [page, setPage] = useState(1);
   const limit = 12;
-  const totalPages = Math.ceil(totalForms / limit); // totalForms'u kullanarak toplam sayfa sayısını hesaplıyoruz
+  const totalPages = Math.ceil(totalForms / limit);
 
   useEffect(() => {
-    getPersonalFormsByInterview(interviewId, page, limit); // Sayfa değiştikçe verileri tekrar çekiyoruz
+    getPersonalFormsByInterview(interviewId, page, limit);
   }, [interviewId, page, getPersonalFormsByInterview]);
 
   const apiUrl = import.meta.env.VITE_BE_URL;
@@ -63,15 +63,6 @@ const InterviewVideosPage = () => {
     };
     fetchVideos();
   }, [personalForms]);
-
-  // Toplam video ve pending video sayısını hesaplayalım
-  const totalVideos = personalForms.length;
-  const pendingVideos = personalForms.filter((form) => form.status === "pending").length;
-
-  // Video sayısını store'a aktaralım
-  useEffect(() => {
-    setVideoCounts(interviewId, totalVideos, pendingVideos);
-  }, [totalVideos, pendingVideos, interviewId, setVideoCounts]);
 
   const openModal = async (videoUrl, formId, formStatus, videoId, formNote) => {
     setSelectedVideo(videoUrl);
@@ -129,16 +120,15 @@ const InterviewVideosPage = () => {
             onClick={() => openModal(videoURLs[form.videoId], form._id, form.status, form.videoId, form.note)}
           >
             <button
-              className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
               onClick={(e) => {
                 e.stopPropagation();
                 handleDelete(form._id, form.videoId);
               }}
-            >
-              &times;
-            </button>
+            >✖
+           </button>
             <div className={`absolute top-2 left-2 w-4 h-4 rounded-full ${form.status === "passed" ? "bg-green-400" : form.status === "failed" ? "bg-red-400" : "bg-gray-400"}`} title={form.status === "passed" ? "Passed" : form.status === "failed" ? "Failed" : "Pending"}></div>
-            <div className="bg-[#92C7CF] px-6 py-4">
+            <div className="bg-[#47a7a2] px-6 py-4">
               <h2 className="font-semibold text-lg text-slate-100">
                 {form.name} {form.surname}
               </h2>
@@ -152,19 +142,21 @@ const InterviewVideosPage = () => {
           </div>
         ))}
       </div>
-      <div className="flex justify-center mt-4 gap-2">
+
+      {/* Pagination */}
+      <div className="flex items-center justify-center mt-8 space-x-2 text-[#47a7a2]">
         <button
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
           disabled={page === 1}
-          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+          className="px-4 py-2 rounded-full hover:bg-[#47a7a2] hover:text-white disabled:opacity-50"
         >
-          Previous
+          &laquo; Prev
         </button>
         {Array.from({ length: totalPages }, (_, index) => (
           <button
             key={index}
             onClick={() => setPage(index + 1)}
-            className={`px-4 py-2 ${page === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-300'} rounded`}
+            className={`px-3 py-1 rounded-full ${page === index + 1 ? 'bg-[#47a7a2] text-white' : 'text-[#47a7a2]'} hover:bg-[#47a7a2] hover:text-white`}
           >
             {index + 1}
           </button>
@@ -172,11 +164,12 @@ const InterviewVideosPage = () => {
         <button
           onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
           disabled={page === totalPages}
-          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+          className="px-4 py-2 rounded-full hover:bg-[#47a7a2] hover:text-white disabled:opacity-50"
         >
-          Next
+          Next &raquo;
         </button>
       </div>
+
       <VideoPopupContent
         isOpen={isModalOpen}
         onClose={closeModal}

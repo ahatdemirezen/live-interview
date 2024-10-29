@@ -6,23 +6,26 @@ import { FaUserCog } from "react-icons/fa";
 
 const SideBar = () => {
   return (
-    <div className="h-screen w-full lg:w-64 bg-white text-neutral-500 fixed top-0 left-0 lg:rounded-r-xl rounded-b-xl lg:rounded-none">
-      <div className="p-4 text-2xl font-semibold flex item-center">
-      <FaUserCog className="text-3xl mr-2" />
-       <span>Admin Panel</span> 
+    <div className="h-16 lg:h-screen w-full lg:w-64 bg-white text-neutral-500 fixed bottom-0 lg:top-0 lg:left-0 flex lg:flex-col lg:rounded-r-xl rounded-t-xl lg:rounded-none shadow-md">
+      {/* Header */}
+      <div className="p-4 lg:text-2xl text-lg font-semibold flex items-center justify-center lg:justify-start lg:mb-6">
+        <FaUserCog className="text-2xl lg:text-3xl mr-2" />
+        <span className="hidden lg:inline">Admin Panel</span>
       </div>
-      <nav className="mt-6">
-        <ul>
-          <li className="mb-4">
-            <Link to="/packages" className="flex items-center p-3 hover:bg-gray-700 rounded-lg">
-            <GoArchive className="text-xl"/>
-              <span className="ml-4">Manage Question Package</span>
+      
+      {/* Navigation */}
+      <nav className="flex lg:flex-col flex-1 justify-evenly lg:justify-start">
+        <ul className="flex lg:flex-col w-full">
+          <li className="lg:mb-4 flex-1 lg:w-full">
+            <Link to="/packages" className="flex items-center justify-center lg:justify-start p-3 hover:bg-gray-200 rounded-lg lg:rounded-none">
+              <GoArchive className="text-2xl" />
+              <span className="hidden lg:inline ml-4">Manage Question Package</span>
             </Link>
           </li>
-          <li className="mb-4">
-            <Link to="/interview-list" className="flex items-center p-3 hover:bg-gray-700 rounded-lg">
-               <GoLog className= "text-xl" />
-              <span className="ml-4">Interview List</span>
+          <li className="lg:mb-4 flex-1 lg:w-full">
+            <Link to="/interview-list" className="flex items-center justify-center lg:justify-start p-3 hover:bg-gray-200 rounded-lg lg:rounded-none">
+              <GoLog className="text-2xl" />
+              <span className="hidden lg:inline ml-4">Interview List</span>
             </Link>
           </li>
         </ul>

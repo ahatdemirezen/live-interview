@@ -21,9 +21,10 @@ const Button = ({
   
   // Renk ve stil varyantları
   const variantStyles = {
-    primary: 'bg-[#92C7CF] text-white hover:bg-[#92C7CF]',
-    secondary: 'bg-amber-400 text-white hover:bg-amber-400 ml-4',
+    primary: 'bg-[#47a7a2] text-white hover:bg-[#6fcfcb]',
+    secondary: 'bg-[#6FCCB6] text-white hover:bg-amber-400 ml-4',
     outline: 'border border-gray-500 text-gray-500 hover:bg-gray-100',
+    special: 'bg-[#6FCCB6] text-white'
   };
   
   // Köşe yapısı

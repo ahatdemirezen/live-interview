@@ -1,5 +1,7 @@
 import React from "react";
 import ModalForVideos from "../../components/modalForVideos";
+import Button from "../../components/buttonComponent";
+import TextareaComponent from "../../components/textAreaComponent";
 
 const VideoPopupContent = ({
   isOpen,
@@ -11,7 +13,6 @@ const VideoPopupContent = ({
   status,
   toggleStatus,
   handleSaveNote,
-  
 }) => {
   return (
     <ModalForVideos isOpen={isOpen} onClose={onClose} title="Interview Video">
@@ -33,47 +34,44 @@ const VideoPopupContent = ({
                 </div>
               ))}
             </div>
-            <textarea
+
+            {/* Not alanı */}
+            <TextareaComponent
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Enter note here..."
-              className="w-full h-1/3 p-2 border rounded-bl-lg rounded-br-lg"
-            ></textarea>
+            />
+
+            {/* Passed ve Failed butonları */}
+            <div className="flex justify-start items-center mt-2">
+              <label htmlFor="passedStatus" className="inline-flex items-center mr-4">
+                <input
+                  type="checkbox"
+                  id="passedStatus"
+                  checked={status === "passed"}
+                  onChange={() => toggleStatus("passed")}
+                  className="form-checkbox h-5 w-5 accent-[#6fcfcb]"
+                />
+                <span className="ml-2 text-gray-600">Passed</span>
+              </label>
+
+              <label htmlFor="failedStatus" className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  id="failedStatus"
+                  checked={status === "failed"}
+                  onChange={() => toggleStatus("failed")}
+                  className="form-checkbox h-5 w-5 accent-[#FF6F61] "
+                />
+                <span className="ml-2 text-gray-600">Failed</span>
+              </label>
+            </div>
           </div>
         </div>
 
-        <div className="flex justify-start items-center mt-2">
-          <label htmlFor="passedStatus" className="inline-flex items-center mr-4">
-            <input
-              type="checkbox"
-              id="passedStatus"
-              checked={status === "passed"}
-              onChange={() => toggleStatus("passed")}
-              className="form-checkbox h-5 w-5 text-green-500"
-            />
-            <span className="ml-2 text-gray-600">Passed</span>
-          </label>
-
-          <label htmlFor="failedStatus" className="inline-flex items-center">
-            <input
-              type="checkbox"
-              id="failedStatus"
-              checked={status === "failed"}
-              onChange={() => toggleStatus("failed")}
-              className="form-checkbox h-5 w-5 text-red-500"
-            />
-            <span className="ml-2 text-gray-600">Failed</span>
-          </label>
-        </div>
-
+        {/* Kaydet butonu */}
         <div className="flex gap-4 justify-end mt-4">
-          <button
-            onClick={handleSaveNote}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded shadow-lg"
-          >
-            Save
-          </button>
-          
+          <Button label="Save" onClick={handleSaveNote} variant="primary" size="md" />
         </div>
       </div>
     </ModalForVideos>
