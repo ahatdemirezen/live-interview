@@ -260,8 +260,9 @@ const QuestionPanel = ({ interviewId, formId }) => {
     {questions.map((_, index) => (
       <div
         key={index}
-        className={`h-2 w-8 rounded-full ${index === currentQuestionIndex ? 'bg-blue-500' : 'bg-gray-300'}`}
-      />
+        className={`h-2 w-8 rounded-full ${index === currentQuestionIndex ? '' : 'bg-gray-300'}`}
+        style={{ backgroundColor: index === currentQuestionIndex ? '#0764BB' : 'bg-gray-300' }}
+              />
     ))}
   </div>
 </div>

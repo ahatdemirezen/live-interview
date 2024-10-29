@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import useInterviewStore from '../stores/InterviewFetchStore';
 import useCandidateStore from '../stores/InformationFormStore';
 import dayjs from 'dayjs';
+import backgroundImage from '../assets/background.jpg'; // Arka plan resmi dosyasını içe aktardık
 
 function PersonalInformationForm() {
   const { interviewId } = useParams();
@@ -66,9 +67,17 @@ function PersonalInformationForm() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-700">Personal Information Form</h2>
+    <div
+      className="flex justify-center items-center min-h-screen"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+<div className="bg-white bg-opacity-70 p-8 rounded-lg shadow-lg w-full max-w-md backdrop-blur-sm">
+<h2 className="text-2xl font-bold text-center mb-6 text-gray-700">Personal Information Form</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700">Name*</label>
@@ -122,10 +131,12 @@ function PersonalInformationForm() {
           </div>
           <button
   type="submit"
-  className="w-full py-3 bg-[#224064] text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+  className="w-full py-3 bg-[#224064] text-white font-semibold rounded-lg shadow-md hover:bg-[#0764BB] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 >
   Submit
 </button>
+
+
 
         </form>
       </div>
