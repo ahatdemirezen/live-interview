@@ -4,7 +4,7 @@ import InterviewCard from "./InterviewCard";
 import AddInterviewModal from "./AddInterviewModal";
 import SideBar from "../../components/SideBar";
 import Button from "../../components/buttonComponent";
-import Header from "../../components/Header";
+import Header from "../../components/header";
 import { MdPostAdd } from "react-icons/md";
 import SearchBar from "../../components/searchBar";
 
