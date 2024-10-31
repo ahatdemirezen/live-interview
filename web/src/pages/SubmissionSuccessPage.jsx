@@ -1,26 +1,24 @@
-// SubmissionSuccessPage.js
 import React, { useEffect } from 'react';
 import { AiOutlineCheckCircle } from 'react-icons/ai'; // Başarı simgesi için ikon
-import { useNavigate } from 'react-router-dom';
 import backgroundImage from '../assets/background.jpg'; // Arka plan resmi dosyasını içe aktar
 
 const SubmissionSuccessPage = () => {
-  const navigate = useNavigate();
-
   useEffect(() => {
-    // Kullanıcı geri gitmeye çalıştığında tekrar aynı sayfaya yönlendirme
+    // Geri gitmeyi engelleme fonksiyonu
     const handlePopState = () => {
-      navigate('/submission-success', { replace: true });
+      window.history.pushState(null, null, window.location.pathname); // Aynı sayfaya tekrar yönlendir
     };
 
-    // Tarayıcı geçmişine bir olay ekliyoruz
+    // Başlangıçta sayfa durumunu ekle
+    window.history.pushState(null, null, window.location.pathname);
+    // popstate olayını dinle
     window.addEventListener('popstate', handlePopState);
 
-    // Kullanıcı bu sayfadan çıkarsa popstate dinleyicisini kaldırırız
+    // Bileşen kapatıldığında dinleyiciyi kaldır
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [navigate]);
+  }, []);
 
   return (
     <div
