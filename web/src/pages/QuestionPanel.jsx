@@ -18,6 +18,8 @@ const QuestionPanel = ({ formId }) => {
   const [totalTime, setTotalTime] = useState(0); // Başlangıçta 0, dinamik olarak belirlenecek
   const [timerInterval, setTimerInterval] = useState(null);
   const [showPopup, setShowPopup] = useState(true); // Pop-up gösterme durumu
+  const [submitButtonVisible, setSubmitButtonVisible] = useState(false);
+
   const videoRef = useRef(null);
   const previewStreamRef = useRef(null); // Önizleme için stream referansı
   const navigate = useNavigate();
@@ -131,6 +133,7 @@ const QuestionPanel = ({ formId }) => {
       stream.getTracks().forEach((track) => track.stop()); // Kamera ve mikrofonu kapat
       videoRef.current.srcObject = null;
       clearInterval(timerInterval);
+      setSubmitButtonVisible(true); // Submit butonunu görünür yap
     }
   };
 
@@ -308,14 +311,14 @@ const QuestionPanel = ({ formId }) => {
                     )}
                   </div>
                 )}
-                {videoBlob && (
-                  <button
-                    className="bg-blue-500 text-white px-3 py-1 md:px-4 md:py-2 rounded text-sm md:text-base mt-2 md:mt-0"
-                    onClick={handleSubmit}
-                  >
-                    Submit Video
-                  </button>
-                )}
+               {submitButtonVisible && (
+  <button
+    className="bg-blue-500 text-white px-3 py-1 md:px-4 md:py-2 rounded text-sm md:text-base mt-2 md:mt-0"
+    onClick={handleSubmit}
+  >
+    Submit Video
+  </button>
+)}
               </div>
             </>
           ) : (

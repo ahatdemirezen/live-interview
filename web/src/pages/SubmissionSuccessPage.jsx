@@ -1,9 +1,27 @@
 // SubmissionSuccessPage.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AiOutlineCheckCircle } from 'react-icons/ai'; // Başarı simgesi için ikon
+import { useNavigate } from 'react-router-dom';
 import backgroundImage from '../assets/background.jpg'; // Arka plan resmi dosyasını içe aktar
 
 const SubmissionSuccessPage = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Kullanıcı geri gitmeye çalıştığında tekrar aynı sayfaya yönlendirme
+    const handlePopState = () => {
+      navigate('/submission-success', { replace: true });
+    };
+
+    // Tarayıcı geçmişine bir olay ekliyoruz
+    window.addEventListener('popstate', handlePopState);
+
+    // Kullanıcı bu sayfadan çıkarsa popstate dinleyicisini kaldırırız
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [navigate]);
+
   return (
     <div
       className="flex items-center justify-center h-screen bg-cover bg-center px-4"
