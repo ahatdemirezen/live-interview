@@ -51,17 +51,23 @@ export const getMediaInfoService = async (config: any) => {
 };
 
 // Delete Candidate and Media Service
-export const deleteCandidateAndMediaService = async (formId: string, videoId: string, config: any) => {
+export const deleteCandidateAndMediaService = async (formId: string, videoId: string | null, config: any) => {
   // 1. Adayı Silme İşlemi
   const deletedForm = await PersonalInformationForm.findByIdAndDelete(formId);
   if (!deletedForm) throw createHttpError(404, 'Candidate form not found');
 
-  // 2. Video Silme İşlemi
-  const videoDeleteUrl = `${config.Link}/${config.Project}/${config.BUCKET_NAME}/${config.AWS_SECRET_ACCESS_KEY}/${videoId}`;
-  const videoDeleteResponse = await axios.delete(videoDeleteUrl);
-
-  if (videoDeleteResponse.status !== 200 && videoDeleteResponse.status !== 204) {
-    throw createHttpError(500, 'Failed to delete media from external service');
+  // 2. Video Silme İşlemi (Video varsa)
+  if (videoId) {
+    const videoDeleteUrl = `${config.Link}/${config.Project}/${config.BUCKET_NAME}/${config.AWS_SECRET_ACCESS_KEY}/${videoId}`;
+    try {
+      const videoDeleteResponse = await axios.delete(videoDeleteUrl);
+      if (videoDeleteResponse.status !== 200 && videoDeleteResponse.status !== 204) {
+        throw createHttpError(500, 'Failed to delete media from external service');
+      }
+    } catch (error) {
+      console.error("Video silme işlemi sırasında hata oluştu:", error);
+      // Videoyu silme hatası adayın silinmesini engellemez
+    }
   }
 
   return deletedForm;

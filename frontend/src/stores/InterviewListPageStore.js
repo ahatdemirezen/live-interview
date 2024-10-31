@@ -91,21 +91,28 @@ const useInterviewStore = create((set) => ({
     }
   },
 
-  deleteCandidateAndMedia: async (formId, videoId) => {
+  deleteCandidateAndMedia: async (formId, videoId = null) => {
     try {
+      // API'ye gönderilecek veriyi videoId varlığına göre ayarla
+      const requestData = videoId ? { formId, videoId } : { formId };
+      
       const response = await axios.delete(`${apiUrl}/upload/delete-candidate-media`, {
-        data: { formId, videoId },
+        data: requestData,
         withCredentials: true,
       });
+      
+      // Durumu güncelle ve ilgili formu sil
       set((state) => ({
         personalForms: state.personalForms.filter((form) => form._id !== formId),
       }));
+      
       console.log('Aday ve medya başarıyla silindi:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error deleting candidate and media:', error);
     }
   },
+  
 
   updateCandidateStatus: async (formId, newStatus) => {
     try {

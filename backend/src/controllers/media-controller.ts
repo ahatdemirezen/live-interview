@@ -88,7 +88,7 @@ export const getMediaInfo = async (req: Request, res: Response, next: NextFuncti
 export const deleteCandidateAndMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { formId, videoId } = req.body;
 
-  if (!formId || !videoId) {
+  if (!formId) {
     res.status(400).json({ message: 'Both formId and videoId are required' });
     return;
   }
