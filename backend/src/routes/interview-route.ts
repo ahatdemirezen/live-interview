@@ -15,8 +15,8 @@ router.get("/:interviewId/expire-date", InterviewController.getInterviewExpireDa
 
 router.get('/:interviewId/personal-forms', authenticateToken, InterviewController.getPersonalFormsByInterview);
 
+router.get("/:interviewId/settings", InterviewController.getInterviewSettings);
+
 router.get("/ids", InterviewController.getInterviewIds);
-
-
 
 export default router;

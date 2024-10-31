@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { createInterviewService, getInterviewsService, deleteInterviewService , fetchInterviewIds , getInterviewExpireDateService , getPersonalFormsByInterviewService, getPackageQuestionsByInterviewService } from "../services/interview-service"; // Service'i import et
+import { createInterviewService, getInterviewsService, deleteInterviewService , fetchInterviewIds , getInterviewExpireDateService , getInterviewSettingsService , getPersonalFormsByInterviewService, getPackageQuestionsByInterviewService } from "../services/interview-service"; // Service'i import et
 
 export const createInterview = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { interviewTitle, expireDate, packageIds } = req.body; // packageId değil packageIds array olarak aldık
+    const { interviewTitle, expireDate, packageIds, canSkip = false, showAtOnce = false } = req.body;
 
     // Service katmanını kullanarak interview oluştur
-    const savedInterview = await createInterviewService(interviewTitle, expireDate, packageIds);
+    const savedInterview = await createInterviewService(interviewTitle, expireDate, packageIds, canSkip, showAtOnce);
 
     // Başarı durumunda yanıt döndür
     res.status(201).json(savedInterview);
@@ -15,6 +15,7 @@ export const createInterview = async (req: Request, res: Response, next: NextFun
     next(error);
   }
 };
+
 
 export const getPackageQuestionsByInterview = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -106,4 +107,14 @@ export const deleteInterview = async (req: Request, res: Response, next: NextFun
   }
 };
 
+export const getInterviewSettings = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { interviewId } = req.params;
 
+    const interviewSettings = await getInterviewSettingsService(interviewId);
+
+    res.status(200).json(interviewSettings);
+  } catch (error) {
+    next(error);
+  }
+};

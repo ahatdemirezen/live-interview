@@ -6,7 +6,13 @@ import PersonalInformationForm from "../models/candidate-model";
 import { Document } from "mongoose";
 
 // Interview oluşturma servisi
-export const createInterviewService = async (interviewTitle: string, expireDate: Date, packageIds: string[]) => {
+export const createInterviewService = async (
+  interviewTitle: string,
+  expireDate: Date,
+  packageIds: string[],
+  canSkip: boolean,
+  showAtOnce: boolean
+) => {
   // Gelen packageIds'in bir array olup olmadığını kontrol et
   if (!Array.isArray(packageIds)) {
     throw createHttpError(400, "packageIds must be an array");
@@ -29,6 +35,8 @@ export const createInterviewService = async (interviewTitle: string, expireDate:
     interviewTitle,
     expireDate,
     packageId: packageIds, // Artık bir array olarak kaydediyoruz
+    canSkip,     // Yeni eklenen değer
+    showAtOnce,  // Yeni eklenen değer
   });
 
   // Veritabanına kaydet
@@ -36,6 +44,7 @@ export const createInterviewService = async (interviewTitle: string, expireDate:
 
   return savedInterview;
 };
+
 
 
 // Tüm interview'ları getirme servisi
@@ -168,4 +177,15 @@ export const deleteInterviewService = async (interviewId: string) => {
     return interview.expireDate;
   };
 
+  export const getInterviewSettingsService = async (interviewId: string) => {
+    const interview = await Interview.findById(interviewId).select("canSkip showAtOnce");
   
+    if (!interview) {
+      throw createHttpError(404, "Interview not found");
+    }
+  
+    return {
+      canSkip: interview.canSkip,
+      showAtOnce: interview.showAtOnce,
+    };
+  };

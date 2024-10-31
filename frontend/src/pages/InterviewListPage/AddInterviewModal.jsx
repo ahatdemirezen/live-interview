@@ -11,6 +11,8 @@ const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded }) => {
     setInterviewTitle,
     setPackageId,
     setExpireDate,
+    setCanSkip,
+    setShowAtOnce,
     addInterview,
     currentInterview,
   } = useCreateInterviewStore();
@@ -102,8 +104,39 @@ const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded }) => {
         value={currentInterview.expireDate}
         dateInputHeader="Expire Date"
       />
-      
-      <div className="flex justify-end">
+
+      {/* Can Skip ve Show At Once switchleri */}
+      <div className="mt-4 flex space-x-4 items-center">
+        <label className="flex items-center space-x-2">
+          <span className="text-sm font-medium text-gray-700">Can Skip</span>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={currentInterview.canSkip}
+              onChange={(e) => setCanSkip(e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600"></div>
+            <div className="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-full"></div>
+          </label>
+        </label>
+
+        <label className="flex items-center space-x-2">
+          <span className="text-sm font-medium text-gray-700">Show At Once</span>
+          <label className="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={currentInterview.showAtOnce}
+              onChange={(e) => setShowAtOnce(e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600"></div>
+            <div className="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-full"></div>
+          </label>
+        </label>
+      </div>
+
+      <div className="flex justify-end mt-6">
         <Button
           onClick={handleAddInterview} // Butona tıklandığında veriler gönderilir
           size="md"

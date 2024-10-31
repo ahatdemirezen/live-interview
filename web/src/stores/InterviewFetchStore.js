@@ -8,6 +8,8 @@ const useInterviewStore = create((set, get) => ({
   questions: [],
   loading: false,          // Yükleme durumu
   error: null,             // Hata durumu
+  canSkip: null,           // canSkip değeri
+  showAtOnce: null,        // showAtOnce değeri
 
   // Interview ID'yi kontrol etme fonksiyonu
   checkInterviewId: async (interviewId) => {
@@ -66,7 +68,16 @@ const useInterviewStore = create((set, get) => ({
     }
   },
   
-
+  fetchInterviewSettings: async (interviewId) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.get(`${apiUrl}/interview/${interviewId}/settings`);
+      const { canSkip, showAtOnce } = response.data;
+      set({ canSkip, showAtOnce, loading: false });
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
 
 }));
 

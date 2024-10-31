@@ -19,7 +19,15 @@ const InterviewSchema = new Schema({
     type: Types.ObjectId, 
     ref: 'PersonalInformationForm', // Referans gösterilen schema
     required: true,
-  }],  
+  }],
+  canSkip: {
+    type: Boolean,
+    default: false,  // Varsayılan olarak false
+  },
+  showAtOnce: {
+    type: Boolean,
+    default: false,  // Varsayılan olarak false
+  },
 });
 
 const Interview = mongoose.model('Interview', InterviewSchema);
