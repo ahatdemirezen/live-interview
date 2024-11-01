@@ -241,39 +241,43 @@ const QuestionPanel = ({ formId }) => {
 </div>
 
 
-              {/* Soru alanı */}
-              <div className={`flex flex-col ${showAtOnce ? "items-center justify-center" : "grid grid-cols-1 gap-4"}`}>
-                {showAtOnce ? (
-                  <>
-                    <div className="bg-gray-100 py-10 px-6 md:py-16 md:px-10 rounded-lg shadow-lg w-full max-w-xl text-center">
-                      <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-5 text-gray-800">
-                        Question {currentQuestionIndex + 1} of {questions.length}
-                      </h2>
-                      <p className="text-lg md:text-xl text-gray-700">
-                        {questions[currentQuestionIndex].questionText}
-                      </p>
-                    </div>
-                    <div className="flex mt-3 md:mt-5 space-x-2">
-                      {questions.map((_, index) => (
-                        <div
-                          key={index}
-                          className={`h-2 w-8 rounded-full ${index === currentQuestionIndex ? '' : 'bg-gray-300'}`}
-                          style={{ backgroundColor: index === currentQuestionIndex ? '#0764BB' : 'bg-gray-300' }}
-                        />
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  questions.map((question, index) => (
-                    <div key={index} className="bg-gray-100 py-10 px-6 md:py-16 md:px-10 rounded-lg shadow-lg w-full max-w-xl text-center">
-                      <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-5 text-gray-800">
-                        Question {index + 1} of {questions.length}
-                      </h2>
-                      <p className="text-lg md:text-xl text-gray-700">{question.questionText}</p>
-                    </div>
-                  ))
-                )}
-              </div>
+           
+           {/* Soru alanı */}
+<div
+  className={`flex flex-col items-center ${showAtOnce ? "justify-center" : "gap-4"} overflow-y-auto`}
+  style={{ maxHeight: '400px' }} // Sabit yükseklik verildi ve scroll için overflow ayarlandı
+>
+  {showAtOnce ? (
+    <>
+      <div className="bg-gray-100 py-10 px-6 md:py-16 md:px-10 rounded-lg shadow-lg w-full max-w-xl text-center">
+        <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-5 text-gray-800">
+          Question {currentQuestionIndex + 1} of {questions.length}
+        </h2>
+        <p className="text-lg md:text-xl text-gray-700">
+          {questions[currentQuestionIndex].questionText}
+        </p>
+      </div>
+      <div className="flex mt-3 md:mt-5 space-x-2">
+        {questions.map((_, index) => (
+          <div
+            key={index}
+            className={`h-2 w-8 rounded-full ${index === currentQuestionIndex ? '' : 'bg-gray-300'}`}
+            style={{ backgroundColor: index === currentQuestionIndex ? '#0764BB' : 'bg-gray-300' }}
+          />
+        ))}
+      </div>
+    </>
+  ) : (
+    questions.map((question, index) => (
+      <div key={index} className="bg-gray-100 py-10 px-6 md:py-16 md:px-10 rounded-lg shadow-lg w-full max-w-xl text-center">
+        <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-5 text-gray-800">
+          Question {index + 1} of {questions.length}
+        </h2>
+        <p className="text-lg md:text-xl text-gray-700">{question.questionText}</p>
+      </div>
+    ))
+  )}
+</div>
 
               {/* Butonlar */}
               <div className="text-center mt-4 md:mt-auto">
