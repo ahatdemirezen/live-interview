@@ -222,21 +222,24 @@ const QuestionPanel = ({ formId }) => {
         <div className="w-1/2 p-4 flex flex-col justify-between">
           {questions.length > 0 ? (
             <>
-              {/* Zaman alanı */}
-              <div className="flex flex-row md:flex-row justify-center md:justify-between items-center px-4 py-2 mb-4 space-x-4">
-                <div className="flex flex-col items-center">
-                  <div className="bg-[#d0dcea] text-xl font-bold text-gray-900 py-1 px-3 rounded-lg mb-1 shadow-sm">
-                    {formatTime(timeRemaining)}
-                  </div>
-                  <span className="text-md font-semibold text-gray-700 text-center">Question Time</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="bg-[#d0dcea] text-xl font-bold text-gray-900 py-1 px-3 rounded-lg mb-1 shadow-sm">
-                    {formatTime(totalTime)}
-                  </div>
-                  <span className="text-md font-semibold text-gray-700 text-center">Total Time</span>
-                </div>
-              </div>
+          {/* Zaman alanı */}
+<div className="flex flex-row md:flex-row justify-center md:justify-between items-center px-4 py-2 mb-4 space-x-4">
+  {showAtOnce && ( // showAtOnce true olduğunda Question Time gösterilecek
+    <div className="flex flex-col items-center">
+      <div className="bg-[#d0dcea] text-xl font-bold text-gray-900 py-1 px-3 rounded-lg mb-1 shadow-sm">
+        {formatTime(timeRemaining)}
+      </div>
+      <span className="text-md font-semibold text-gray-700 text-center">Question Time</span>
+    </div>
+  )}
+  <div className="flex flex-col items-center">
+    <div className="bg-[#d0dcea] text-xl font-bold text-gray-900 py-1 px-3 rounded-lg mb-1 shadow-sm">
+      {formatTime(totalTime)}
+    </div>
+    <span className="text-md font-semibold text-gray-700 text-center">Total Time</span>
+  </div>
+</div>
+
 
               {/* Soru alanı */}
               <div className={`flex flex-col ${showAtOnce ? "items-center justify-center" : "grid grid-cols-1 gap-4"}`}>
