@@ -174,12 +174,14 @@ const InterviewVideosPage = () => {
             <div className="bg-stone-200 h-48 flex items-center justify-center">
               {videoURLs[form.videoId] ? (
                 <video
-                  className="h-full w-full object-cover"
-                  src={videoURLs[form.videoId]}
-                  muted
-                  controls={false}
-                  preload="metadata"
-                />
+                className="h-full w-full object-cover"
+                src={videoURLs[form.videoId]}
+                muted
+                controls={false}
+                preload="auto"  // preload özelliğini 'auto' olarak değiştiriyoruz
+                onLoadedMetadata={(e) => e.target.play()}  // Metadata yüklendiğinde otomatik oynatmayı başlatıyoruz
+              />
+              
               ) : (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
