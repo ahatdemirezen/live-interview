@@ -33,6 +33,10 @@ const PersonalInformationFormSchema = new Schema(
       type: String,
       default: '', // Varsayılan olarak boş bir string atanır
     },
+    alert: {
+      type : Boolean,
+      default : false
+    },
   },
   {
     timestamps: true, // createdAt ve updatedAt alanlarını otomatik olarak ekler

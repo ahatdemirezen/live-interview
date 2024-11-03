@@ -189,3 +189,38 @@ export const deleteInterviewService = async (interviewId: string) => {
       showAtOnce: interview.showAtOnce,
     };
   };
+
+  export const updateInterviewService = async (
+    interviewId: string,
+    interviewTitle?: string,
+    expireDate?: Date,
+    packageIds?: string[],
+    canSkip?: boolean,
+    showAtOnce?: boolean
+  ) => {
+    // Interview ID'nin geçerliliğini kontrol et
+    if (!mongoose.isValidObjectId(interviewId)) {
+      throw createHttpError(400, "Invalid interview ID format");
+    }
+  
+    // Güncellenmesi istenen alanları bir obje olarak hazırlıyoruz
+    const updateFields: any = {};
+    if (interviewTitle !== undefined) updateFields.interviewTitle = interviewTitle;
+    if (expireDate !== undefined) updateFields.expireDate = expireDate;
+    if (packageIds !== undefined) updateFields.packageId = packageIds;
+    if (canSkip !== undefined) updateFields.canSkip = canSkip;
+    if (showAtOnce !== undefined) updateFields.showAtOnce = showAtOnce;
+  
+    // İlgili Interview kaydını bul ve güncelle
+    const updatedInterview = await Interview.findByIdAndUpdate(
+      interviewId,
+      updateFields,
+      { new: true, runValidators: true } // Güncellenmiş belgeyi döndür ve validatorleri çalıştır
+    );
+  
+    if (!updatedInterview) {
+      throw createHttpError(404, "Interview not found");
+    }
+  
+    return updatedInterview;
+  };

@@ -5,6 +5,7 @@ const useMediaStore = create((set) => ({
   isLoading: false,
   error: null,
   fileId: null, // fileId'yi yakalamak için state ekliyoruz
+  userAlerts: {}, // Kullanıcı uyarı durumları
 
   // Medya dosyası yükleme fonksiyonu
   uploadMedia: async (mediaFile, formId, fileName) => {  // fileName'i parametre olarak alıyoruz
@@ -43,6 +44,27 @@ const useMediaStore = create((set) => ({
       set({ isLoading: false, error: 'Failed to upload media' });
     }
   },
+
+  // Kullanıcı uyarı durumunu ayarlamak için fonksiyon
+  setUserAlert: async (formId, alert) => {
+    set({
+      userAlerts: { [formId]: alert }, // 'state' kullanmadan direkt olarak güncellenmiş 'userAlerts' değerini atıyoruz
+    });
+    console.log('setUserAlert çağrıldı, güncellenen userAlerts:', { [formId]: alert });
+  
+    try {
+      // Patch isteği ile alert durumunu güncelleme
+      const apiUrl = `http://localhost:5002/api/candidate/${formId}/alert`;
+      const response = await axios.patch(apiUrl, { alert });
+  
+      console.log('Alert status updated successfully:', response.data);
+    } catch (error) {
+      console.error('Error updating alert status:', error.message || error);
+      set({
+        error: `Failed to update alert status for user ${formId}`,
+      });
+    }
+  },  
 }));
 
 export default useMediaStore;

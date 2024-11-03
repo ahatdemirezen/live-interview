@@ -9,6 +9,7 @@ import Button from "../../components/buttonComponent";
 import SearchBar from "../../components/searchBar";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaTrash } from "react-icons/fa";
+import { FaExclamationTriangle } from "react-icons/fa"; // Kırmızı ünlem ikonu
 
 const InterviewVideosPage = () => {
   const { interviewId } = useParams();
@@ -122,15 +123,14 @@ const InterviewVideosPage = () => {
 
   return (
     <div className="p-8">
-    <div className="flex justify-between items-center mb-4">
-      <h1 className="text-2xl font-bold text-center text-neutral-600">
-        Interview Video Collection
-      </h1>
-      {/* Search bar sağ üstte */}
-      <SearchBar value={searchQuery} onChange={setSearchQuery} />
-    </div>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold text-center text-neutral-600">
+          Interview Video Collection
+        </h1>
+        {/* Search bar sağ üstte */}
+        <SearchBar value={searchQuery} onChange={setSearchQuery} />
+      </div>
   
-
       <div className="grid grid-cols-3 gap-4">
         {filteredForms.map((form) => (
           <div
@@ -149,10 +149,12 @@ const InterviewVideosPage = () => {
               className="bg-[#6f95b6] px-6 py-4 flex items-center justify-between"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="ml-4 font-semibold text-lg text-slate-100 flex-grow">
-                {form.name} {form.surname}
-              </h2>
-
+              <h2 className="ml-4 font-semibold text-lg text-slate-100 flex items-center">
+  {form.alert && (
+    <FaExclamationTriangle className="text-red-500 text-lg mr-2" title="Attention needed!" />
+  )}
+  {form.name} {form.surname}
+</h2>
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -174,14 +176,12 @@ const InterviewVideosPage = () => {
             <div className="bg-stone-200 h-48 flex items-center justify-center">
               {videoURLs[form.videoId] ? (
                 <video
-                className="h-full w-full object-cover"
-                src={videoURLs[form.videoId]}
-                muted
-                controls={false}
-                preload="auto"  // preload özelliğini 'auto' olarak değiştiriyoruz
-                onLoadedMetadata={(e) => e.target.play()}  // Metadata yüklendiğinde otomatik oynatmayı başlatıyoruz
-              />
-              
+                  className="h-full w-full object-cover"
+                  src={videoURLs[form.videoId]}
+                  muted
+                  controls={false}
+                  preload="metadata"
+                />
               ) : (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

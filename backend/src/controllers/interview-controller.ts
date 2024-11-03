@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createInterviewService, getInterviewsService, deleteInterviewService , fetchInterviewIds , getInterviewExpireDateService , getInterviewSettingsService , getPersonalFormsByInterviewService, getPackageQuestionsByInterviewService } from "../services/interview-service"; // Service'i import et
+import { createInterviewService, getInterviewsService, deleteInterviewService , fetchInterviewIds , updateInterviewService , getInterviewExpireDateService , getInterviewSettingsService , getPersonalFormsByInterviewService, getPackageQuestionsByInterviewService } from "../services/interview-service"; // Service'i import et
 
 export const createInterview = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -116,5 +116,19 @@ export const getInterviewSettings = async (req: Request, res: Response, next: Ne
     res.status(200).json(interviewSettings);
   } catch (error) {
     next(error);
+  }
+};
+
+export const updateInterview = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { interviewId } = req.params;
+    const { interviewTitle, expireDate, packageIds, canSkip, showAtOnce } = req.body;
+
+    // updateInterviewService ile interview'ı güncelle
+    const updatedInterview = await updateInterviewService(interviewId, interviewTitle, expireDate, packageIds, canSkip, showAtOnce);
+
+    res.status(200).json(updatedInterview); // Güncellenmiş interview'ı döndür
+  } catch (error) {
+    next(error); // Hataları yakalayıp bir sonraki middleware'e ilet
   }
 };

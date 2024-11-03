@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { getAllPersonalInfoService, createPersonalInfoService , updateCandidateStatusService ,updateCandidateNoteService  } from '../services/candidate-service';
+import PersonalInformationForm from '../models/candidate-model';
 
 // GET - Tüm kişisel bilgileri getirme
 export const getAllPersonalInfo = async (req: Request, res: Response): Promise<void> => {
@@ -61,5 +62,26 @@ export const updateCandidateNote = async (req: Request, res: Response, next: Nex
     res.status(200).json(updatedCandidate);
   } catch (error) {
     next(error); // Hataları middleware'e yönlendiriyoruz
+  }
+};
+
+// Kullanıcı uyarı durumunu güncelleme
+export const updateUserAlert = async (req: Request, res: Response): Promise<void>  => {
+  const { formId } = req.params;
+  const { alert } = req.body;
+  try {
+    // Veritabanında kullanıcıyı bul ve alert alanını güncelle
+    const updatedUser = await PersonalInformationForm.findByIdAndUpdate(
+      formId,
+      { alert: alert },
+      { new: true } // Güncellenmiş kullanıcıyı döndür
+    );
+    if (!updatedUser) {
+       res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'Alert status updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating alert status:', error);
+    res.status(500).json({ message: 'Error updating alert status', error });
   }
 };

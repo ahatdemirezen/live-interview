@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllPersonalInfo, createPersonalInfo, updateCandidateStatus , updateCandidateNote } from '../controllers/candidate-controller';
+import { getAllPersonalInfo, createPersonalInfo, updateCandidateStatus , updateCandidateNote , updateUserAlert } from '../controllers/candidate-controller';
 import { authenticateToken } from "../middleware/auth";
 
 const router = express.Router();
@@ -13,5 +13,7 @@ router.post("/:interviewId", createPersonalInfo);
 router.patch("/status" , authenticateToken, updateCandidateStatus)
 
 router.patch("/:formId/note", authenticateToken, updateCandidateNote);
+
+router.patch("/:formId/alert" , updateUserAlert)
 
 export default router;

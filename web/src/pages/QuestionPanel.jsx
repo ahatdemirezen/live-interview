@@ -6,7 +6,7 @@ import useMediaStore from '../stores/RecordVideoStore'; // Medya upload fonksiyo
 const QuestionPanel = ({ formId }) => {
   const { interviewId } = useParams(); // interviewId URL'den alınır
   const { questions, getQuestionsByInterview, fetchInterviewSettings, canSkip, showAtOnce } = useInterviewStore(); // Soruları ve ayarları almak için state
-  const { uploadMedia, isLoading, error, fileId } = useMediaStore(); // Medya upload fonksiyonu ve fileId
+  const { uploadMedia, isLoading, error, fileId, setUserAlert } = useMediaStore(); // Medya upload fonksiyonu, fileId ve alert durumu güncelleme
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false); // Önizleme durumu için state
@@ -23,6 +23,33 @@ const QuestionPanel = ({ formId }) => {
   const videoRef = useRef(null);
   const previewStreamRef = useRef(null); // Önizleme için stream referansı
   const navigate = useNavigate();
+  const [hasSwitchedTab, setHasSwitchedTab] = useState(false); // Yeni eklenen state
+
+  // Sekme değişimini yakalayan ve alert durumunu güncelleyen useEffect
+  // Sekme değişimini yakalayan ve alert durumunu güncelleyen useEffect
+useEffect(() => {
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'hidden' && !hasSwitchedTab) {
+      setUserAlert(formId, true); // Alert durumunu true olarak güncelle
+      setHasSwitchedTab(true); // Sekme değiştirildi olarak işaretleyin
+    }
+  };
+
+  const handleBlur = () => {
+    if (!hasSwitchedTab) {
+      setUserAlert(formId, true); // Alert durumunu true olarak güncelle
+      setHasSwitchedTab(true); // Sekme değiştirildi olarak işaretleyin
+    }
+  };
+
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  window.addEventListener('blur', handleBlur); // Blur olayını dinleyerek klavye sekme değişikliklerini algıla
+
+  return () => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    window.removeEventListener('blur', handleBlur); // Temizle
+  };
+}, [formId, setUserAlert, hasSwitchedTab]);
 
   // Soruları çek ve ilk sorunun süresini ayarla
   useEffect(() => {
@@ -222,63 +249,59 @@ const QuestionPanel = ({ formId }) => {
         <div className="w-1/2 p-4 flex flex-col justify-between">
           {questions.length > 0 ? (
             <>
-          {/* Zaman alanı */}
-<div className="flex flex-row md:flex-row justify-center md:justify-between items-center px-4 py-2 mb-4 space-x-4">
-  {showAtOnce && ( // showAtOnce true olduğunda Question Time gösterilecek
-    <div className="flex flex-col items-center">
-      <div className="bg-[#d0dcea] text-xl font-bold text-gray-900 py-1 px-3 rounded-lg mb-1 shadow-sm">
-        {formatTime(timeRemaining)}
-      </div>
-      <span className="text-md font-semibold text-gray-700 text-center">Question Time</span>
-    </div>
-  )}
-  <div className="flex flex-col items-center">
-    <div className="bg-[#d0dcea] text-xl font-bold text-gray-900 py-1 px-3 rounded-lg mb-1 shadow-sm">
-      {formatTime(totalTime)}
-    </div>
-    <span className="text-md font-semibold text-gray-700 text-center">Total Time</span>
-  </div>
-</div>
-
-
-           
-           {/* Soru alanı */}
-<div
-  className={`flex flex-col items-center ${showAtOnce ? "justify-center" : "gap-4"} overflow-y-auto`}
-  style={{ maxHeight: '400px' }} // Sabit yükseklik verildi ve scroll için overflow ayarlandı
->
-  {showAtOnce ? (
-    <>
-      <div className="bg-gray-100 py-10 px-6 md:py-16 md:px-10 rounded-lg shadow-lg w-full max-w-xl text-center">
-        <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-5 text-gray-800">
-          Question {currentQuestionIndex + 1} of {questions.length}
-        </h2>
-        <p className="text-lg md:text-xl text-gray-700">
-          {questions[currentQuestionIndex].questionText}
-        </p>
-      </div>
-      <div className="flex mt-3 md:mt-5 space-x-2">
-        {questions.map((_, index) => (
-          <div
-            key={index}
-            className={`h-2 w-8 rounded-full ${index === currentQuestionIndex ? '' : 'bg-gray-300'}`}
-            style={{ backgroundColor: index === currentQuestionIndex ? '#0764BB' : 'bg-gray-300' }}
-          />
-        ))}
-      </div>
-    </>
-  ) : (
-    questions.map((question, index) => (
-      <div key={index} className="bg-gray-100 py-10 px-6 md:py-16 md:px-10 rounded-lg shadow-lg w-full max-w-xl text-center">
-        <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-5 text-gray-800">
-          Question {index + 1} of {questions.length}
-        </h2>
-        <p className="text-lg md:text-xl text-gray-700">{question.questionText}</p>
-      </div>
-    ))
-  )}
-</div>
-
+              {/* Zaman alanı */}
+              <div className="flex flex-row md:flex-row justify-center md:justify-between items-center px-4 py-2 mb-4 space-x-4">
+                {showAtOnce && (
+                  <div className="flex flex-col items-center">
+                    <div className="bg-[#d0dcea] text-xl font-bold text-gray-900 py-1 px-3 rounded-lg mb-1 shadow-sm">
+                      {formatTime(timeRemaining)}
+                    </div>
+                    <span className="text-md font-semibold text-gray-700 text-center">Question Time</span>
+                  </div>
+                )}
+                <div className="flex flex-col items-center">
+                  <div className="bg-[#d0dcea] text-xl font-bold text-gray-900 py-1 px-3 rounded-lg mb-1 shadow-sm">
+                    {formatTime(totalTime)}
+                  </div>
+                  <span className="text-md font-semibold text-gray-700 text-center">Total Time</span>
+                </div>
+              </div>
+              {/* Soru alanı */}
+              <div
+                className={`flex flex-col items-center ${showAtOnce ? "justify-center" : "gap-4"} overflow-y-auto`}
+                style={{ maxHeight: '400px' }}
+              >
+                {showAtOnce ? (
+                  <>
+                    <div className="bg-gray-100 py-10 px-6 md:py-16 md:px-10 rounded-lg shadow-lg w-full max-w-xl text-center">
+                      <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-5 text-gray-800">
+                        Question {currentQuestionIndex + 1} of {questions.length}
+                      </h2>
+                      <p className="text-lg md:text-xl text-gray-700">
+                        {questions[currentQuestionIndex].questionText}
+                      </p>
+                    </div>
+                    <div className="flex mt-3 md:mt-5 space-x-2">
+                      {questions.map((_, index) => (
+                        <div
+                          key={index}
+                          className={`h-2 w-8 rounded-full ${index === currentQuestionIndex ? '' : 'bg-gray-300'}`}
+                          style={{ backgroundColor: index === currentQuestionIndex ? '#0764BB' : 'bg-gray-300' }}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  questions.map((question, index) => (
+                    <div key={index} className="bg-gray-100 py-10 px-6 md:py-16 md:px-10 rounded-lg shadow-lg w-full max-w-xl text-center">
+                      <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-5 text-gray-800">
+                        Question {index + 1} of {questions.length}
+                      </h2>
+                      <p className="text-lg md:text-xl text-gray-700">{question.questionText}</p>
+                    </div>
+                  ))
+                )}
+              </div>
               {/* Butonlar */}
               <div className="text-center mt-4 md:mt-auto">
                 {!videoBlob && (
@@ -318,14 +341,14 @@ const QuestionPanel = ({ formId }) => {
                     )}
                   </div>
                 )}
-               {submitButtonVisible && (
-  <button
-    className="bg-blue-500 text-white px-3 py-1 md:px-4 md:py-2 rounded text-sm md:text-base mt-2 md:mt-0"
-    onClick={handleSubmit}
-  >
-    Submit Video
-  </button>
-)}
+                {submitButtonVisible && (
+                  <button
+                    className="bg-blue-500 text-white px-3 py-1 md:px-4 md:py-2 rounded text-sm md:text-base mt-2 md:mt-0"
+                    onClick={handleSubmit}
+                  >
+                    Submit Video
+                  </button>
+                )}
               </div>
             </>
           ) : (
