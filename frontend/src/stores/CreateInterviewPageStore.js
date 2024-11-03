@@ -11,6 +11,8 @@ const useCreateInterviewStore = create((set, get) => ({
     canSkip: false, // Varsayılan olarak false
     showAtOnce: false, // Varsayılan olarak false
   },
+  interviews: [], // interviews alanını ekliyoruz
+
   setInterviewTitle: (title) => set((state) => ({
     currentInterview: { ...state.currentInterview, interviewTitle: title },
   })),
@@ -18,15 +20,32 @@ const useCreateInterviewStore = create((set, get) => ({
     currentInterview: { ...state.currentInterview, expireDate: date },
   })),
   setPackageId: (packageIds) => set((state) => ({
-    currentInterview: { ...state.currentInterview, packageId: packageIds },
+    currentInterview: {
+      ...state.currentInterview,
+      packageId: packageIds, // `packageId` listesini güncelle
+    },
   })),
+  
+  
   setCanSkip: (canSkip) => set((state) => ({
     currentInterview: { ...state.currentInterview, canSkip },
   })),
   setShowAtOnce: (showAtOnce) => set((state) => ({
     currentInterview: { ...state.currentInterview, showAtOnce },
   })),
-
+  // Yeni eklenen setCurrentInterview fonksiyonu
+  setCurrentInterview: (interviewData) => set({
+    currentInterview: interviewData,
+  }),
+  resetCurrentInterview: () => set({
+    currentInterview: {
+      interviewTitle: '',
+      expireDate: '',
+      packageId: [],
+      canSkip: false,
+      showAtOnce: false,
+    },
+  }),
   // Interview oluşturma fonksiyonu
   addInterview: async () => {
     const { interviewTitle, expireDate, packageId, canSkip, showAtOnce } = get().currentInterview;
@@ -63,6 +82,25 @@ const useCreateInterviewStore = create((set, get) => ({
       });
     } catch (error) {
       console.error('Error creating interview:', error);
+    }
+  },
+  updateInterview: async (interviewId, updatedData) => {
+    try {
+      const response = await axios.patch(`${apiUrl}/interview/${interviewId}`, updatedData, {
+        withCredentials: true,
+      });
+      
+      // Gelen yanıtla state'teki interview'ı güncelle
+      set((state) => ({
+        interviews: state.interviews.map((interview) =>
+          interview._id === interviewId ? response.data : interview
+        ),
+      }));
+      
+      console.log('Interview updated successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating interview:', error);
     }
   },
 }));

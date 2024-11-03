@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
 import useCreateInterviewStore from "../../stores/CreateInterviewPageStore";
-import usePackageStore from "../../stores/PackagePageStore"; // Paket store'unu import ediyoruz
+import usePackageStore from "../../stores/PackagePageStore";
 import Modal from "../../components/modal";
 import TextInputComponent from "../../components/textInputComponent";
 import DateInputComponent from "../../components/dateInputComponent";
 import Button from "../../components/buttonComponent";
+import dayjs from "dayjs"; // Tarih formatı için dayjs import ediliyor
 
-const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded }) => {
+const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded, interviewData = null }) => {
   const {
     setInterviewTitle,
     setPackageId,
@@ -15,51 +16,70 @@ const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded }) => {
     setShowAtOnce,
     addInterview,
     currentInterview,
+    updateInterview,
+    setCurrentInterview,
+    resetCurrentInterview, // Yeni fonksiyon ekliyoruz
   } = useCreateInterviewStore();
 
-  // Package store'u kullanarak paketleri çekiyoruz
   const { packages, getPackages, loading } = usePackageStore();
 
-  // Paketleri modal açıldığında yüklüyoruz
   useEffect(() => {
     if (isOpen) {
-      getPackages(); // Paketleri getir
+      getPackages();
+      if (interviewData) {
+        
+        // Eğer interviewData varsa, form alanlarını doldur
+        setCurrentInterview({
+          interviewTitle: interviewData.interviewTitle,
+          expireDate: dayjs(interviewData.expireDate).format("YYYY-MM-DD"), // Tarihi formatlıyoruz
+          packageId: interviewData.packageId.map(pkg => ({ _id: pkg._id, title: pkg.title })),
+          canSkip: interviewData.canSkip,
+          showAtOnce: interviewData.showAtOnce,
+        });
+      } else {
+        // interviewData yoksa input alanlarını sıfırla
+        resetCurrentInterview();
+      }
     }
-  }, [isOpen, getPackages]);
+  }, [isOpen, getPackages, interviewData, setCurrentInterview, resetCurrentInterview]);
 
-  // Paket seçimi yaparken hem id hem de title'ı ekleyeceğiz
   const handlePackageSelect = (e) => {
     const selectedPackageId = e.target.value;
-    const selectedPackage = packages.find(pkg => pkg._id === selectedPackageId); // Seçilen paketi buluyoruz
+    const selectedPackage = packages.find(pkg => pkg._id === selectedPackageId);
     if (selectedPackage && !currentInterview.packageId.some(pkg => pkg._id === selectedPackageId)) {
-      setPackageId([...currentInterview.packageId, { _id: selectedPackageId, title: selectedPackage.title }]); // Hem id'yi hem title'ı ekliyoruz
+      setPackageId([...currentInterview.packageId, { _id: selectedPackageId, title: selectedPackage.title }]);
     }
   };
+  
 
-  // Seçili paketi kaldırma işlemi (id ile silme yapıyoruz)
-  const removePackage = (pkgToRemoveId) => {
-    setPackageId(currentInterview.packageId.filter(pkg => pkg._id !== pkgToRemoveId));
-  };
+ const removePackage = (pkgToRemoveId) => {
+  setPackageId(currentInterview.packageId.filter(pkg => pkg._id !== pkgToRemoveId));
+};
 
-  // Interview oluşturma işlemi butona tıklanınca tetiklenir
-  const handleAddInterview = async () => {
-    await addInterview(); // Zustand store'daki addInterview fonksiyonunu çağırıyoruz
-    onClose(); // Modal'ı kapatıyoruz
-    onInterviewAdded(); // Interview eklendikten sonra listeyi yenilemek için callback fonksiyonunu çağırıyoruz
-  };
+
+  const handleSaveInterview = async () => {
+    if (interviewData) {
+        // Eğer edit modundaysa güncelleme fonksiyonunu çağır
+        await updateInterview(interviewData._id, currentInterview);
+    } else {
+        // Eğer yeni ekleme modundaysa add fonksiyonunu çağır
+        await addInterview();
+    }
+    onClose(); // Modal'ı kapat
+    onInterviewAdded(); // Sayfayı yenilemek yerine listeyi güncelle
+};
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create Interview">
+    <Modal isOpen={isOpen} onClose={onClose} title={interviewData ? "Edit Interview" : "Create Interview"}>
       <TextInputComponent
         value={currentInterview.interviewTitle}
         onChange={(e) => setInterviewTitle(e.target.value)}
         textInputHeader="Title"
       />
 
-      {/* Birden fazla paket seçimi yapılabilen dropdown */}
       <label className="block text-sm font-medium text-gray-700">Package</label>
       <select
-        value="" // Her zaman boş tutuyoruz ki her seçimden sonra yeniden paket seçilebilsin
+        value=""
         onChange={handlePackageSelect}
         className="block w-full mt-1 p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
       >
@@ -68,29 +88,23 @@ const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded }) => {
           <option value="">Loading...</option>
         ) : (
           packages
-            .filter((pkg) => !currentInterview.packageId.some(selectedPkg => selectedPkg._id === pkg._id)) // Zaten seçili olan paketleri dropdown'dan çıkarıyoruz
+            .filter((pkg) => !currentInterview.packageId.some(selectedPkg => selectedPkg._id === pkg._id))
             .map((pkg) => (
-              <option key={pkg._id} value={pkg._id}> {/* package title yerine id'yi gönderiyoruz */}
+              <option key={pkg._id} value={pkg._id}>
                 {pkg.title}
               </option>
             ))
         )}
       </select>
 
-      {/* Seçilen paketlerin altında etiket şeklinde gösterilmesi */}
       <div className="mt-4">
         <h4 className="font-medium text-gray-700">Selected Packages:</h4>
         <div className="flex flex-wrap gap-2">
           {currentInterview.packageId && currentInterview.packageId.length > 0 ? (
             currentInterview.packageId.map((pkg, index) => (
               <div key={index} className="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-md">
-                <span>{pkg.title}</span> {/* Artık title gösteriliyor */}
-                <button
-                  className="text-red-500"
-                  onClick={() => removePackage(pkg._id)} // id ile kaldırma işlemi
-                >
-                  ✕
-                </button>
+                <span>{pkg.title}</span>
+                <button className="text-red-500" onClick={() => removePackage(pkg._id)}>✕</button>
               </div>
             ))
           ) : (
@@ -101,11 +115,10 @@ const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded }) => {
 
       <DateInputComponent
         onChange={(e) => setExpireDate(e.target.value)}
-        value={currentInterview.expireDate}
+        value={currentInterview.expireDate} // Formatlanmış tarih burada kullanılıyor
         dateInputHeader="Expire Date"
       />
 
-      {/* Can Skip ve Show At Once switchleri */}
       <div className="mt-4 flex space-x-4 items-center">
         <label className="flex items-center space-x-2">
           <span className="text-sm font-medium text-gray-700">Can Skip</span>
@@ -138,11 +151,11 @@ const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded }) => {
 
       <div className="flex justify-end mt-6">
         <Button
-          onClick={handleAddInterview} // Butona tıklandığında veriler gönderilir
+          onClick={handleSaveInterview}
           size="md"
           variant="outline"
           rounded="rounded-md"
-          label="Add"
+          label={interviewData ? "Save" : "Add"}
         />
       </div>
     </Modal>

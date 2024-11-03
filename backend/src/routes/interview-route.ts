@@ -19,6 +19,6 @@ router.get("/:interviewId/settings", InterviewController.getInterviewSettings);
 
 router.get("/ids", InterviewController.getInterviewIds);
 
-router.patch("/:interviewId",authenticateToken, InterviewController.updateInterview);
+router.patch("/:interviewId", authenticateToken, InterviewController.updateInterview);
 
 export default router;

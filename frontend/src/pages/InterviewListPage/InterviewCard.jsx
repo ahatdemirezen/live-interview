@@ -3,17 +3,20 @@ import useInterviewStore from "../../stores/InterviewListPageStore";
 import Button from "../../components/buttonComponent";
 import dayjs from "dayjs";
 import QuestionListModal from "./InterviewQuestionListPopup";
+import AddInterviewModal from "./AddInterviewModal"; // AddInterviewModal bileşenini import ediyoruz
 import { MdOutlineQuestionMark } from "react-icons/md";
 import { AiOutlineLink } from "react-icons/ai";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaEdit } from "react-icons/fa";
 import { GoChevronRight } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 
 const InterviewCard = ({ interview }) => {
   const deleteInterview = useInterviewStore((state) => state.deleteInterview);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false); // Düzenleme modalı için state
   const [accessError, setAccessError] = useState(false);
-  
+  const fetchInterviews = useInterviewStore((state) => state.fetchInterviews); // fetchInterviews'i ekleyin
+
   const navigate = useNavigate();
   const getQuestionsByInterview = useInterviewStore((state) => state.getQuestionsByInterview);
 
@@ -56,6 +59,10 @@ const InterviewCard = ({ interview }) => {
     navigate(`/interview/${interview._id}/videos`);
   };
 
+  const handleEditClick = () => {
+    setEditModalOpen(true); // Düzenleme modalını aç
+  };
+
   return (
     <div className="bg-white p-4 m-4 shadow-xl rounded-3xl relative w-full sm:w-60 h-auto sm:h-60 flex flex-col items-center">
       {/* Sol üst köşedeki yuvarlak bağlantı simgesi */}
@@ -63,9 +70,10 @@ const InterviewCard = ({ interview }) => {
         <AiOutlineLink className="text-white text-2xl" onClick={handleCopyLink} />
       </div>
 
-      {/* Soru işareti ve silme ikonu */}
+      {/* Soru işareti, düzenleme ve silme ikonları */}
       <div className="absolute top-4 right-4 sm:top-1 sm:right-1 flex items-center space-x-1">
         <Button icon={<MdOutlineQuestionMark className="text-[#E2BB70] text-2xl" />} size="sm" onClick={handleOpenModal} />
+        <Button icon={<FaEdit className="text-[#ff7f0a] hover:text-[#cc6600]" />} size="sm" onClick={handleEditClick} />
         <Button icon={<FaTrash className="text-[#D9534F] hover:text-[#cc0000]" />} size="sm" onClick={() => deleteInterview(interview._id)} />
       </div>
 
@@ -74,7 +82,7 @@ const InterviewCard = ({ interview }) => {
 
       {/* Aday sayıları */}
       <div className="bg-gray-100 rounded-lg p-2 flex justify-between items-center mt-4 sm:mt-6 shadow-md w-full max-w-xs">
-        <div className="text-center ">
+        <div className="text-center">
           <p className="text-xs text-gray-500">TOTAL</p>
           <p className="text-lg sm:text-xl font-bold">{totalVideos}</p>
         </div>
@@ -96,8 +104,16 @@ const InterviewCard = ({ interview }) => {
         />
       </div>
 
-      {/* Modal bileşeni */}
+      {/* Soru listesi modali */}
       <QuestionListModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+
+      {/* Düzenleme modali */}
+      <AddInterviewModal
+        isOpen={isEditModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onInterviewAdded={fetchInterviews} // fetchInterviews fonksiyonunu çağırarak veriyi güncelle
+        interviewData={interview} // Güncellenmesi gereken interview verilerini gönderiyoruz
+      />
 
       {/* Erişim hatası mesajı */}
       {accessError && (
