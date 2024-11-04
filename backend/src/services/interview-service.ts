@@ -49,26 +49,25 @@ export const createInterviewService = async (
 
 // Tüm interview'ları getirme servisi
 export const getInterviewsService = async () => {
-  const interviews = await Interview.find().populate('personalInformationForms').lean();
+    const interviews = await Interview.find().populate('packageId', '_id title').lean();
 
-  // Her interview için totalForms ve pendingForms sayısını hesapla
-  const interviewsWithStats = interviews.map((interview) => {
-    // `personalInformationForms` alanını any[] olarak dönüştürerek `status` alanına erişim sağlıyoruz
-    const personalForms = interview.personalInformationForms as any[];
+    // Her interview için totalForms ve pendingForms sayısını hesapla
+    const interviewsWithStats = interviews.map((interview) => {
+        const personalForms = interview.personalInformationForms as any[];
 
-    const totalForms = personalForms.length;
-    const pendingForms = personalForms.filter(
-      (form) => form.status === 'pending'
-    ).length;
+        const totalForms = personalForms.length;
+        const pendingForms = personalForms.filter(
+            (form) => form.status === 'pending'
+        ).length;
 
-    return {
-      ...interview,
-      totalForms,
-      pendingForms,
-    };
-  });
+        return {
+            ...interview,
+            totalForms,
+            pendingForms,
+        };
+    });
 
-  return interviewsWithStats;
+    return interviewsWithStats;
 };
 
 export const fetchInterviewIds = async (): Promise<string[]> => {
@@ -215,8 +214,9 @@ export const deleteInterviewService = async (interviewId: string) => {
     const updatedInterview = await Interview.findByIdAndUpdate(
       interviewId,
       updateFields,
+     
       { new: true, runValidators: true } // Güncellenmiş belgeyi döndür ve validatorleri çalıştır
-    );
+    ).populate("packageId", "_id title"); // packageId alanını populate ederek _id ve title bilgilerini alıyoruz
   
     if (!updatedInterview) {
       throw createHttpError(404, "Interview not found");
@@ -224,3 +224,22 @@ export const deleteInterviewService = async (interviewId: string) => {
   
     return updatedInterview;
   };
+
+
+  export const addPackageToInterviewService = async (interviewId: string, packageId: string) => {
+    if (!mongoose.isValidObjectId(packageId)) {
+        throw createHttpError(400, "Invalid packageId format");
+    }
+
+    const updatedInterview = await Interview.findByIdAndUpdate(
+        interviewId,
+        { $addToSet: { packageId } }, // packageId dizisine ekleme yapıyoruz
+        { new: true }
+    ).populate("packageId", "_id title"); // _id ve title alanlarını getir
+
+    if (!updatedInterview) {
+        throw createHttpError(404, "Interview not found");
+    }
+
+    return updatedInterview;
+};

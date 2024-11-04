@@ -31,15 +31,21 @@ const useInterviewStore = create((set) => ({
   fetchInterviews: async () => {
     set({ loading: true });
     try {
-      const response = await axios.get(`${apiUrl}/interview`, {
-        withCredentials: true,
-      });
-      set({ interviews: response.data, loading: false });
-    } catch (error) {
-      set({ error: error.message, loading: false });
-    }
-  },
+        const response = await axios.get(`${apiUrl}/interview`, {
+            withCredentials: true,
+        });
 
+        // Gelen veriyi güncelleme
+        const interviewsWithPackages = response.data.map(interview => ({
+            ...interview,
+            packageId: interview.packageId.map(pkg => ({ _id: pkg._id, title: pkg.title })),
+        }));
+
+        set({ interviews: interviewsWithPackages, loading: false });
+    } catch (error) {
+        set({ error: error.message, loading: false });
+    }
+},
   getQuestionsByInterview: async (interviewId) => {
     try {
       const response = await axios.get(`${apiUrl}/interview/${interviewId}/packages/questions`, {

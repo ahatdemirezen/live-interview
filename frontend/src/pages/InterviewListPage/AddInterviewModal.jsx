@@ -46,27 +46,33 @@ const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded, interviewData = 
   const handlePackageSelect = (e) => {
     const selectedPackageId = e.target.value;
     const selectedPackage = packages.find(pkg => pkg._id === selectedPackageId);
-    if (selectedPackage && !currentInterview.packageId.some(pkg => pkg._id === selectedPackageId)) {
-      setPackageId([...currentInterview.packageId, { _id: selectedPackageId, title: selectedPackage.title }]);
-    }
-  };
-  
 
- const removePackage = (pkgToRemoveId) => {
-  setPackageId(currentInterview.packageId.filter(pkg => pkg._id !== pkgToRemoveId));
+    // Eğer paket mevcut değilse ekle
+    if (selectedPackage && !currentInterview.packageId.some(pkg => pkg._id === selectedPackageId)) {
+        setPackageId([...currentInterview.packageId, { _id: selectedPackageId, title: selectedPackage.title }]);
+    }
 };
 
+const removePackage = (pkgToRemoveId) => {
+    // Seçili paket listesinden çıkarma
+    setPackageId(currentInterview.packageId.filter(pkg => pkg._id !== pkgToRemoveId));
+};
 
-  const handleSaveInterview = async () => {
-    if (interviewData) {
-        // Eğer edit modundaysa güncelleme fonksiyonunu çağır
-        await updateInterview(interviewData._id, currentInterview);
-    } else {
-        // Eğer yeni ekleme modundaysa add fonksiyonunu çağır
-        await addInterview();
-    }
-    onClose(); // Modal'ı kapat
-    onInterviewAdded(); // Sayfayı yenilemek yerine listeyi güncelle
+const handleSaveInterview = async () => {
+  const updatedInterviewData = {
+      ...currentInterview,
+      packageId: currentInterview.packageId.map(pkg => pkg._id), // Sadece package ID'leri gönderiyoruz
+  };
+
+  if (interviewData) {
+      // Eğer edit modundaysa güncelleme fonksiyonunu çağır
+      await updateInterview(interviewData._id, updatedInterviewData);
+  } else {
+      // Eğer yeni ekleme modundaysa add fonksiyonunu çağır
+      await addInterview();
+  }
+  onClose(); // Modal'ı kapat
+  onInterviewAdded(); // Sayfayı yenilemek yerine listeyi güncelle
 };
 
   return (
