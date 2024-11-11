@@ -1,6 +1,17 @@
 import React from "react";
+import { useAuthStore } from "../stores/LoginStore"; // useAuthStore'u içe aktarıyoruz
+import { useNavigate } from "react-router-dom";
+import { FaSignOutAlt } from "react-icons/fa"; // Logout ikonu için Font Awesome kullanımı
 
 const Header = () => {
+  const logout = useAuthStore((state) => state.logout); // Logout fonksiyonunu Zustand'dan alıyoruz
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout(); // Zustand'daki logout fonksiyonunu çağırıyoruz
+    navigate("/login"); // Kullanıcıyı login sayfasına yönlendiriyoruz
+  };
+
   return (
     <nav>
       <div className="responsive-nav">
@@ -8,8 +19,14 @@ const Header = () => {
           <h2 className="responsive-nav-heading text-white text-base sm:text-lg md:text-xl lg:text-2xl">
             Remote-tech Admin Page
           </h2>
-          {/* Sağ tarafa doğru uzama için boş bir alan veya ekstra öğe ekleyebiliriz */}
           <div className="flex-grow"></div>
+          {/* Logout butonu */}
+          <div className="flex flex-col items-center text-white">
+            <button onClick={handleLogout} className="text-xl">
+              <FaSignOutAlt />
+            </button>
+            <span className="text-xs">Logout</span> {/* Logout yazısı */}
+          </div>
         </div>
       </div>
     </nav>

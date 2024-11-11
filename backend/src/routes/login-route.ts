@@ -1,9 +1,13 @@
 import express from "express";
-import { createUser } from "../controllers/login-controller";
+import { createUser , checkToken , logoutUser } from "../controllers/login-controller";
 
 const router = express.Router();
 
 // POST isteği için rota
 router.post("/", createUser);
+
+router.get("/check-token", checkToken);
+
+router.post("/logout", logoutUser);
 
 export default router;

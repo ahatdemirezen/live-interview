@@ -44,3 +44,37 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     next(error); // Hata yakalama
   }
 };
+
+
+export const checkToken = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const cookieToken = req.cookies.token;
+    console.log("cookietoken" , cookieToken)
+    if (!cookieToken) {
+      return res.status(401).json({ message: "Token is missing or expired" });
+    }
+    
+    const verifiedToken = jwt.verify(cookieToken, jwtSecret!);
+    if (verifiedToken) {
+      return res.status(200).json({ message: "Token is valid" });
+    }
+  } catch (error) {
+    return res.status(401).json({ message: "Token is invalid or expired" });
+  }
+};
+
+export const logoutUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Token çerezini temizliyoruz
+    res.clearCookie('token', {
+      httpOnly: process.env.NODE_ENV == "production" ? true : false,
+      secure: false,
+      sameSite: 'strict',
+    });
+
+    // Başarılı çıkış yanıtı
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    next(error); // Hata yakalama
+  }
+};

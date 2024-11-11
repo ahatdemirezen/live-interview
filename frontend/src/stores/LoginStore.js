@@ -3,27 +3,24 @@ import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_BE_URL;
 
-
 export const useAuthStore = create((set) => ({
   token: null,
-  isAuthenticated: localStorage.getItem("auth"),
+  isAuthenticated: localStorage.getItem("auth") === "true", // String kontrolü yaparak boolean'a çeviriyoruz
   error: null,
 
   login: async (email, password) => {
     try {
       const response = await axios.post(`${apiUrl}/login`, { email, password }, { withCredentials: true });
 
-      if(response){
-        localStorage.setItem("auth",true)
+      if (response) {
+        localStorage.setItem("auth", true); // Başarılı login durumunda auth bilgisi localStorage'a kaydediliyor
       }
-      // Başarılı login durumunda token'ı state'e kaydediyoruz
+      
       set({
-        token: response.data.token,
         isAuthenticated: true,
         error: null,
       });
     } catch (error) {
-      // Hata durumunda error mesajını kaydediyoruz
       set({
         token: null,
         isAuthenticated: false,
@@ -32,12 +29,22 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  logout: () => {
-    // Token'ı sıfırlayıp kullanıcıyı logout yapıyoruz
-    set({
-      token: null,
-      isAuthenticated: false,
-      error: null,
-    });
+  logout: async () => {
+    try {
+      await axios.post(`${apiUrl}/login/logout`, {}, { withCredentials: true });
+
+      // Logout işlemi başarılı olursa localStorage'daki auth durumunu kaldırıyoruz
+      localStorage.removeItem("auth");
+
+      set({
+        token: null,
+        isAuthenticated: false,
+        error: null,
+      });
+    } catch (error) {
+      set({
+        error: "Logout failed. Please try again.",
+      });
+    }
   },
 }));
