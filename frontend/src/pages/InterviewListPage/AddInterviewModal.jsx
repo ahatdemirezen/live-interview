@@ -6,6 +6,9 @@ import TextInputComponent from "../../components/textInputComponent";
 import DateInputComponent from "../../components/dateInputComponent";
 import Button from "../../components/buttonComponent";
 import dayjs from "dayjs"; // Tarih formatı için dayjs import ediliyor
+import DropDown from "../../components/dropDownComponent";
+import { AiFillCloseCircle } from "react-icons/ai";
+import ToggleSwitch from "../../components/toggleSwitchComponent";
 
 const AddInterviewModal = ({ isOpen, onClose, onInterviewAdded, interviewData = null }) => {
   const {
@@ -83,38 +86,20 @@ const handleSaveInterview = async () => {
         textInputHeader="Title"
       />
 
-      <label className="block text-sm font-medium text-gray-700">Package</label>
-      <select
-        value=""
-        onChange={handlePackageSelect}
-        className="block w-full mt-1 p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-      >
-        <option value="" disabled>Select Package</option>
-        {loading ? (
-          <option value="">Loading...</option>
-        ) : (
-          packages
-            .filter((pkg) => !currentInterview.packageId.some(selectedPkg => selectedPkg._id === pkg._id))
-            .map((pkg) => (
-              <option key={pkg._id} value={pkg._id}>
-                {pkg.title}
-              </option>
-            ))
-        )}
-      </select>
+      <DropDown packages={packages} currentInterview={currentInterview} loading={loading} handlePackageSelect={handlePackageSelect}/>
 
       <div className="mt-4">
-        <h4 className="font-medium text-gray-700">Selected Packages:</h4>
-        <div className="flex flex-wrap gap-2">
+        <h4 className="text-sm text-gray-700">Selected Packages:</h4>
+        <div className="flex flex-wrap gap-2 mb-2">
           {currentInterview.packageId && currentInterview.packageId.length > 0 ? (
             currentInterview.packageId.map((pkg, index) => (
-              <div key={index} className="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-md">
+              <div key={index} className="flex items-center space-x-2 bg-[#B3CCE5] px-3 py-1 rounded-xl text-inherit max-w-xs overflow-hidden">
                 <span>{pkg.title}</span>
-                <button className="text-red-500" onClick={() => removePackage(pkg._id)}>✕</button>
+                <Button onClick={() => removePackage(pkg._id)} icon={<AiFillCloseCircle className="text-gray-500 ml-6"/>}  className="p-0 m-0 h-1 w-1"/>
               </div>
             ))
           ) : (
-            <p>No packages selected</p>
+            <p className="text-sm text-gray-700">No packages selected</p>
           )}
         </div>
       </div>
@@ -127,31 +112,11 @@ const handleSaveInterview = async () => {
 
       <div className="mt-4 flex space-x-4 items-center">
         <label className="flex items-center space-x-2">
-          <span className="text-sm font-medium text-gray-700">Can Skip</span>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={currentInterview.canSkip}
-              onChange={(e) => setCanSkip(e.target.checked)}
-              className="sr-only peer"
-            />
-            <div className="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600"></div>
-            <div className="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-full"></div>
-          </label>
+          <ToggleSwitch checked={currentInterview.canSkip} onChange={(e) => setCanSkip(e.target.checked)} label="Can Skip"/>
         </label>
 
         <label className="flex items-center space-x-2">
-          <span className="text-sm font-medium text-gray-700">Show At Once</span>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={currentInterview.showAtOnce}
-              onChange={(e) => setShowAtOnce(e.target.checked)}
-              className="sr-only peer"
-            />
-            <div className="w-10 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600"></div>
-            <div className="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-full"></div>
-          </label>
+          <ToggleSwitch checked={currentInterview.showAtOnce} onChange={(e) => setShowAtOnce(e.target.checked)} label="Show At Once"/>
         </label>
       </div>
 

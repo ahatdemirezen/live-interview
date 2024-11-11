@@ -49,26 +49,31 @@ export const createInterviewService = async (
 
 // Tüm interview'ları getirme servisi
 export const getInterviewsService = async () => {
-    const interviews = await Interview.find().populate('packageId', '_id title').lean();
+  // Interview'leri packageId ve personalInformationForms ile populate et
+  const interviews = await Interview.find()
+      .populate('packageId', '_id title')
+      .populate('personalInformationForms', '_id status') // personalInformationForms ile gerekli alanları çek
+      .lean();
 
-    // Her interview için totalForms ve pendingForms sayısını hesapla
-    const interviewsWithStats = interviews.map((interview) => {
-        const personalForms = interview.personalInformationForms as any[];
+  // Her interview için totalForms ve pendingForms sayısını hesapla
+  const interviewsWithStats = interviews.map((interview) => {
+      const personalForms = interview.personalInformationForms as any[];
 
-        const totalForms = personalForms.length;
-        const pendingForms = personalForms.filter(
-            (form) => form.status === 'pending'
-        ).length;
+      const totalForms = personalForms.length;
+      const pendingForms = personalForms.filter(
+          (form) => form.status === 'pending'
+      ).length;
 
-        return {
-            ...interview,
-            totalForms,
-            pendingForms,
-        };
-    });
+      return {
+          ...interview,
+          totalForms,
+          pendingForms,
+      };
+  });
 
-    return interviewsWithStats;
+  return interviewsWithStats;
 };
+
 
 export const fetchInterviewIds = async (): Promise<string[]> => {
   const interviews = await Interview.find({}, { _id: 1 });

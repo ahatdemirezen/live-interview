@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import usePackageStore from '../../stores/PackagePageStore';
 import { FaTrash, FaEdit } from 'react-icons/fa';
+import Button from '../../components/buttonComponent';
 
 const PackageList = ({ packages }) => {
   const { getPackages, deletePackage, loading, error } = usePackageStore();
@@ -26,7 +27,7 @@ const PackageList = ({ packages }) => {
   if (error) return <div>Error loading packages: {error}</div>;
 
   return (
-    <div className="bg-gray-50 p-6 rounded-lg shadow-md">
+    <div className="bg-gray-50 p-4 rounded-lg shadow-md">
       <div className="overflow-x-auto">
         <table className="hidden md:table w-full text-left">
           <thead>
@@ -43,20 +44,10 @@ const PackageList = ({ packages }) => {
                 <td className="py-4 px-2">{pkg.title}</td>
                 <td className="py-4 px-2">{pkg.questions.length}</td>
                 <td className="py-4 px-2 text-center align-middle">
-                  <button
-                    className="text-red-600 hover:text-red-800"
-                    onClick={() => handleDelete(pkg._id)}
-                  >
-                    <FaTrash className='text-[#D9534F] hover:text-[#cc0000]'/>
-                  </button>
+                <Button onClick={() => handleDelete(pkg._id)} icon={<FaTrash className="text-[#D9534F] hover:text-[#cc0000] text-base"/>} fullWidth />
                 </td>
                 <td className="py-4 px-2 text-center align-middle">
-                  <button
-                    className="text-blue-600 hover:text-blue-800"
-                    onClick={() => handleEdit(pkg._id)}
-                  >
-                    <FaEdit className='text-[#ff7f0a] hover:text-[#cc6600]' />
-                  </button>
+                 <Button onClick={() => handleEdit(pkg._id)} icon={<FaEdit className='text-[#ff7f0a] hover:text-[#cc6600] text-base'/>} fullWidth/>
                 </td>
               </tr>
             ))}
@@ -70,20 +61,8 @@ const PackageList = ({ packages }) => {
               <h2 className="font-semibold text-lg">{pkg.title}</h2>
               <p className="text-gray-700">Questions: {pkg.questions.length}</p>
               <div className="flex justify-between mt-4">
-                <button
-                  className="text-red-600 hover:text-red-800 flex items-center"
-                  onClick={() => handleDelete(pkg._id)}
-                >
-                  <FaTrash className='text-[#FF6F61] hover:text-[#cc0000] mr-1'/>
-                  Delete
-                </button>
-                <button
-                  className="text-blue-600 hover:text-blue-800 flex items-center"
-                  onClick={() => handleEdit(pkg._id)}
-                >
-                  <FaEdit className='text-[#ff7f0a] hover:text-[#cc6600] mr-1' />
-                  Edit
-                </button>
+                <Button onClick={() => handleDelete(pkg._id)} icon={<FaTrash className='text-[#D9534F] hover:text-[#cc0000] mr-1'/>} label="Delete"/>
+                <Button onClick={() => handleEdit(pkg._id)} icon={ <FaEdit className='text-[#ff7f0a] hover:text-[#cc6600] mr-1' />} label="Edit"/>
               </div>
             </div>
           ))}

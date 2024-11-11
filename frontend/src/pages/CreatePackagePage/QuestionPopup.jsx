@@ -3,6 +3,7 @@ import Modal from "../../components/modal";
 import useCreatePackage from "../../stores/CreatePackagePageStore";  // Zustand store import edildi
 import TextareaComponent from "../../components/textAreaComponent";
 import Button from "../../components/buttonComponent";
+import TextInputComponent from "../../components/textInputComponent";
 
 const AddQuestionModal = ({ isOpen, onClose, packageId, onAddQuestion, question, onUpdateQuestion }) => {
   const currentQuestion = useCreatePackage((state) => state.currentQuestion);
@@ -61,17 +62,12 @@ const AddQuestionModal = ({ isOpen, onClose, packageId, onAddQuestion, question,
     <Modal isOpen={isOpen} onClose={onClose} title={question ? "Edit Question" : "Add Question"}>
      <TextareaComponent placeholder="Input..." value={currentQuestion} onChange={(e) => setCurrentQuestion(e.target.value)} textAreaInputHeader="Question" rows={10}/>
 
-      <div className="flex space-x-4 mb-4">
+      <div className="flex items-start space-x-4 mb-4">
         <div className="flex items-center">
-          <input
-            type="text"
-            className="border p-2 rounded w-16"
-            value={currentTime}
-            onChange={(e) => setCurrentTime(e.target.value)}  // Zustand ile state yönetimi
-          />
+          <TextInputComponent value={currentTime} onChange={(e) => setCurrentTime(e.target.value)} className="border p-2 rounded w-16"/>
           <span className="ml-2">min</span>
         </div>
-        <Button onClick={handleSubmit} label={question ? "Update" : "Add"} variant="outline"/>
+        <Button onClick={handleSubmit} label={question ? "Update" : "Add"} variant="outline" className="w-auto mt-2"  rounded="rounded-md"/>
       </div>
     </Modal>
   );

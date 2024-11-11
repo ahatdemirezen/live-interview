@@ -4,8 +4,7 @@ import useInterviewStore from '../../stores/InterviewListPageStore';
 
 const QuestionListModal = ({ isOpen, onClose }) => {
   const questions = useInterviewStore((state) => state.questions); // Store'dan soruları alıyoruz
-  console.log("Popup İçinde Sorular (Önceki paketler üstte):", questions);
-
+ 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Question List">
       {/* Soruların bulunduğu kapsayıcı div'e sabit yükseklik ve kaydırma özelliği ekledik */}

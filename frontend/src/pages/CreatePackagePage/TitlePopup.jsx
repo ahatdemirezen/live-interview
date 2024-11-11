@@ -37,7 +37,7 @@ const TitleModal = ({ isOpen, onClose }) => {
 
       {/* Save Butonu */}
       <div className="flex justify-end">
-       <Button onClick={handleSubmit} label='Save' variant="outline"/>
+       <Button onClick={handleSubmit} label='Save' variant="outline"  rounded="rounded-md" />
       </div>
     </Modal>
   );

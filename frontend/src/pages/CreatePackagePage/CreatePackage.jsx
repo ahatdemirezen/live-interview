@@ -91,7 +91,6 @@ const CreatePackage = () => {
             <div className="flex flex-col md:flex-row justify-between items-center mb-4">
             <h2 className="text-xl md:text-2xl font-semibold text-neutral-600">{packageTitle || "Loading Package Title..."}</h2>
            <Button onClick={() => {setSelectedQuestion(null);setIsModalOpen(true);}} label="Add Question" variant="outline"/>
-              
             </div>
             <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="questions">

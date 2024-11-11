@@ -10,6 +10,7 @@ import SearchBar from "../../components/searchBar";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaTrash } from "react-icons/fa";
 import { FaExclamationTriangle } from "react-icons/fa"; // Kırmızı ünlem ikonu
+import PaginationComponent from "../../components/paginationComponent";
 
 const InterviewVideosPage = () => {
   const { interviewId } = useParams();
@@ -122,45 +123,45 @@ const InterviewVideosPage = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold text-center text-neutral-600">
+    <div className="p-8 bg-gray-100 min-h-screen">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-neutral-700 text-center">
           Interview Video Collection
         </h1>
         {/* Search bar sağ üstte */}
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
       </div>
   
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredForms.map((form) => (
           <div
             key={form._id}
-            className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transform hover:scale-105 transition-transform duration-300 relative"
+            className="bg-white shadow-md hover:shadow-lg rounded-lg overflow-hidden cursor-pointer transform transition-transform duration-300 hover:scale-105 relative"
             onClick={() => openModal(videoURLs[form.videoId], form._id, form.status, form.videoId, form.note)}
           >
             <div
-              className={`absolute top-2 left-2 w-4 h-4 rounded-full ${
+              className={`absolute top-3 left-3 w-4 h-4 rounded-full border-2 border-white ${
                 form.status === "passed" ? "bg-green-400" : form.status === "failed" ? "bg-red-400" : "bg-gray-400"
               }`}
               title={form.status === "passed" ? "Passed" : form.status === "failed" ? "Failed" : "Pending"}
             ></div>
 
             <div
-              className="bg-[#6f95b6] px-6 py-4 flex items-center justify-between"
+              className="bg-[#6f95b6] px-6 py-4 flex items-center justify-between text-slate-100"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="ml-4 font-semibold text-lg text-slate-100 flex items-center">
-  {form.alert && (
-    <FaExclamationTriangle className="text-red-500 text-lg mr-2" title="Attention needed!" />
-  )}
-  {form.name} {form.surname}
-</h2>
+              <h2 className="ml-4 font-semibold text-lg flex items-center">
+                {form.alert && (
+                <FaExclamationTriangle className="text-red-500 text-lg mr-2" title="Attention needed!" />
+                    )}
+                {form.name} {form.surname}
+              </h2>
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
                   openUserInfoModal(form);
                 }}
-                icon={<AiOutlineInfoCircle className="text-2xl md:text-2xl text-[#F2D096] absolute right-20 top-5" />}
+                icon={<AiOutlineInfoCircle className="text-2xl md:text-2xl text-[#F2D096] hover:text-yellow-400 absolute right-20 top-5" />}
               />
               <Button
                 icon={
@@ -173,10 +174,10 @@ const InterviewVideosPage = () => {
               />
             </div>
 
-            <div className="bg-stone-200 h-48 flex items-center justify-center">
+            <div className="bg-stone-200 h-48 flex items-center justify-center relative">
               {videoURLs[form.videoId] ? (
                 <video
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover rounded-b-lg"
                   src={videoURLs[form.videoId]}
                   muted
                   controls={false}
@@ -209,34 +210,7 @@ const InterviewVideosPage = () => {
         ))}
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-center mt-8 space-x-2 text-[#4B657B]">
-        <button
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
-          className="px-4 py-2 rounded-full hover:bg-[#4B657B] hover:text-white disabled:opacity-50"
-        >
-          &laquo; Prev
-        </button>
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            onClick={() => setPage(index + 1)}
-            className={`px-3 py-1 rounded-full ${
-              page === index + 1 ? "bg-[#4B657B] text-white" : "text-[#4B657B]"
-            } hover:bg-[#4B657B] hover:text-white`}
-          >
-            {index + 1}
-          </button>
-        ))}
-        <button
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={page === totalPages}
-          className="px-4 py-2 rounded-full hover:bg-[#4B657B] hover:text-white disabled:opacity-50"
-        >
-          Next &raquo;
-        </button>
-      </div>
+    <PaginationComponent page={page} setPage={setPage} totalPages={totalPages}/>
 
       <VideoPopupContent
         isOpen={isModalOpen}

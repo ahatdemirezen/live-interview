@@ -6,7 +6,7 @@ import Login from "./pages/Login";
 import Modal from 'react-modal';
 import InterviewList from "./pages/InterviewListPage/InterviewList";
 import ProtectedRoute from './access-control/auth-controller'; // Koruma bileşenini import ediyoruz
-import InterviewVideosPage from "./pages/InterviewListPage/interviewVideos"
+import InterviewVideosPage from "./pages/InterviewVideoCollectionPage/interviewVideos";
 Modal.setAppElement('#root');
 
 const App = () => {

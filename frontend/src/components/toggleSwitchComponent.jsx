@@ -2,7 +2,7 @@ import React from 'react';
 const ToggleSwitch = ({ label, checked, onChange }) => {
   return (
     <label className="flex items-center cursor-pointer space-x-2">
-      <span className="text-gray-700 text-sm md:text-base">{label}</span>
+      <span className="text-gray-700 text-sm md:text-base font-medium">{label}</span>
       <div className="relative">
         <input
           type="checkbox"

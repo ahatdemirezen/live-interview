@@ -71,14 +71,14 @@ const InterviewCard = ({ interview }) => {
       </div>
 
       {/* Soru işareti, düzenleme ve silme ikonları */}
-      <div className="absolute top-4 right-4 sm:top-1 sm:right-1 flex items-center space-x-1">
-        <Button icon={<MdOutlineQuestionMark className="text-[#E2BB70] text-2xl" />} size="sm" onClick={handleOpenModal} />
-        <Button icon={<FaEdit className="text-[#ff7f0a] hover:text-[#cc6600]" />} size="sm" onClick={handleEditClick} />
+      <div className="absolute top-4 right-4 sm:top-1 sm:right-1 flex items-center3">
+        <Button icon={<MdOutlineQuestionMark className="text-[#E2BB70] hover:text-[#C59A5A] text-2xl" />} size="sm" onClick={handleOpenModal} />
+        <Button icon={<FaEdit className="text-[#ff7f0a] hover:text-[#cc6600] " />} size="sm" onClick={handleEditClick} />
         <Button icon={<FaTrash className="text-[#D9534F] hover:text-[#cc0000]" />} size="sm" onClick={() => deleteInterview(interview._id)} />
       </div>
 
       {/* Başlık */}
-      <h3 className="text-lg sm:text-xl font-bold mb-1 mt-8 text-center text-gray-500">{interview.interviewTitle}</h3>
+      <h3 className="text-lg sm:text-xl font-bold mb-1 mt-8 text-center text-gray-500 ">{interview.interviewTitle}</h3>
 
       {/* Aday sayıları */}
       <div className="bg-gray-100 rounded-lg p-2 flex justify-between items-center mt-4 sm:mt-6 shadow-md w-full max-w-xs">

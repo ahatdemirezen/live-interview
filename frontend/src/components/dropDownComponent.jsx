@@ -1,23 +1,29 @@
 import React from 'react';
-const Dropdown = ({ label, options, value, onChange }) => {
+
+function DropDown({ packages, currentInterview, loading, handlePackageSelect }) {
   return (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 text-left">
-        {label}
-      </label>
+    <div>
+      <label className="block text-sm block text-gray-700 mb-2 font-medium">Package</label>
       <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value=""
+        onChange={handlePackageSelect}
         className="block w-full mt-1 p-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
       >
-        <option value="">Seç</option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
+        <option value="" disabled>Select Package</option>
+        {loading ? (
+          <option value="">Loading...</option>
+        ) : (
+          packages
+            .filter((pkg) => !currentInterview.packageId.some(selectedPkg => selectedPkg._id === pkg._id))
+            .map((pkg) => (
+              <option key={pkg._id} value={pkg._id}>
+                {pkg.title}
+              </option>
+            ))
+        )}
       </select>
     </div>
   );
-};
-export default Dropdown;
+}
+
+export default DropDown;
