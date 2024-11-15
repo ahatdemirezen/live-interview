@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
+import axiosInstance from './axiosInstance';
 
 // API URL'sini .env dosyasındaki VITE_BE_URL ile alıyoruz
 const apiUrl = import.meta.env.VITE_BE_URL;
@@ -13,7 +14,7 @@ const usePackageStore = create((set) => ({
   getPackages: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get(`${apiUrl}/package`,{
+      const response = await axiosInstance.get(`${apiUrl}/package`,{
           withCredentials:true
       });
       set({ packages: response.data, loading: false });
@@ -31,7 +32,7 @@ const usePackageStore = create((set) => ({
   deletePackage: async (packageId) => {
     set({ loading: true, error: null });
     try {
-      await axios.delete(`${apiUrl}/package/${packageId}` , {
+      await axiosInstance.delete(`${apiUrl}/package/${packageId}` , {
         withCredentials:true
       });
       set((state) => ({
@@ -45,7 +46,7 @@ const usePackageStore = create((set) => ({
   updatePackageOrder: async (packageId, reorderedQuestions) => {
     set({ loading: true, error: null });
     try {
-      await axios.post(`${apiUrl}/package/${packageId}/update-order`, {
+      await axiosInstance.post(`${apiUrl}/package/${packageId}/update-order`, {
         questions: reorderedQuestions,
       }, {
         withCredentials: true,  // Çerezleri gönder

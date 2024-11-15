@@ -15,7 +15,8 @@ export const authenticateToken = (req: CustomRequest, res: Response, next: NextF
   console.log("Cookie Token:", cookieToken); // Çerezdeki token'ı loglayın
   // Bearer token ya da cookie token yoksa hata döndür
   if (!cookieToken) {
-    return next(createHttpError(403, "No token provided"));
+    res.status(401).json({message : "Invalid or expired token"})
+    return
   }
   console.log
   // Bearer token ya da cookie token ile doğrulama yap
@@ -24,6 +25,7 @@ export const authenticateToken = (req: CustomRequest, res: Response, next: NextF
   if (verifiedToken) {
     next()
   } else {
-    return next(createHttpError(403, "Token not verified"));
+    res.status(401).json({message : "Unauthorized request"})
+    return
   }
 };

@@ -5,7 +5,7 @@ const apiUrl = import.meta.env.VITE_BE_URL;
 
 export const useAuthStore = create((set) => ({
   token: null,
-  isAuthenticated: localStorage.getItem("auth") === "true", // String kontrolü yaparak boolean'a çeviriyoruz
+  isAuthenticated: localStorage.getItem("auth") === "true",
   error: null,
 
   login: async (email, password) => {
@@ -13,7 +13,7 @@ export const useAuthStore = create((set) => ({
       const response = await axios.post(`${apiUrl}/login`, { email, password }, { withCredentials: true });
 
       if (response) {
-        localStorage.setItem("auth", true); // Başarılı login durumunda auth bilgisi localStorage'a kaydediliyor
+        localStorage.setItem("auth", true);
       }
       
       set({
@@ -29,15 +29,34 @@ export const useAuthStore = create((set) => ({
     }
   },
 
+  refreshToken: async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/login/refresh-token`, { withCredentials: true });
+      
+      if (response.status === 200) {
+
+        set({
+          isAuthenticated: true,
+          error: null,
+        });
+      }
+    } catch (error) {
+      set({
+        token: null,
+        isAuthenticated: false,
+        error: "Failed to refresh access token",
+      });
+      await useAuthStore.getState().logout(); // Refresh token geçersizse kullanıcıyı çıkış yaptır
+    }
+  },
+
   logout: async () => {
     try {
       await axios.post(`${apiUrl}/login/logout`, {}, { withCredentials: true });
 
-      // Logout işlemi başarılı olursa localStorage'daki auth durumunu kaldırıyoruz
       localStorage.removeItem("auth");
 
       set({
-        token: null,
         isAuthenticated: false,
         error: null,
       });

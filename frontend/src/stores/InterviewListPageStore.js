@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
+import axiosInstance from './axiosInstance';
 
 const apiUrl = import.meta.env.VITE_BE_URL; // Backend URL'ini çevresel değişkenden alıyoruz
 
@@ -31,7 +32,7 @@ const useInterviewStore = create((set) => ({
   fetchInterviews: async () => {
     set({ loading: true });
     try {
-        const response = await axios.get(`${apiUrl}/interview`, {
+        const response = await axiosInstance.get(`${apiUrl}/interview`, {
             withCredentials: true,
         });
 
@@ -48,7 +49,7 @@ const useInterviewStore = create((set) => ({
 },
   getQuestionsByInterview: async (interviewId) => {
     try {
-      const response = await axios.get(`${apiUrl}/interview/${interviewId}/packages/questions`, {
+      const response = await axiosInstance.get(`${apiUrl}/interview/${interviewId}/packages/questions`, {
         withCredentials: true,
       });
 
@@ -68,7 +69,7 @@ const useInterviewStore = create((set) => ({
   // Interview'daki adayların kişisel bilgilerini getiren fonksiyon
   getPersonalFormsByInterview: async (interviewId, page = 1, limit = 12) => {
     try {
-      const response = await axios.get(`${apiUrl}/interview/${interviewId}/personal-forms`, {
+      const response = await axiosInstance.get(`${apiUrl}/interview/${interviewId}/personal-forms`, {
         params: { page, limit },
         withCredentials: true,
       });
@@ -86,7 +87,7 @@ const useInterviewStore = create((set) => ({
 
   deleteInterview: async (interviewId) => {
     try {
-      await axios.delete(`${apiUrl}/interview/${interviewId}`, {
+      await axiosInstance.delete(`${apiUrl}/interview/${interviewId}`, {
         withCredentials: true,
       });
       set((state) => ({
@@ -102,7 +103,7 @@ const useInterviewStore = create((set) => ({
       // API'ye gönderilecek veriyi videoId varlığına göre ayarla
       const requestData = videoId ? { formId, videoId } : { formId };
       
-      const response = await axios.delete(`${apiUrl}/upload/delete-candidate-media`, {
+      const response = await axiosInstance.delete(`${apiUrl}/upload/delete-candidate-media`, {
         data: requestData,
         withCredentials: true,
       });
@@ -122,7 +123,7 @@ const useInterviewStore = create((set) => ({
 
   updateCandidateStatus: async (formId, newStatus) => {
     try {
-      const response = await axios.patch(`${apiUrl}/candidate/status`, {
+      const response = await axiosInstance.patch(`${apiUrl}/candidate/status`, {
         formId: formId,
         status: newStatus,
       }, {
@@ -141,7 +142,7 @@ const useInterviewStore = create((set) => ({
 
   updateCandidateNote: async (formId, note) => {
     try {
-      const response = await axios.patch(`${apiUrl}/candidate/${formId}/note`, {
+      const response = await axiosInstance.patch(`${apiUrl}/candidate/${formId}/note`, {
         note: note,
       }, {
         withCredentials: true,
@@ -156,9 +157,6 @@ const useInterviewStore = create((set) => ({
       console.error('Error updating candidate note:', error);
     }
   },
-
-
-
 
 }));
 

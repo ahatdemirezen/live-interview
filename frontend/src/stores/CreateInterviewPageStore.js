@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
+import axiosInstance from './axiosInstance';
+
 const apiUrl = import.meta.env.VITE_BE_URL;
 const useCreateInterviewStore = create((set, get) => ({
   currentInterview: {
@@ -46,7 +48,7 @@ const useCreateInterviewStore = create((set, get) => ({
     // Sadece _id'leri gönderiyoruz
     const packageIds = packageId.map(pkg => pkg._id);
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${apiUrl}/interview`,
         {
           interviewTitle,
@@ -80,7 +82,7 @@ const useCreateInterviewStore = create((set, get) => ({
     const packageIds = packageId.map(pkg => pkg._id);
   console.log("packageIds" , packageIds)
     try {
-      const response = await axios.patch(
+      const response = await axiosInstance.patch(
         `${apiUrl}/interview/${interviewId}`,
         {
           interviewTitle,

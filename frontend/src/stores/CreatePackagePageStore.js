@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 import usePackageStore from '../stores/PackagePageStore'; // Paket Store'u import et
+import axiosInstance from './axiosInstance';
 
 
 // API URL'sini .env dosyasındaki VITE_BE_URL ile alıyoruz
@@ -44,7 +45,7 @@ const useCreatePackage = create((set) => ({
       };
 
       // POST isteği ile yeni paket oluşturma
-      const response = await axios.post(`${apiUrl}/package`, packageData,{
+      const response = await axiosInstance.post(`${apiUrl}/package`, packageData,{
         withCredentials:true,
       });
 
@@ -74,7 +75,7 @@ const useCreatePackage = create((set) => ({
       const state = useCreatePackage.getState();
 
       // Silme isteği: packageId URL'den, questionId body'den gönderiliyor
-      await axios.delete(`${apiUrl}/package/${state.packageId}/questions`,  {
+      await axiosInstance.delete(`${apiUrl}/package/${state.packageId}/questions`,  {
         data: { questionId }, // request body'de questionId'yi gönderiyoruz
         withCredentials:true,
       });
@@ -106,7 +107,7 @@ const useCreatePackage = create((set) => ({
       };
   
       // Backend'e doğrudan questionText ve timeLimit ile POST isteği yapıyoruz
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${apiUrl}/package/${state.packageId}/questions`, 
         {
           newQuestions: [{  // Burada newQuestions bir array olarak gönderiliyor
@@ -142,7 +143,7 @@ const useCreatePackage = create((set) => ({
       const state = useCreatePackage.getState();
 
       // Patch isteği: packageId URL'den, questionId de URL üzerinden
-      const response = await axios.patch(`${apiUrl}/package/${state.packageId}/questions/${questionId}` , updatedQuestionData ,
+      const response = await axiosInstance.patch(`${apiUrl}/package/${state.packageId}/questions/${questionId}` , updatedQuestionData ,
         { withCredentials: true }
       );
       
@@ -178,7 +179,7 @@ const useCreatePackage = create((set) => ({
   getPackageById: async (packageId) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get(`${apiUrl}/package/${packageId}`, {
+      const response = await axiosInstance.get(`${apiUrl}/package/${packageId}`, {
         withCredentials: true,
       });
   

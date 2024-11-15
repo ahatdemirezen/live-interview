@@ -47,7 +47,7 @@ const InterviewList = () => {
           <div className="flex flex-col md:flex-row justify-between items-center mb-2">
             <h2 className="text-xl md:text-2xl font-semibold text-neutral-600">Interview List</h2>
             <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 md:mt-0">
-              <SearchBar value={searchQuery} onChange={setSearchQuery} />
+              <SearchBar value={searchQuery} onChange={setSearchQuery} placeholder="Search interviews..." />
               <Button icon={<MdPostAdd className="text-2xl md:text-3xl text-[#5C7C98]" />} onClick={() => setIsModalOpen(true)} />
             </div>
           </div>

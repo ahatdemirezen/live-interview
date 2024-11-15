@@ -129,7 +129,7 @@ const InterviewVideosPage = () => {
           Interview Video Collection
         </h1>
         {/* Search bar sağ üstte */}
-        <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        <SearchBar value={searchQuery} onChange={setSearchQuery} placeholder="Search videos..." />
       </div>
   
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">

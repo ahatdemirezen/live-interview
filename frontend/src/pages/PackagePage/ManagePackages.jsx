@@ -45,7 +45,7 @@ const ManagePackages = () => {
             
             {/* Search Bar and Add Button */}
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 items-center mt-2 md:mt-0">
-              <SearchBar value={searchQuery} onChange={setSearchQuery} />
+              <SearchBar value={searchQuery} onChange={setSearchQuery} placeholder="Search Packages..." />
               <Button onClick={openModal} size='lg' icon={<HiViewGridAdd className='text-2xl md:text-3xl text-[#5C7C98]' />} />
             </div>
           </div>
