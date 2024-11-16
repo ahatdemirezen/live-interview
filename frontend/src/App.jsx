@@ -8,7 +8,7 @@ import InterviewList from "./pages/InterviewListPage/InterviewList";
 import ProtectedRoute from './access-control/auth-controller'; // Koruma bileşenini import ediyoruz
 import InterviewVideosPage from "./pages/InterviewVideoCollectionPage/interviewVideos";
 Modal.setAppElement('#root');
-
+//free cmmt
 const App = () => {
   return (
     <Router>
