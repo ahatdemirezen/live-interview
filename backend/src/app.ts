@@ -16,7 +16,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL || "https://live-interview-delta.vercel.app"],
+    origin: [process.env.FRONTEND_URL || "https://live-interview-delta.vercel.app",],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Credentials ile ilgili isteklere izin ver
