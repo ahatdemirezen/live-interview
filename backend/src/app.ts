@@ -16,7 +16,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174'], // Birden fazla frontend URL'sine izin veriyoruz
+    origin: '*' , // Birden fazla frontend URL'sine izin veriyoruz
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Credentials ile ilgili isteklere izin ver
