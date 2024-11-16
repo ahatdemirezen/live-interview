@@ -24,7 +24,7 @@ const InterviewCard = ({ interview }) => {
   const totalVideos = interview.totalForms || 0;
   const pendingVideos = interview.pendingForms || 0;   
   const isExpired = dayjs(interview.expireDate).isBefore(dayjs());
-  const apiUrl = import.meta.env.VITE_WEB_URL;
+  const apiUrl = import.meta.env.VITE_BE_URL2;
 
   useEffect(() => {
     if (accessError) {
