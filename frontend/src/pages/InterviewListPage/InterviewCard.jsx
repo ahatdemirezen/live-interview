@@ -24,6 +24,7 @@ const InterviewCard = ({ interview }) => {
   const totalVideos = interview.totalForms || 0;
   const pendingVideos = interview.pendingForms || 0;   
   const isExpired = dayjs(interview.expireDate).isBefore(dayjs());
+  const apiUrl = import.meta.env.VITE_WEB_URL;
 
   useEffect(() => {
     if (accessError) {
@@ -39,7 +40,7 @@ const InterviewCard = ({ interview }) => {
     if (isExpired) {
       setAccessError(true);
     } else {
-      const interviewLink = `http://localhost:5174/information-form/${interview._id}`;
+      const interviewLink = `${apiUrl}/information-form/${interview._id}`;
       navigator.clipboard.writeText(interviewLink)
         .then(() => {
           alert("Link copied to clipboard!");
