@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import axios from 'axios';
 import axiosInstance from './axiosInstance';
 
 const apiUrl = import.meta.env.VITE_BE_URL; // Backend URL'ini çevresel değişkenden alıyoruz

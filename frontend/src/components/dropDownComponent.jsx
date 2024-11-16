@@ -3,7 +3,7 @@ import React from 'react';
 function DropDown({ packages, currentInterview, loading, handlePackageSelect }) {
   return (
     <div>
-      <label className="block text-sm block text-gray-700 mb-2 font-medium">Package</label>
+      <label className="block text-sm text-gray-700 mb-2 font-medium">Package</label>
       <select
         value=""
         onChange={handlePackageSelect}

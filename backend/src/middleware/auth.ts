@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import * as dotenv from "dotenv";
-import createHttpError from "http-errors";
 // .env dosyasındaki verileri kullanabilmek için dotenv'i başlatıyoruz
 dotenv.config();
 const jwtSecret = process.env.JWT_SECRET;

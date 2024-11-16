@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import axios from 'axios';
 import usePackageStore from '../stores/PackagePageStore'; // Paket Store'u import et
 import axiosInstance from './axiosInstance';
 

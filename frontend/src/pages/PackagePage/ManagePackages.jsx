@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import PackageList from './PackageList';
 import SideBar from '../../components/SideBar';
 import TitleModal from "../CreatePackagePage/TitlePopup";
@@ -13,7 +12,6 @@ const ManagePackages = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const navigate = useNavigate();
   const { packages } = usePackageStore();
 
   const openModal = () => {

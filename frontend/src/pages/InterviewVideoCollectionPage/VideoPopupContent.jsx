@@ -44,7 +44,7 @@ const VideoPopupContent = ({
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Enter note here..."
-              className="bg-gray-50 shadow-lg rounded-lg p-4 w-full h-32 resize-none bg-white border border-[#c3c8cf]"
+              className="shadow-lg rounded-lg p-4 w-full h-32 resize-none bg-white border border-[#c3c8cf]"
             />
            
            {/* Passed ve Failed butonları */}

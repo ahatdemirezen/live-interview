@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import axios from 'axios';
 import axiosInstance from './axiosInstance';
 
 // API URL'sini .env dosyasındaki VITE_BE_URL ile alıyoruz
