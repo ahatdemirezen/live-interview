@@ -1,100 +1,86 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import useInterviewStore from '../stores/InterviewFetchStore'; // Soruları ve ayarları almak için state
-import useMediaStore from '../stores/RecordVideoStore'; // Medya upload fonksiyonu ve fileId
+import useInterviewStore from '../stores/InterviewFetchStore';
+import useMediaStore from '../stores/RecordVideoStore';
 
 const QuestionPanel = ({ formId }) => {
-  const { interviewId } = useParams(); // interviewId URL'den alınır
-  const { questions, getQuestionsByInterview, fetchInterviewSettings, canSkip, showAtOnce } = useInterviewStore(); // Soruları ve ayarları almak için state
-  const { uploadMedia, isLoading, error, fileId, setUserAlert } = useMediaStore(); // Medya upload fonksiyonu, fileId ve alert durumu güncelleme
+  const { interviewId } = useParams();
+  const { questions, getQuestionsByInterview, fetchInterviewSettings, canSkip, showAtOnce } = useInterviewStore();
+  const { uploadMedia, setUserAlert } = useMediaStore();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
-  const [isPreviewing, setIsPreviewing] = useState(false); // Önizleme durumu için state
+  const [isPreviewing, setIsPreviewing] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [videoBlob, setVideoBlob] = useState(null); // Blob verisini tutmak için state
+  const [videoBlob, setVideoBlob] = useState(null);
   const [_, setVideoURL] = useState(null);
   const [stream, setStream] = useState(null);
-  const [timeRemaining, setTimeRemaining] = useState(120); // Başlangıç süresi (2 dakika)
-  const [totalTime, setTotalTime] = useState(0); // Başlangıçta 0, dinamik olarak belirlenecek
+  const [timeRemaining, setTimeRemaining] = useState(120);
+  const [totalTime, setTotalTime] = useState(0);
   const [timerInterval, setTimerInterval] = useState(null);
-  const [showPopup, setShowPopup] = useState(true); // Pop-up gösterme durumu
+  const [showPopup, setShowPopup] = useState(true);
   const [submitButtonVisible, setSubmitButtonVisible] = useState(false);
 
   const videoRef = useRef(null);
-  const previewStreamRef = useRef(null); // Önizleme için stream referansı
+  const previewStreamRef = useRef(null);
   const navigate = useNavigate();
-  const [hasSwitchedTab, setHasSwitchedTab] = useState(false); // Yeni eklenen state
 
   // Sekme değişimini yakalayan ve alert durumunu güncelleyen useEffect
-  // Sekme değişimini yakalayan ve alert durumunu güncelleyen useEffect
-useEffect(() => {
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === 'hidden' && !hasSwitchedTab) {
-      setUserAlert(formId, true); // Alert durumunu true olarak güncelle
-      setHasSwitchedTab(true); // Sekme değiştirildi olarak işaretleyin
-    }
-  };
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        setUserAlert(formId, true);
+      }
+    };
 
-  const handleBlur = () => {
-    if (!hasSwitchedTab) {
-      setUserAlert(formId, true); // Alert durumunu true olarak güncelle
-      setHasSwitchedTab(true); // Sekme değiştirildi olarak işaretleyin
-    }
-  };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [formId, setUserAlert]);
 
-  document.addEventListener('visibilitychange', handleVisibilityChange);
-  window.addEventListener('blur', handleBlur); // Blur olayını dinleyerek klavye sekme değişikliklerini algıla
-
-  return () => {
-    document.removeEventListener('visibilitychange', handleVisibilityChange);
-    window.removeEventListener('blur', handleBlur); // Temizle
-  };
-}, [formId, setUserAlert, hasSwitchedTab]);
-
-  // Soruları çek ve ilk sorunun süresini ayarla
+  // Soruları ve ayarları çekme
   useEffect(() => {
     const fetchQuestionsAndSettings = async () => {
       await getQuestionsByInterview(interviewId);
-      await fetchInterviewSettings(interviewId); // CanSkip ve showAtOnce ayarlarını getir
+      await fetchInterviewSettings(interviewId);
     };
     fetchQuestionsAndSettings();
   }, [interviewId, getQuestionsByInterview, fetchInterviewSettings]);
 
-  // Sorular yüklendiğinde `totalTime`'ı hesapla
+  // Total zamanı hesaplama
   useEffect(() => {
     if (questions.length > 0) {
-      const calculatedTotalTime = questions.reduce((acc, question) => {
-        return acc + (question.timeLimit ? question.timeLimit * 60 : 0);
-      }, 0);
-      setTotalTime(calculatedTotalTime); // `totalTime`'ı güncelle
+      const calculatedTotalTime = questions.reduce(
+        (acc, question) => acc + (question.timeLimit ? question.timeLimit * 60 : 0),
+        0
+      );
+      setTotalTime(calculatedTotalTime);
     }
   }, [questions]);
 
-  // Mevcut sorunun timeLimit süresini ayarla
+  // Mevcut sorunun süresini ayarlama
   useEffect(() => {
     if (questions.length > 0) {
       const currentQuestion = questions[currentQuestionIndex];
       if (currentQuestion.timeLimit) {
-        setTimeRemaining(currentQuestion.timeLimit * 60); // Dakika cinsinden gelen timeLimit'i saniyeye çevir
+        setTimeRemaining(currentQuestion.timeLimit * 60);
       }
     }
   }, [questions, currentQuestionIndex]);
 
-  // Geri sayım başlatma fonksiyonu
+  // Zamanlayıcı başlatma
   const startTimer = () => {
     if (timeRemaining > 0) {
       const interval = setInterval(() => {
         setTimeRemaining((prevTime) => {
           if (prevTime === 1) {
             clearInterval(interval);
-            handleSkip(); // Süre bittiğinde bir sonraki soruya geç
+            handleSkip();
           }
           return prevTime - 1;
         });
-        setTotalTime((prevTotal) => prevTotal - 1); // Total zaman güncelleniyor
+        setTotalTime((prevTotal) => prevTotal - 1);
       }, 1000);
       setTimerInterval(interval);
-      return () => clearInterval(interval); // Bileşen kapandığında temizle
+      return () => clearInterval(interval);
     }
   };
 
@@ -103,17 +89,17 @@ useEffect(() => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       clearInterval(timerInterval);
-      setTimeRemaining(questions[currentQuestionIndex + 1].timeLimit * 60 || 0); // Yeni sorunun timeLimit'ini başlat
+      setTimeRemaining(questions[currentQuestionIndex + 1]?.timeLimit * 60 || 0);
       startTimer();
     }
   };
 
-  // Video kaydını başlatma fonksiyonu
+  // Video kaydını başlatma
   const handleStartRecording = async () => {
     try {
       if (isPreviewing && previewStreamRef.current) {
-        previewStreamRef.current.getTracks().forEach(track => track.stop()); // Önizleme stream'ini durdur
-        setIsPreviewing(false); // Önizleme modunu kapat
+        previewStreamRef.current.getTracks().forEach((track) => track.stop());
+        setIsPreviewing(false);
       }
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       const recorder = new MediaRecorder(stream);
@@ -126,9 +112,9 @@ useEffect(() => {
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           const blob = new Blob([event.data], { type: 'video/webm' });
-          setVideoBlob(blob); // Blob'u state'e kaydet
+          setVideoBlob(blob);
           const videoUrl = URL.createObjectURL(blob);
-          setVideoURL(videoUrl); // Video URL'sini oluştur
+          setVideoURL(videoUrl);
         }
       };
     } catch (error) {
@@ -136,64 +122,64 @@ useEffect(() => {
     }
   };
 
-  // Önizleme fonksiyonu
+  // Önizleme başlatma
   const handlePreview = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
-        audio: false, // Sadece video, ses yok
+        audio: false,
       });
       previewStreamRef.current = stream;
       videoRef.current.srcObject = stream;
       videoRef.current.play();
-      setIsPreviewing(true); // Önizleme durumunu true yap
+      setIsPreviewing(true);
     } catch (error) {
       console.error('Önizleme başlatılamadı:', error);
     }
   };
 
-  // Video kaydını durdurma fonksiyonu
+  // Video kaydını durdurma
   const handleStopRecording = () => {
     if (mediaRecorder) {
       mediaRecorder.stop();
       setIsRecording(false);
-      stream.getTracks().forEach((track) => track.stop()); // Kamera ve mikrofonu kapat
+      stream.getTracks().forEach((track) => track.stop());
       videoRef.current.srcObject = null;
       clearInterval(timerInterval);
-      setSubmitButtonVisible(true); // Submit butonunu görünür yap
+      setSubmitButtonVisible(true);
     }
   };
 
-  // Video upload işlemi
+  // Video yükleme
   const handleSubmit = async () => {
     if (!videoBlob) {
       alert('Lütfen önce bir video kaydedin.');
       return;
     }
-  
-    const fileName = `video_${Date.now()}.webm`; // Dinamik dosya adı
+
+    const fileName = `video_${Date.now()}.webm`;
 
     try {
-      await uploadMedia(videoBlob, formId, fileName); // Videoyu fileName ile yüklüyoruz
-      navigate('/submission-success'); // Başarı sayfasına yönlendir
+      await uploadMedia(videoBlob, formId, fileName);
+      navigate('/submission-success');
     } catch (err) {
       console.error('Video yüklenirken hata oluştu:', err);
       alert('Video yüklenemedi.');
     }
   };
 
-  // Geri kalan zamanı dakika ve saniye olarak göstermek için formatlama fonksiyonu
+  // Zaman formatlama
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = timeInSeconds % 60;
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
   };
 
-  // Pop-up kapatma fonksiyonu
+  // Pop-up kapatma
   const closePopup = () => setShowPopup(false);
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-gradient-to-b from-gray-50 to-gray-100 p-4">
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
           <div className="bg-white p-6 sm:p-9 rounded-lg shadow-2xl max-w-xs sm:max-w-lg w-11/12 sm:w-10/12 text-center">
@@ -212,148 +198,143 @@ useEffect(() => {
       )}
 
       {/* İlerleme Çubuğu */}
-      <div className="relative h-3 bg-gray-300 rounded-lg overflow-hidden shadow-inner">
+      <div className="relative h-3 bg-gray-300 rounded-lg overflow-hidden shadow-inner mb-6">
         <div
           className="h-full bg-green-600 transition-all duration-500 ease-out"
           style={{
             width: isRecording && questions.length > 0
               ? `${((currentQuestionIndex + 1) / questions.length) * 100}%`
-              : '0%'
+              : '0%',
           }}
         />
-        {questions.map((_, index) => (
-          index !== 0 && (
-            <div
-              key={index}
-              className="absolute h-full border-l-2 border-white"
-              style={{ left: `${(index / questions.length) * 100}%` }}
-            />
-          )
-        ))}
       </div>
 
-      <div className="flex h-full p-4 bg-gray-100 rounded-lg shadow-md border-4 border-gray-400">
-        {/* Sol taraf: Video */}
-        <div className="w-1/2 flex items-center justify-center border-r-4 border-gray-300 p-4">
-          <div className="flex justify-center items-center w-full h-full bg-black rounded-lg">
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              autoPlay
-              muted
-            />
-          </div>
+      <div className="flex flex-col lg:flex-row h-full gap-6">
+        {/* Sol: Video */}
+        <div className="flex-1 flex justify-center items-center bg-black rounded-lg shadow-lg p-4">
+          <video
+            ref={videoRef}
+            className="w-full h-full object-cover rounded-lg"
+            autoPlay
+            muted
+          />
         </div>
 
-        {/* Sağ taraf: Zaman ve Soru */}
-        <div className="w-1/2 p-4 flex flex-col justify-between">
-          {questions.length > 0 ? (
-            <>
-              {/* Zaman alanı */}
-              <div className="flex flex-row md:flex-row justify-center md:justify-between items-center px-4 py-2 mb-4 space-x-4">
-                {showAtOnce && (
-                  <div className="flex flex-col items-center">
-                    <div className="bg-[#d0dcea] text-xl font-bold text-gray-900 py-1 px-3 rounded-lg mb-1 shadow-sm">
-                      {formatTime(timeRemaining)}
-                    </div>
-                    <span className="text-md font-semibold text-gray-700 text-center">Question Time</span>
+        {/* Sağ: Sorular ve Zaman */}
+        <div className="flex-1 flex flex-col justify-between bg-white rounded-lg shadow-lg p-6">
+        <div className="flex justify-between items-center mb-6">
+  {/* Eğer toplu gösterim ayarlanmadıysa veya tek tek gösterim seçildiyse bu alan görünsün */}
+     {showAtOnce === true && (
+    <div className="text-center">
+      <div className="bg-gray-100 text-2xl font-bold text-gray-800 py-2 px-4 rounded-lg shadow-sm">
+        {formatTime(timeRemaining)}
+      </div>
+      <span className="text-sm text-gray-600">Question Time</span>
+    </div>
+    )}
+
+   {/* Total Time her zaman görüntülenecek */}
+  <div className="text-center">
+    <div className="bg-gray-100 text-2xl font-bold text-gray-800 py-2 px-4 rounded-lg shadow-sm">
+      {formatTime(totalTime)}
+    </div>
+    <span className="text-sm text-gray-600">Total Time</span>
+   </div>
+   </div>
+
+          <div
+            className={`flex flex-col items-center justify-center space-y-4 overflow-y-auto max-h-[300px] text-center`}
+          >
+            {questions.length > 0 ? (
+              showAtOnce ? (
+                <>
+             <div className="bg-gray-100 p-6 rounded-lg shadow-lg w-full max-w-xl">
+                <h2 className="text-lg font-bold text-gray-800 mb-2">
+                Question {currentQuestionIndex + 1} of {questions.length}
+                </h2>
+                <p className="text-gray-700 break-words overflow-hidden text-ellipsis max-h-32 line-clamp-5">
+                {questions[currentQuestionIndex]?.questionText}
+                </p>
+             </div>
+                  <div className="flex mt-3 space-x-2 justify-center">
+                    {questions.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`h-2 w-8 rounded-full ${
+                          index === currentQuestionIndex ? 'bg-blue-600' : 'bg-gray-300'
+                        }`}
+                      />
+                    ))}
                   </div>
-                )}
-                <div className="flex flex-col items-center">
-                  <div className="bg-[#d0dcea] text-xl font-bold text-gray-900 py-1 px-3 rounded-lg mb-1 shadow-sm">
-                    {formatTime(totalTime)}
-                  </div>
-                  <span className="text-md font-semibold text-gray-700 text-center">Total Time</span>
-                </div>
-              </div>
-              {/* Soru alanı */}
-              <div
-                className={`flex flex-col items-center ${showAtOnce ? "justify-center" : "gap-4"} overflow-y-auto`}
-                style={{ maxHeight: '400px' }}
-              >
-                {showAtOnce ? (
-                  <>
-                    <div className="bg-gray-100 py-10 px-6 md:py-16 md:px-10 rounded-lg shadow-lg w-full max-w-xl text-center">
-                      <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-5 text-gray-800">
-                        Question {currentQuestionIndex + 1} of {questions.length}
-                      </h2>
-                      <p className="text-lg md:text-xl text-gray-700">
-                        {questions[currentQuestionIndex].questionText}
-                      </p>
-                    </div>
-                    <div className="flex mt-3 md:mt-5 space-x-2">
-                      {questions.map((_, index) => (
-                        <div
-                          key={index}
-                          className={`h-2 w-8 rounded-full ${index === currentQuestionIndex ? '' : 'bg-gray-300'}`}
-                          style={{ backgroundColor: index === currentQuestionIndex ? '#0764BB' : 'bg-gray-300' }}
-                        />
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  questions.map((question, index) => (
-                    <div key={index} className="bg-gray-100 py-10 px-6 md:py-16 md:px-10 rounded-lg shadow-lg w-full max-w-xl text-center">
-                      <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-5 text-gray-800">
-                        Question {index + 1} of {questions.length}
-                      </h2>
-                      <p className="text-lg md:text-xl text-gray-700">{question.questionText}</p>
-                    </div>
-                  ))
-                )}
-              </div>
-              {/* Butonlar */}
-              <div className="text-center mt-4 md:mt-auto">
-                {!videoBlob && (
-                  <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-2">
-                    {canSkip && showAtOnce && (
-                      <button
-                        className="bg-gray-500 text-white px-3 py-1 md:px-4 md:py-2 rounded text-sm md:text-base"
-                        onClick={handleSkip}
-                        disabled={isRecording === false}
-                      >
-                        Next
-                      </button>
-                    )}
-                    {!isRecording ? (
-                      <>
-                        <button
-                          className="bg-[#224064] text-white px-3 py-1 md:px-4 md:py-2 rounded text-sm md:text-base"
-                          onClick={handlePreview}
-                          disabled={isPreviewing}
-                        >
-                          Preview
-                        </button>
-                        <button
-                          className="bg-[#224064] text-white px-3 py-1 md:px-4 md:py-2 rounded text-sm md:text-base"
-                          onClick={handleStartRecording}
-                        >
-                          Start Recording
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        className="bg-red-500 text-white px-3 py-1 md:px-4 md:py-2 rounded text-sm md:text-base"
-                        onClick={handleStopRecording}
-                      >
-                        Stop Recording
-                      </button>
-                    )}
-                  </div>
-                )}
-                {submitButtonVisible && (
-                  <button
-                    className="bg-blue-500 text-white px-3 py-1 md:px-4 md:py-2 rounded text-sm md:text-base mt-2 md:mt-0"
-                    onClick={handleSubmit}
+                </>
+              ) : (
+                questions.map((question, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-100 p-6 rounded-lg shadow-lg w-full max-w-xl"
                   >
-                    Submit Video
+                  <h2 className="text-lg font-bold text-gray-800 mb-2">
+                   Question {index + 1} of {questions.length}
+                  </h2>
+
+                 <p className="text-gray-700 break-words overflow-hidden text-ellipsis max-h-32">
+                   {question.questionText}
+                  </p>
+                 </div>
+                ))
+              )
+            ) : (
+              <div>Loading questions...</div>
+            )}
+          </div>
+
+          {/* Butonlar */}
+          <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mt-6 space-y-3 sm:space-y-0 sm:space-x-3">
+            {!videoBlob && (
+              <>
+                {canSkip && showAtOnce && (
+                  <button
+                    className="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600 transition"
+                    onClick={handleSkip}
+                    disabled={!isRecording}
+                  >
+                    Next
                   </button>
                 )}
-              </div>
-            </>
-          ) : (
-            <div>Loading questions...</div>
-          )}
+                {!isRecording ? (
+                  <>
+                    <button
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition"
+                      onClick={handlePreview}
+                    >
+                      Preview
+                    </button>
+                    <button
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-700 transition"
+                      onClick={handleStartRecording}
+                    >
+                      Start Recording
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition"
+                    onClick={handleStopRecording}
+                  >
+                    Stop Recording
+                  </button>
+                )}
+              </>
+            )}
+            {submitButtonVisible && (
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition"
+                onClick={handleSubmit}
+              >
+                Submit Video
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

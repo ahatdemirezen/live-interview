@@ -80,6 +80,11 @@ const CreatePackage = () => {
     }
   };
 
+  const truncateText = (text, maxLength) => {
+    if (!text) return '';
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+  };
+
   return (
     <div className="flex flex-col lg:flex-row bg-gray-100 h-screen">
       <SideBar />
@@ -110,30 +115,43 @@ const CreatePackage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {questions.map((question, index) => (
-                      <Draggable key={question._id || index} draggableId={question._id || `${index}`} index={index}>
-                        {(provided) => (
-                          <tr
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="bg-gray-50 hover:bg-gray-100 p-4 rounded-md"
-                          >
-                            <td className="py-4 px-2">{index + 1}</td>
-                            <td className="py-4 px-2">{question.questionText}</td>
-                            <td className="py-4 px-2">{question.timeLimit} min</td>
-                            <td className="py-4 px-2  text-center align-middle">
-                           <Button onClick={() => handleDeleteQuestion(question._id)} icon={<FaTrash className="text-[#D9534F] hover:text-[#cc0000] " />} />
-                            </td>
-                            <td className="py-4 px-2 text-center align-middle">
-                              <Button onClick={() => handleEditQuestion(question)} icon={<FaEdit className="text-[#ff7f0a] hover:text-[#cc6600] " />}/>
-                            </td>
-                          </tr>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </tbody>
+  {questions.map((question, index) => (
+    <Draggable
+      key={question._id || index}
+      draggableId={question._id || `${index}`}
+      index={index}
+    >
+      {(provided) => (
+        <tr
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className="bg-gray-50 hover:bg-gray-100 p-4 rounded-md"
+        >
+          <td className="py-4 px-2">{index + 1}</td>
+          <td className="py-4 px-2" title={question.questionText}>
+            {truncateText(question.questionText, 50)}
+          </td>
+          <td className="py-4 px-2">{question.timeLimit} min</td>
+          <td className="py-4 px-2 text-center align-middle">
+            <Button
+              onClick={() => handleDeleteQuestion(question._id)}
+              icon={<FaTrash className="text-[#D9534F] hover:text-[#cc0000]" />}
+            />
+          </td>
+          <td className="py-4 px-2 text-center align-middle">
+            <Button
+              onClick={() => handleEditQuestion(question)}
+              icon={<FaEdit className="text-[#ff7f0a] hover:text-[#cc6600]" />}
+            />
+          </td>
+        </tr>
+      )}
+    </Draggable>
+  ))}
+  {provided.placeholder}
+</tbody>
+
                 </table>
               )}
             </Droppable>
