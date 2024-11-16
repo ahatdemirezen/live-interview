@@ -126,7 +126,7 @@ function PersonalInformationForm() {
           <div className="flex items-start">
             <input type="checkbox" name="kvkk" required className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
             <label className="ml-2 block text-sm text-gray-700">
-              I have read and approved the <a href="#" className="text-blue-600 hover:underline">KVKK text</a>.
+              I have read and approved the <a  className="text-blue-600 hover:underline">KVKK text</a>.
             </label>
           </div>
           <button

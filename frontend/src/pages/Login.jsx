@@ -73,7 +73,6 @@ const Login = () => {
               </button>
               <div className="text-right">
                 <a
-                  href="#"
                   className="inline-block align-baseline font-bold text-xs text-red-500 hover:text-red-800"
                 >
                   Şifremi Unuttum
