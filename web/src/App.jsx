@@ -15,7 +15,7 @@ const App = () => {
           <Route path="/information-form/:interviewId" element={<PersonalInformationForm />} />
           <Route path="/interview/:interviewId/:formId" element={<InterviewPage />} /> {/* formId ve interviewId URL'den geliyor */}
           <Route path="/submission-success" element={<SubmissionSuccessPage />} /> {/* formId ve interviewId URL'den geliyor */}
-
+          
         </Routes>
       </div>
     </Router>
