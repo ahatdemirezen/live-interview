@@ -42,7 +42,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 
       // Access token'ı HTTP-Only cookie olarak ekliyoruz
       res.cookie('token', accessToken, {
-        httpOnly: false,
+        httpOnly: true,
         secure: process.env.NODE_ENV == "production" ? true : false,
         maxAge: 2 * 60 * 1000, // 2 dakika
         sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
@@ -50,7 +50,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 
       // Refresh token'ı başka bir HTTP-Only cookie olarak ekliyoruz
       res.cookie('refreshToken', refreshToken, {
-        httpOnly: false,
+        httpOnly: true,
         secure: process.env.NODE_ENV == "production" ? true : false,
         maxAge: 24 * 60 * 60 * 1000, // 1 gün
         sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
@@ -83,7 +83,7 @@ export const refreshAccessToken = async (req: Request, res: Response, next: Next
 
     // Yeni access token'ı HTTP-Only cookie olarak ekliyoruz
     res.cookie('token', newAccessToken, {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV == "production" ? true : false,
       maxAge: 2 * 60 * 1000, // 2 dakika
       sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
@@ -100,12 +100,12 @@ export const logoutUser = async (req: Request, res: Response, next: NextFunction
   try {
     // Access token ve refresh token çerezlerini temizliyoruz
     res.clearCookie('token', {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV == "production" ? true : false,
       sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
     });
     res.clearCookie('refreshToken', {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV == "production" ? true : false,
       sameSite: process.env.NODE_ENV == "production" ? "none" : "lax"
     });
