@@ -45,7 +45,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
         httpOnly: true,
         secure: process.env.NODE_ENV == "production" ? true : false,
         maxAge: 2 * 60 * 1000, // 2 dakika
-        sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
+        sameSite: "none"
       });
 
       // Refresh token'ı başka bir HTTP-Only cookie olarak ekliyoruz
@@ -53,7 +53,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
         httpOnly: true,
         secure: process.env.NODE_ENV == "production" ? true : false,
         maxAge: 24 * 60 * 60 * 1000, // 1 gün
-        sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
+        sameSite: "none"
       });
 
       res.status(200).json({
@@ -86,7 +86,7 @@ export const refreshAccessToken = async (req: Request, res: Response, next: Next
       httpOnly: true,
       secure: process.env.NODE_ENV == "production" ? true : false,
       maxAge: 2 * 60 * 1000, // 2 dakika
-      sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
+      sameSite: "none"
     });
 
     res.status(200).json({ message: "Access token refreshed successfully" });
@@ -102,12 +102,12 @@ export const logoutUser = async (req: Request, res: Response, next: NextFunction
     res.clearCookie('token', {
       httpOnly: true,
       secure: process.env.NODE_ENV == "production" ? true : false,
-      sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
+      sameSite: "none"
     });
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: process.env.NODE_ENV == "production" ? true : false,
-      sameSite: process.env.NODE_ENV == "production" ? "none" : "lax"
+      sameSite: "none"
     });
 
     res.status(200).json({ message: "Logout successful" });
