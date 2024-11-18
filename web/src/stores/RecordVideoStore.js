@@ -7,6 +7,8 @@ const useMediaStore = create((set) => ({
   fileId: null, // fileId'yi yakalamak için state ekliyoruz
   userAlerts: {}, // Kullanıcı uyarı durumları
 
+
+
   // Medya dosyası yükleme fonksiyonu
   uploadMedia: async (mediaFile, formId, fileName) => {  // fileName'i parametre olarak alıyoruz
     set({ isLoading: true, error: null });
@@ -17,10 +19,9 @@ const useMediaStore = create((set) => ({
       formData.append('file', mediaFile, fileName); // Dinamik olarak oluşturulan fileName'i kullanıyoruz
     
       // Backend API URL (formId'yi URL'ye ekliyoruz)
-      const apiUrl = `http://localhost:5002/api/upload/media/${formId}`;
-    
+      const apiUrl = import.meta.env.VITE_BE_URL; // Backend URL
       // POST isteği
-      const response = await axios.post(apiUrl, formData, {
+      const response = await axios.post(`${apiUrl}/upload/media/${formId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
