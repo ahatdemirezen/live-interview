@@ -42,18 +42,18 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 
       // Access token'ı HTTP-Only cookie olarak ekliyoruz
       res.cookie('token', accessToken, {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV == "production" ? true : false,
         maxAge: 2 * 60 * 1000, // 2 dakika
-        sameSite: "none"
+        sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
       });
 
       // Refresh token'ı başka bir HTTP-Only cookie olarak ekliyoruz
       res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV == "production" ? true : false,
         maxAge: 24 * 60 * 60 * 1000, // 1 gün
-        sameSite: "none"
+        sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
       });
 
       res.status(200).json({
@@ -83,10 +83,10 @@ export const refreshAccessToken = async (req: Request, res: Response, next: Next
 
     // Yeni access token'ı HTTP-Only cookie olarak ekliyoruz
     res.cookie('token', newAccessToken, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV == "production" ? true : false,
       maxAge: 2 * 60 * 1000, // 2 dakika
-      sameSite: "none"
+      sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
     });
 
     res.status(200).json({ message: "Access token refreshed successfully" });
@@ -100,14 +100,14 @@ export const logoutUser = async (req: Request, res: Response, next: NextFunction
   try {
     // Access token ve refresh token çerezlerini temizliyoruz
     res.clearCookie('token', {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV == "production" ? true : false,
-      sameSite: "none"
+      sameSite: process.env.NODE_ENV == "production" ? "none" : "lax",
     });
     res.clearCookie('refreshToken', {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV == "production" ? true : false,
-      sameSite: "none"
+      sameSite: process.env.NODE_ENV == "production" ? "none" : "lax"
     });
 
     res.status(200).json({ message: "Logout successful" });
