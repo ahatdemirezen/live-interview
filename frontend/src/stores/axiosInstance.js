@@ -1,7 +1,7 @@
 // axiosInstance.js veya axiosConfig.js
 
 import axios from 'axios';
-import { useAuthStore } from '../stores/LoginStore';
+import { useAuthStore } from './LoginStore';
 
 const apiUrl = import.meta.env.VITE_BE_URL; // Base URL'niz varsa buraya ekleyin
 
@@ -19,7 +19,7 @@ axiosInstance.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-
+//free commit
     // Eğer 401 döndüyse ve bu istek bir refresh değilse
     if (error.response?.status === 401 && !originalRequest._retry) {
       const authStore = useAuthStore.getState();

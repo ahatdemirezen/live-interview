@@ -18,7 +18,7 @@ const useCandidateStore = create((set) => ({
     set((state) => ({
       candidateForm: { ...state.candidateForm, ...formData },
     })),
-
+//free commit
   // Aday formunu submit eden fonksiyon (POST request)
   submitCandidateForm: async (interviewId) => {
     try {
