@@ -7,7 +7,7 @@ export const useAuthStore = create((set) => ({
   token: null,
   isAuthenticated: localStorage.getItem("auth") === "true",
   error: null,
-//freecommit
+//trycommit
   login: async (email, password) => {
     try {
       const response = await axios.post(`${apiUrl}/login`, { email, password }, { withCredentials: true });
